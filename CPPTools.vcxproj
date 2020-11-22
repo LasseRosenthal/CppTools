@@ -159,6 +159,7 @@
     <ClInclude Include="include\Benchmark\StopWatch.h" />
     <ClInclude Include="include\Benchmark\Utility.h" />
     <ClInclude Include="include\Benchmark\WinHighResClock.h" />
+    <ClInclude Include="include\Meta\Algorithms.h" />
     <ClInclude Include="include\Meta\CompileTimeArithmetic.h" />
     <ClInclude Include="include\Meta\RatioUtils.h" />
     <ClInclude Include="include\Meta\Typelist.h" />

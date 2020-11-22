@@ -60,7 +60,7 @@ public:
 
 /** 
  * @struct ConversionFactorT
- * @brief  Version for dimension with at least rational exponent.
+ * @brief  Version for dimension with at least one rational exponent.
  */
 template <typename UnitSystemTo, typename UnitSystemFrom>
 class ConversionFactorT<UnitSystemTo, UnitSystemFrom, RequiresSameDimension<UnitSystemTo, UnitSystemFrom>,

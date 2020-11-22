@@ -46,6 +46,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
+    <ClInclude Include="src\include\AlgorithmsTest.h" />
     <ClInclude Include="src\include\BaseDimensionTagTest.h" />
     <ClInclude Include="src\include\BenchmarkTest.h" />
     <ClInclude Include="src\include\BitFieldTest.h" />

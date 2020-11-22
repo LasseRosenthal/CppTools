@@ -156,6 +156,9 @@
     <ClInclude Include="include\Unit\detail\UnitSystemConversion.h">
       <Filter>Header Files\Unit\detail</Filter>
     </ClInclude>
+    <ClInclude Include="include\Meta\Algorithms.h">
+      <Filter>Header Files\Meta</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\WinHighResClock.cpp">

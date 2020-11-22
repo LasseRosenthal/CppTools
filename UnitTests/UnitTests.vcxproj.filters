@@ -87,6 +87,9 @@
     <ClInclude Include="src\include\UnitSystemTest.h">
       <Filter>Header Files\Unit</Filter>
     </ClInclude>
+    <ClInclude Include="src\include\AlgorithmsTest.h">
+      <Filter>Header Files\Meta</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">

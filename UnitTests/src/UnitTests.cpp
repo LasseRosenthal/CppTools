@@ -24,3 +24,4 @@
 #include "BaseDimensionTagTest.h"
 #include "DimensionTest.h"
 #include "UnitSystemTest.h"
+#include "AlgorithmsTest.h"
