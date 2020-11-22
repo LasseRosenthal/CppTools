@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Meta">
+      <UniqueIdentifier>{bb54f384-8efc-447e-a85f-b1af66f0e146}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utils">
+      <UniqueIdentifier>{e407c0ec-ca53-463a-8e65-c246637a8a2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Benchmark">
+      <UniqueIdentifier>{5e324355-bf27-47e5-bd1f-1ede67f4b06b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Benchmark">
+      <UniqueIdentifier>{93a562a2-4073-4e54-9c7f-ff76afd967dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MultiIndexVector">
+      <UniqueIdentifier>{b805953a-1e73-485e-948b-bb8ae22527c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\TransformationMatrix">
+      <UniqueIdentifier>{808b51a4-95b9-449d-b410-82f9bf2fa005}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ArbeitsCode">
+      <UniqueIdentifier>{85948b72-97d0-40a6-914f-e62101a9f5de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ArbeitsCode">
+      <UniqueIdentifier>{f1da69c1-86d2-416b-ab83-83b3ffc16b64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Unit">
+      <UniqueIdentifier>{51909ff7-29fc-4bf5-967c-ca5f71d95bb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Unit\detail">
+      <UniqueIdentifier>{9bdbb979-5064-4884-80c9-f2bf504dcf32}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".clang-format" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Meta\Utility.h">
+      <Filter>Header Files\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Utils\miscellaneous.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Utils\BitField.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Meta\Typelist.h">
+      <Filter>Header Files\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Meta\Valuelist.h">
+      <Filter>Header Files\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Utils\EnumRange.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Utils\ZipIterator.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Utils\MultiTypeMap.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Utils\LambdaOverload.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Benchmark\DurationTypes.h">
+      <Filter>Header Files\Benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Benchmark\StopWatch.h">
+      <Filter>Header Files\Benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Benchmark\Utility.h">
+      <Filter>Header Files\Benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Benchmark\WinHighResClock.h">
+      <Filter>Header Files\Benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MultiIndexVector\StorageOrdering.h">
+      <Filter>Header Files\MultiIndexVector</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MultiIndexVector\AdressCalculator.h">
+      <Filter>Header Files\MultiIndexVector</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MultiIndexVector\ArrayOperations.h">
+      <Filter>Header Files\MultiIndexVector</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MultiIndexVector\IteratorRange.h">
+      <Filter>Header Files\MultiIndexVector</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MultiIndexVector\MultiArrayAccessor.h">
+      <Filter>Header Files\MultiIndexVector</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MultiIndexVector\MultiIndexArray.h">
+      <Filter>Header Files\MultiIndexVector</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MultiIndexVector\MultiIndexVector.h">
+      <Filter>Header Files\MultiIndexVector</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MultiIndexVector\StackMatrix.h">
+      <Filter>Header Files\MultiIndexVector</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MultiIndexVector\StackVector.h">
+      <Filter>Header Files\MultiIndexVector</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MultiIndexVector\VectorMatrixAlgebra.h">
+      <Filter>Header Files\MultiIndexVector</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TransformationMatrix\CTM.h">
+      <Filter>Header Files\TransformationMatrix</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Utils\StringUtils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ArbeitsCode\ImpoSurfaceSheetRelation.h">
+      <Filter>Header Files\ArbeitsCode</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Unit\BaseDimensions.h">
+      <Filter>Header Files\Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Unit\BaseDimensionTag.h">
+      <Filter>Header Files\Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Unit\Dimension.h">
+      <Filter>Header Files\Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Meta\CompileTimeArithmetic.h">
+      <Filter>Header Files\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Meta\RatioUtils.h">
+      <Filter>Header Files\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="StringUtilsVorlage.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Unit\UnitSystem.h">
+      <Filter>Header Files\Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Unit\UnitSystemGenerator.h">
+      <Filter>Header Files\Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Unit\detail\Arithmetic.h">
+      <Filter>Header Files\Unit\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Unit\detail\UnitSystemConversion.h">
+      <Filter>Header Files\Unit\detail</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\WinHighResClock.cpp">
+      <Filter>Source Files\Benchmark</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ImpoSurfaceSheetRelation.cpp">
+      <Filter>Source Files\ArbeitsCode</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

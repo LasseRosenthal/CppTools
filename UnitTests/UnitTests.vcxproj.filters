@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\UnitTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\include\UtilityTest.h">
+      <Filter>Header Files\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\TestMiscellaneous.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\BitFieldTest.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\TypelistTest.h">
+      <Filter>Header Files\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\ValuelistTest.h">
+      <Filter>Header Files\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\EnumRangeTest.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\ZipIteratorTest.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\MultiTypeMapTest.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\BenchmarkTest.h">
+      <Filter>Header Files\Benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\TestAdressCalculator.h">
+      <Filter>Header Files\MultiIndexVector</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\StackMatrixTest.h">
+      <Filter>Header Files\MultiIndexVector</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\StackVectorTest.h">
+      <Filter>Header Files\MultiIndexVector</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\TestMultiArrayAccessor.h">
+      <Filter>Header Files\MultiIndexVector</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\DummyClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\TestMultiIndexArray.h">
+      <Filter>Header Files\MultiIndexVector</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\TestMultiIndexVector.h">
+      <Filter>Header Files\MultiIndexVector</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\TestVectorMatrixAlgebra.h">
+      <Filter>Header Files\MultiIndexVector</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\TestCTM.h">
+      <Filter>Header Files\TransformationMatrix</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\StringUtilsTest.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\ImpoSurfaceSheetRelationTest.h">
+      <Filter>Header Files\ArbeitsCode</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\BaseDimensionTagTest.h">
+      <Filter>Header Files\Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\DimensionTest.h">
+      <Filter>Header Files\Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\CompileTimeArithmeticTest.h">
+      <Filter>Header Files\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\RatioUtilsTest.h">
+      <Filter>Header Files\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\UnitSystemTest.h">
+      <Filter>Header Files\Unit</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{01ff519a-994c-4977-8980-bb7a8065ef63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Meta">
+      <UniqueIdentifier>{e03e618e-9390-4a76-9e36-0e95211e2089}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utils">
+      <UniqueIdentifier>{a2719049-4d03-4266-9150-b2dcfc67628c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{f2cd5fd0-6d85-4f7b-bb90-a452034294ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Benchmark">
+      <UniqueIdentifier>{225e6305-6c95-4c08-924e-c9870695f7e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MultiIndexVector">
+      <UniqueIdentifier>{7a295da8-b998-48c1-80fe-7bab761f627d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\TransformationMatrix">
+      <UniqueIdentifier>{faae7cf1-9735-4156-a60b-0df574a03e22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ArbeitsCode">
+      <UniqueIdentifier>{496594b8-1b1f-4ba9-9703-f643e87c2bef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Unit">
+      <UniqueIdentifier>{5771bd21-cc3f-42de-8791-34ed71a863c3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+</Project>

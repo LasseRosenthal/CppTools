@@ -1,0 +1,96 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30611.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CPPTools", "CPPTools.vcxproj", "{0D62C302-AA2E-48FD-A0E0-5203C65F2096}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTests", "UnitTests\UnitTests.vcxproj", "{87947DAC-2D59-444E-B143-C95C17FF00D3}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Benchmarks", "Benchmarks\Benchmarks.vcxproj", "{5449A7C8-D600-4107-89E7-3B43FFDCA487}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GoogleBenchmark", "GoogleBenchmark", "{45A12380-AA98-4E1D-950E-499AD3319D2F}"
+	ProjectSection(SolutionItems) = preProject
+		D:\Programs\benchmark\src\arraysize.h = D:\Programs\benchmark\src\arraysize.h
+		D:\Programs\benchmark\src\benchmark.cc = D:\Programs\benchmark\src\benchmark.cc
+		D:\Programs\benchmark\include\benchmark\benchmark.h = D:\Programs\benchmark\include\benchmark\benchmark.h
+		D:\Programs\benchmark\src\benchmark_api_internal.cc = D:\Programs\benchmark\src\benchmark_api_internal.cc
+		D:\Programs\benchmark\src\benchmark_api_internal.h = D:\Programs\benchmark\src\benchmark_api_internal.h
+		D:\Programs\benchmark\src\benchmark_main.cc = D:\Programs\benchmark\src\benchmark_main.cc
+		D:\Programs\benchmark\src\benchmark_name.cc = D:\Programs\benchmark\src\benchmark_name.cc
+		D:\Programs\benchmark\src\benchmark_register.cc = D:\Programs\benchmark\src\benchmark_register.cc
+		D:\Programs\benchmark\src\benchmark_register.h = D:\Programs\benchmark\src\benchmark_register.h
+		D:\Programs\benchmark\src\benchmark_runner.cc = D:\Programs\benchmark\src\benchmark_runner.cc
+		D:\Programs\benchmark\src\benchmark_runner.h = D:\Programs\benchmark\src\benchmark_runner.h
+		D:\Programs\benchmark\src\check.h = D:\Programs\benchmark\src\check.h
+		D:\Programs\benchmark\src\CMakeLists.txt = D:\Programs\benchmark\src\CMakeLists.txt
+		D:\Programs\benchmark\src\colorprint.cc = D:\Programs\benchmark\src\colorprint.cc
+		D:\Programs\benchmark\src\colorprint.h = D:\Programs\benchmark\src\colorprint.h
+		D:\Programs\benchmark\src\commandlineflags.cc = D:\Programs\benchmark\src\commandlineflags.cc
+		D:\Programs\benchmark\src\commandlineflags.h = D:\Programs\benchmark\src\commandlineflags.h
+		D:\Programs\benchmark\src\complexity.cc = D:\Programs\benchmark\src\complexity.cc
+		D:\Programs\benchmark\src\complexity.h = D:\Programs\benchmark\src\complexity.h
+		D:\Programs\benchmark\src\console_reporter.cc = D:\Programs\benchmark\src\console_reporter.cc
+		D:\Programs\benchmark\src\counter.cc = D:\Programs\benchmark\src\counter.cc
+		D:\Programs\benchmark\src\counter.h = D:\Programs\benchmark\src\counter.h
+		D:\Programs\benchmark\src\csv_reporter.cc = D:\Programs\benchmark\src\csv_reporter.cc
+		D:\Programs\benchmark\src\cycleclock.h = D:\Programs\benchmark\src\cycleclock.h
+		D:\Programs\benchmark\src\internal_macros.h = D:\Programs\benchmark\src\internal_macros.h
+		D:\Programs\benchmark\src\json_reporter.cc = D:\Programs\benchmark\src\json_reporter.cc
+		D:\Programs\benchmark\src\log.h = D:\Programs\benchmark\src\log.h
+		D:\Programs\benchmark\src\mutex.h = D:\Programs\benchmark\src\mutex.h
+		D:\Programs\benchmark\src\re.h = D:\Programs\benchmark\src\re.h
+		D:\Programs\benchmark\src\reporter.cc = D:\Programs\benchmark\src\reporter.cc
+		D:\Programs\benchmark\src\sleep.cc = D:\Programs\benchmark\src\sleep.cc
+		D:\Programs\benchmark\src\sleep.h = D:\Programs\benchmark\src\sleep.h
+		D:\Programs\benchmark\src\statistics.cc = D:\Programs\benchmark\src\statistics.cc
+		D:\Programs\benchmark\src\statistics.h = D:\Programs\benchmark\src\statistics.h
+		D:\Programs\benchmark\src\string_util.cc = D:\Programs\benchmark\src\string_util.cc
+		D:\Programs\benchmark\src\string_util.h = D:\Programs\benchmark\src\string_util.h
+		D:\Programs\benchmark\src\sysinfo.cc = D:\Programs\benchmark\src\sysinfo.cc
+		D:\Programs\benchmark\src\thread_manager.h = D:\Programs\benchmark\src\thread_manager.h
+		D:\Programs\benchmark\src\thread_timer.h = D:\Programs\benchmark\src\thread_timer.h
+		D:\Programs\benchmark\src\timers.cc = D:\Programs\benchmark\src\timers.cc
+		D:\Programs\benchmark\src\timers.h = D:\Programs\benchmark\src\timers.h
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0D62C302-AA2E-48FD-A0E0-5203C65F2096}.Debug|x64.ActiveCfg = Debug|x64
+		{0D62C302-AA2E-48FD-A0E0-5203C65F2096}.Debug|x64.Build.0 = Debug|x64
+		{0D62C302-AA2E-48FD-A0E0-5203C65F2096}.Debug|x86.ActiveCfg = Debug|Win32
+		{0D62C302-AA2E-48FD-A0E0-5203C65F2096}.Debug|x86.Build.0 = Debug|Win32
+		{0D62C302-AA2E-48FD-A0E0-5203C65F2096}.Release|x64.ActiveCfg = Release|x64
+		{0D62C302-AA2E-48FD-A0E0-5203C65F2096}.Release|x64.Build.0 = Release|x64
+		{0D62C302-AA2E-48FD-A0E0-5203C65F2096}.Release|x86.ActiveCfg = Release|Win32
+		{0D62C302-AA2E-48FD-A0E0-5203C65F2096}.Release|x86.Build.0 = Release|Win32
+		{87947DAC-2D59-444E-B143-C95C17FF00D3}.Debug|x64.ActiveCfg = Debug|x64
+		{87947DAC-2D59-444E-B143-C95C17FF00D3}.Debug|x64.Build.0 = Debug|x64
+		{87947DAC-2D59-444E-B143-C95C17FF00D3}.Debug|x86.ActiveCfg = Debug|Win32
+		{87947DAC-2D59-444E-B143-C95C17FF00D3}.Debug|x86.Build.0 = Debug|Win32
+		{87947DAC-2D59-444E-B143-C95C17FF00D3}.Release|x64.ActiveCfg = Release|x64
+		{87947DAC-2D59-444E-B143-C95C17FF00D3}.Release|x64.Build.0 = Release|x64
+		{87947DAC-2D59-444E-B143-C95C17FF00D3}.Release|x86.ActiveCfg = Release|Win32
+		{87947DAC-2D59-444E-B143-C95C17FF00D3}.Release|x86.Build.0 = Release|Win32
+		{5449A7C8-D600-4107-89E7-3B43FFDCA487}.Debug|x64.ActiveCfg = Debug|x64
+		{5449A7C8-D600-4107-89E7-3B43FFDCA487}.Debug|x64.Build.0 = Debug|x64
+		{5449A7C8-D600-4107-89E7-3B43FFDCA487}.Debug|x86.ActiveCfg = Debug|Win32
+		{5449A7C8-D600-4107-89E7-3B43FFDCA487}.Debug|x86.Build.0 = Debug|Win32
+		{5449A7C8-D600-4107-89E7-3B43FFDCA487}.Release|x64.ActiveCfg = Release|x64
+		{5449A7C8-D600-4107-89E7-3B43FFDCA487}.Release|x64.Build.0 = Release|x64
+		{5449A7C8-D600-4107-89E7-3B43FFDCA487}.Release|x86.ActiveCfg = Release|Win32
+		{5449A7C8-D600-4107-89E7-3B43FFDCA487}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {47D9F69C-2ACD-424E-A78E-83591A28E812}
+	EndGlobalSection
+EndGlobal
