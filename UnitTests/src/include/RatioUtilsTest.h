@@ -22,6 +22,13 @@
 using namespace meta;
 
 
+TEST(RatioUtils, AsDecimalT)
+{
+  constexpr double expected = 17.0 / 7.0;
+  constexpr auto dec = AsDecimal<std::ratio<17, 7>>;
+  EXPECT_EQ(dec, expected);
+}
+
 TEST(RatioUtils, IsIntegralRatioExpectTrue)
 {
   EXPECT_TRUE((IsIntegralRatio<std::ratio<14, 7>>));

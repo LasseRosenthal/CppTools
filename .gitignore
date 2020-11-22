@@ -4,3 +4,4 @@ Debug
 packages
 Release
 StringUtilsVorlage.h
+*.code-workspace

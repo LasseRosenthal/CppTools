@@ -27,6 +27,16 @@ namespace meta {
 
 
 /** 
+ * @struct AsDecimalT
+ * @brief  AsDecimalT converts a ratio into a decimal representation. 
+ */
+template <typename Ratio, typename T = double>
+struct AsDecimalT : std::integral_constant<T, static_cast<T>(Ratio::num) / static_cast<T>(Ratio::den)> {};
+
+template <typename Ratio, typename T = double>
+constexpr auto AsDecimal = AsDecimalT<Ratio, T>::value;
+
+/** 
  * @struct IsIntegralRatio
  * @brief  IsIntegralRatio checks if a given Ratio is integral, i.e. 
  *         a rational number, where the nominator and the denominator
