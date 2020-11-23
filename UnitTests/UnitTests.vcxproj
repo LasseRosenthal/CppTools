@@ -39,10 +39,10 @@
     <IncludePath>D:\Programs\boost_1_74_0;$(ProjectDir)src\include;$(ProjectDir)..\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>D:\Programs\boost_1_74_0;$(ProjectDir)src\include;$(ProjectDir)..\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\lasse\Documents\Programme\boost_1_74_0;D:\Programs\boost_1_74_0;$(ProjectDir)src\include;$(ProjectDir)..\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>D:\Programs\boost_1_74_0;$(ProjectDir)src\include;$(ProjectDir)..\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\lasse\Documents\Programme\boost_1_74_0;D:\Programs\boost_1_74_0;$(ProjectDir)src\include;$(ProjectDir)..\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />

@@ -546,17 +546,17 @@ struct CallWrapper {
  *         number of Typelists and stores the results in a std::array.
  * @tparam VarTypeFun a variadic metafunction that maps its template parameters to a value.
  */
+template <typename CallWrapperT, typename RetType, std::size_t... Is>
+constexpr auto TransformInvoke(std::index_sequence<Is...>) noexcept -> RetType
+{
+  return {CallWrapperT::template value<Is>...};
+}
+
 template <template <typename...> class VarTypeFun, typename... Lists>
 constexpr auto TransformInvoke() noexcept
 {
   using RetType = std::array<typename VarTypeFun<Front<Lists>...>::value_type, Size<meta::FirstTypeOf<Lists...>>>;
   return TransformInvoke<CallWrapper<VarTypeFun, Lists...>, RetType>(std::make_index_sequence<Size<meta::FirstTypeOf<Lists...>>>());
-}
-
-template <typename CallWrapperT, typename RetType, std::size_t... Is>
-constexpr auto TransformInvoke(std::index_sequence<Is...>) noexcept -> RetType
-{
-  return {CallWrapperT::template value<Is>...};
 }
 
 

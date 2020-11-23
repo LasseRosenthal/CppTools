@@ -82,13 +82,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>D:\Programs\boost_1_74_0\boost;D:\Programs\boost_1_74_0;$(SolutionDir)\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Programs\boost_1_74_0\stage\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\lasse\Documents\Programme\boost_1_74_0\boost;C:\Users\lasse\Documents\Programme\boost_1_74_0;D:\Programs\boost_1_74_0\boost;D:\Programs\boost_1_74_0;$(SolutionDir)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\lasse\Documents\Programme\boost_1_74_0\stage\lib;D:\Programs\boost_1_74_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>D:\Programs\boost_1_74_0\boost;D:\Programs\boost_1_74_0;$(SolutionDir)\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Programs\boost_1_74_0\stage\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\lasse\Documents\Programme\boost_1_74_0\stage\lib;D:\Programs\boost_1_74_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

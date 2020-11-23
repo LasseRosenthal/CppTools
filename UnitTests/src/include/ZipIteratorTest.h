@@ -87,7 +87,7 @@ TEST_F(ZipIteratorTest, DereferenceAndModify)
 {
   zipIterator zipIt(intVec.begin(), strList.begin());
 
-  auto& [val, str] = *zipIt;
+  auto [val, str] = *zipIt;
   val = 11;
   str = "Elf"s;
 
@@ -112,7 +112,7 @@ TEST_F(ZipIteratorTest, DereferenceAfterIncrementAndModification)
   zipIterator zipIt(intVec.begin(), strList.begin());
 
   ++zipIt;
-  auto& [intVal, str] = *zipIt;
+  auto [intVal, str] = *zipIt;
   intVal = 14;
   str = "Vierzehn"s;
 
@@ -174,14 +174,15 @@ TEST_F(ZipIteratorTest, ZipperLoop)
   EXPECT_TRUE((nums == intVec && strs == expectedStrings));
 }
 
+template <typename Tuple, std::size_t... Is>
+auto multValues(Tuple const& tup, std::index_sequence<Is...>)
+{
+  return (... * std::get<Is>(tup));
+}
+
 template <typename Tuple>
 auto multValues(Tuple const& tup) {
   return multValues(tup, std::make_index_sequence<std::tuple_size_v<Tuple>>{});
-}
-
-template <typename Tuple, std::size_t... Is>
-auto multValues(Tuple const& tup, std::index_sequence<Is...>) {
-  return (... * std::get<Is>(tup));
 }
 
 TEST_F(ZipIteratorTest, DotProduct)

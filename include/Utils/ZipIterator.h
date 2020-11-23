@@ -19,6 +19,8 @@
  
  
 // includes
+#include <Meta/Utility.h>
+
 #include <tuple>
 #include <type_traits>
 
@@ -286,25 +288,25 @@ private:
   // ---------------------------------------------------
   // ZipIteratorGenerator is used to construct a tuple type that holds iterators.
   template <bool IsConst, std::size_t...>
-  struct ZipIteratorGenerator;
-
-  template <bool IsConst, std::size_t I, std::size_t... Is>
-  struct ZipIteratorGenerator<IsConst, I, Is...> {
-    using type = typename ZipIteratorGenerator<IsConst, I - 1, I - 1, Is...>::type;
-  };
+  struct ZipIteratorGeneratorT;
 
   template <bool IsConst, std::size_t... Is>
-  struct ZipIteratorGenerator<IsConst, 0, Is...>
-  {
-    using type = ZipIterator<std::conditional_t<IsConst, constIteratorType<Is>, iteratorType<Is>>...>;
-  };
+  using ZipIteratorGenerator = typename ZipIteratorGeneratorT<IsConst, Is...>::type;
+
+  template <bool IsConst, std::size_t I, std::size_t... Is>
+  struct ZipIteratorGeneratorT<IsConst, I, Is...>
+    : meta::IdentityT<ZipIteratorGenerator<IsConst, I - 1, I - 1, Is...>> {};
+
+  template <bool IsConst, std::size_t... Is>
+  struct ZipIteratorGeneratorT<IsConst, 0, Is...> 
+    : meta::IdentityT <ZipIterator<std::conditional_t<IsConst, constIteratorType<Is>, iteratorType<Is>>...>> {};
 
 public:
 
   // ---------------------------------------------------
   // the iterator type
-  using iterator       = typename ZipIteratorGenerator<false, sizeof...(Ts)>::type;
-  using const_iterator = typename ZipIteratorGenerator<true, sizeof...(Ts)>::type;
+  using iterator       = ZipIteratorGenerator<false, sizeof...(Ts)>;
+  using const_iterator = ZipIteratorGenerator<true, sizeof...(Ts)>;
   
   // ---------------------------------------------------
   // construction, destruction & assignment
