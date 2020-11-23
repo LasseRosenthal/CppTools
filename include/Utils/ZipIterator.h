@@ -66,18 +66,17 @@ private:
   // ReferenceSequenceGen<N>::type = ReferenceSequenceGen<N-1, N-1>::type = ReferenceSequenceGen <N-2, N-2, N-1>::type
   // = ... = ReferenceSequenceGen<0, 0, 1, ..., N-1>::type
   template <std::size_t...>
-  struct ReferenceSequenceGen;
-
-  template <std::size_t I, std::size_t... Is>
-  struct ReferenceSequenceGen<I, Is...> {
-    using type = typename ReferenceSequenceGen<I - 1, I - 1, Is...>::type;
-  };
+  struct ReferenceSequenceGenT;
 
   template <std::size_t... Is>
-  struct ReferenceSequenceGen<0, Is...>
-  {
-    using type = std::tuple<referenceT<Is>...>;
-  };
+  using ReferenceSequenceGen = typename ReferenceSequenceGenT<Is...>::type;
+
+  template <std::size_t I, std::size_t... Is>
+  struct ReferenceSequenceGenT<I, Is...>
+    : meta::IdentityT<ReferenceSequenceGen<I - 1, I - 1, Is...>> {};
+
+  template <std::size_t... Is>
+  struct ReferenceSequenceGenT<0, Is...> : meta::IdentityT<std::tuple<referenceT<Is>...>> {};
 
   using extentIndexSequence = std::make_index_sequence<extent>;
 
@@ -86,7 +85,7 @@ public:
   // ---------------------------------------------------
   // iterator tags
   using iterator_category = std::forward_iterator_tag;
-  using value_type        = typename ReferenceSequenceGen<extent>::type;
+  using value_type        = ReferenceSequenceGen<extent>;
   using difference_type   = std::ptrdiff_t;
   using pointer           = value_type*;
   using reference         = value_type&;
