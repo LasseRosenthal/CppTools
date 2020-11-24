@@ -21,9 +21,8 @@
 #include <sstream>
 #include <string>
 #include <vector>
-//#include <boost/algorithm/string.hpp>
-#include <C:\Users\lasse\Documents\Programme\boost_1_74_0\boost\algorithm\string.hpp>
-//#include <D:/Programs/boost_1_74_0/boost/algorithm/string.hpp>
+#include <boost/algorithm/string.hpp>
+
 
 namespace stringUtils {
 

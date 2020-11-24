@@ -114,18 +114,14 @@ using Negative = typename NegativeT<Ratio>::type;
  * @struct RatioPowerT
  * @brief  RatioPowerT computes the rational power of a given fraction.
  */
-template <typename RatioBase, typename RatioExp>
+template <typename RatioBase, typename RatioExp, typename T = double>
 struct RatioPowerT {
-  using value_type = double;
-  static constexpr value_type RatioBaseVal = static_cast<value_type>(RatioBase::num) / RatioBase::den;
-  static constexpr value_type value = NthRoot<RatioExp::den>(Power<RatioExp::num>(RatioBaseVal));
-
-//  static constexpr value_type value = NthRoot<RatioExp::den>(Power<RatioExp::num, value_type>(RatioBase::num)) / 
-//                                      NthRoot<RatioExp::den>(Power<RatioExp::num, value_type>(RatioBase::den));
+  using value_type = T;
+  static constexpr value_type value = NthRoot<RatioExp::den>(Power<RatioExp::num>(AsDecimal<RatioBase, value_type>));
 };
 
-template <typename RatioBase, typename RatioExp>
-constexpr auto RatioPower = RatioPowerT<RatioBase, RatioExp>::value;
+template <typename RatioBase, typename RatioExp, typename T = double>
+constexpr auto RatioPower = RatioPowerT<RatioBase, RatioExp, T>::value;
 
 
 }   // namespace meta
