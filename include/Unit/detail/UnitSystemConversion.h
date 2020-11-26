@@ -76,15 +76,14 @@ class ConversionFactorT<UnitSystemTo, UnitSystemFrom, RequiresSameDimension<Unit
   using scaling      = std::ratio_divide<ScalingOf<UnitSystemFrom>, ScalingOf<UnitSystemTo>>;
 
   static constexpr auto fractionToExponentList =
-    meta::typelist::TransformTypeListBinary<fractionList,
-                                            dimension::ExponentsOf<DimensionOf<UnitSystemTo>>,
-                                            PeriodToRationalExponentialT>();
+    meta::typelist::TransformInvoke<fractionList, dimension::ExponentsOf<DimensionOf<UnitSystemTo>>,
+                                    PeriodToRationalExponentialT>();
 
 public:
 
-
+  static constexpr double value = (static_cast<double>(scaling::num) * meta::accumulate(fractionToExponentList, [](auto& a, auto b) { a *= b; }, 1.0)) /
+                                   scaling::denum;
 };
-
 
 
 }   // namespace unit

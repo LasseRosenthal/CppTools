@@ -90,6 +90,9 @@
     <ClInclude Include="src\include\AlgorithmsTest.h">
       <Filter>Header Files\Meta</Filter>
     </ClInclude>
+    <ClInclude Include="src\include\UnitTest.h">
+      <Filter>Header Files\Unit</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">

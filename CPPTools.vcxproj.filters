@@ -159,6 +159,9 @@
     <ClInclude Include="include\Meta\Algorithms.h">
       <Filter>Header Files\Meta</Filter>
     </ClInclude>
+    <ClInclude Include="include\Unit\Unit.h">
+      <Filter>Header Files\Unit</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\WinHighResClock.cpp">

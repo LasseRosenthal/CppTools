@@ -69,6 +69,7 @@
     <ClInclude Include="src\include\TestVectorMatrixAlgebra.h" />
     <ClInclude Include="src\include\TypelistTest.h" />
     <ClInclude Include="src\include\UnitSystemTest.h" />
+    <ClInclude Include="src\include\UnitTest.h" />
     <ClInclude Include="src\include\UtilityTest.h" />
     <ClInclude Include="src\include\ValuelistTest.h" />
     <ClInclude Include="src\include\ZipIteratorTest.h" />

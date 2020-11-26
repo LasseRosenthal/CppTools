@@ -25,3 +25,4 @@
 #include "DimensionTest.h"
 #include "UnitSystemTest.h"
 #include "AlgorithmsTest.h"
+#include "UnitTest.h"

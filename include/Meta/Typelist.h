@@ -534,24 +534,23 @@ struct AccumulateT<List, F, I, false> : AccumulateT<PopFront<List>, F, typename 
 template <typename List, template <typename, typename> class F, typename I>
 struct AccumulateT<List, F, I, true> : Identity<I> {};
 
-
 template <template <typename...> class VarTypeFun, typename... Lists>
 struct CallWrapper {
   template <std::size_t I>
   static constexpr auto value = VarTypeFun<NthElement<Lists, I>...>::value;
 };
 
-/**
- * @brief  TransformInvoke applies a given variadic metafunction to all types of an arbitrary
- *         number of Typelists and stores the results in a std::array.
- * @tparam VarTypeFun a variadic metafunction that maps its template parameters to a value.
- */
 template <typename CallWrapperT, typename RetType, std::size_t... Is>
 constexpr auto TransformInvoke(std::index_sequence<Is...>) noexcept -> RetType
 {
   return {CallWrapperT::template value<Is>...};
 }
 
+/**
+ * @brief  TransformInvoke applies a given variadic metafunction to all types of an arbitrary
+ *         number of Typelists and stores the results in a std::array.
+ * @tparam VarTypeFun a variadic metafunction that maps its template parameters to a value.
+ */
 template <template <typename...> class VarTypeFun, typename... Lists>
 constexpr auto TransformInvoke() noexcept
 {

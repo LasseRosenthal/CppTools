@@ -181,6 +181,7 @@
     <ClInclude Include="include\Unit\detail\Arithmetic.h" />
     <ClInclude Include="include\Unit\detail\UnitSystemConversion.h" />
     <ClInclude Include="include\Unit\Dimension.h" />
+    <ClInclude Include="include\Unit\Unit.h" />
     <ClInclude Include="include\Unit\UnitSystem.h" />
     <ClInclude Include="include\Unit\UnitSystemGenerator.h" />
     <ClInclude Include="include\Utils\BitField.h" />
