@@ -25,7 +25,7 @@ namespace unit {
 
 /**
  * @struct UnitSystemBaseTagLess
- * @brief  provides a compile-time weak ordering of /link #UnitSystemBaseTag /endlink
+ * @brief  provides a compile-time weak ordering of \link #UnitSystemBaseTag \endlink
  *         with respect to their indices.
  */
 template <typename UnitSystemBaseTagT1, typename UnitSystemBaseTagT2>
@@ -34,8 +34,8 @@ struct UnitSystemBaseTagLess : dimension::DimensionTagLess<BaseDimTagOf<UnitSyst
 /** 
  * @struct HasIndexT
  * @brief  HasIndexT defines a nested template metafunction
- *         that checks if the nested /link #BaseDimensionTag /endlink of a given
- *         /link #UnitSystemBaseTag /endlink has a specific index.
+ *         that checks if the nested \link #BaseDimensionTag \endlink of a given
+ *         \link #UnitSystemBaseTag \endlink has a specific index.
  */
 template <std::size_t Index>
 struct HasIndexT {

@@ -84,6 +84,14 @@ struct UnitSystem {
   using scalingFactor      = ScalingFactor;
 };
 
+template <typename UnitSystemT>
+struct BaseUnitGeneratorT {
+  using unitDimensionBaseTags = meta::typelist::Transform<typename UnitSystemT::unitSystemBaseTags, UnitSystemBaseTagUnityPeriodT>;
+  using type                  = UnitSystem<unitDimensionBaseTags>;
+};
+
+template <typename UnitSystemT>
+using BaseUnitGenerator = typename BaseUnitGeneratorT<UnitSystemT>::type;
 
 /**
  * @struct DimensionOfT

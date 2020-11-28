@@ -20,13 +20,99 @@
 #include <Unit/Unit.h>
  
 using namespace unit;
+using namespace unit::literals;
  
-/** 
- * @class 
- * @brief 
- */ 
- 
- 
+
+TEST(Unit, DefaultConstructor)
+{
+  seconds sec;
+  EXPECT_EQ(sec.value(), 0.0);
+}
+TEST(Unit, Constructor)
+{
+  seconds sec{1.4};
+  EXPECT_EQ(sec.value(), 1.4);
+}
+
+TEST(Unit, ConversionDaysToSeconds)
+{
+  constexpr auto d = 1.0_d;
+  seconds sec{d};
+  constexpr double expectedValue = 86400.0;
+  EXPECT_EQ(sec.value(), expectedValue);
+}
+
+TEST(Unit, ConversionSecondsToDays)
+{
+  constexpr auto   s = 108000.0_s;
+  days          d{s};
+  constexpr double expectedValue = 1.25;
+  EXPECT_EQ(d.value(), expectedValue);
+}
+
+TEST(Unit, ConversionSecondsToYears)
+{
+  constexpr auto   s = 1.0_s;
+  years            y{s};
+  constexpr double expectedValue = 1.0 / 31556952.0;
+  EXPECT_EQ(y.value(), expectedValue);
+}
+
+TEST(Unit, AdditionSeconds)
+{
+  auto s1 = 3.0_s;
+  s1 += 2.0_s;
+  constexpr double expectedValue = 5.0;
+  EXPECT_EQ(s1.value(), expectedValue);
+}
+
+TEST(Unit, AdditionSecondsWithDays)
+{
+  auto s1 = 3.0_s;
+  s1 += 1.0_d;
+  constexpr double expectedValue = 86403.0;
+  EXPECT_EQ(s1.value(), expectedValue);
+}
+
+TEST(Unit, MultiplicationWithScalar)
+{
+  auto s1 = 3.2_s;
+  s1 *= 2.0;
+  constexpr double expectedValue = 6.4;
+  EXPECT_EQ(s1.value(), expectedValue);
+}
+
+TEST(Unit, DivisionByScalar)
+{
+  auto s1 = 3.2_s;
+  s1 /= 2.0;
+  constexpr double expectedValue = 1.6;
+  EXPECT_EQ(s1.value(), expectedValue);
+}
+
+TEST(Unit, DivisionOfUnitsNoConversion)
+{
+  constexpr auto   mPerS         = 200.0_m / 10.0_s;
+  constexpr double expectedValue = 20.0;
+  EXPECT_EQ(mPerS.value(), expectedValue);
+}
+TEST(Unit, DivisionOfUnitsOneConversion)
+{
+  constexpr kilometersPerHour kmh           = 253.0_m / 10.0_s;
+  constexpr double            expectedValue = 2.53 * 36.0;
+  EXPECT_EQ(kmh.value(), expectedValue);
+}
+
+TEST(Unit, DivisionOfUnitsMultipleConversions)
+{
+  constexpr mile              len           = 253.0_m;
+  constexpr weeks             t             = 10.0_s;
+  constexpr kilometersPerHour kmh           = len / t;
+  constexpr double            expectedValue = 2.53 * 36.0;
+  EXPECT_EQ(kmh.value(), expectedValue);
+}
+
+
 // *************************************************************************** // 
 // ******************************* END OF FILE ******************************* // 
 // *************************************************************************** // 
