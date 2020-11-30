@@ -141,6 +141,20 @@ TEST(Dimension, InversionType)
   EXPECT_TRUE((std::is_same_v<generatedType, expectedType>));
 }
 
+TEST(Dimension, HasOnlyZeroExponentsExpectTrue)
+{
+  using D = DimensionGenerator<TimeTag<std::ratio<0, 3>>, LengthTag<std::ratio<0, 2>>>;
+  EXPECT_TRUE(HasOnlyZeroExponents<D>);
+}
+
+TEST(Dimension, HasOnlyZeroExponentsExpectFalse)
+{
+  using D = DimensionGenerator<TimeTag<std::ratio<-3, 7>>, LengthTag<std::ratio<2>>,
+                               MassTag<std::ratio<1, 3>>, StorageAmountTag<std::ratio<3, 7>>>;
+  EXPECT_FALSE(HasOnlyZeroExponents<D>);
+}
+
+
 
  
  

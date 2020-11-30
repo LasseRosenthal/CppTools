@@ -52,6 +52,19 @@ struct ExponentsOfT : meta::IdentityT<typename DimensionT::exponents> {};
 template <typename DimensionT>
 using ExponentsOf = typename ExponentsOfT<DimensionT>::type;
 
+/** 
+ * @struct HasOnlyZeroExponentsT
+ * @brief  HasOnlyZeroExponentsT provides a compile time boolean which is true
+ *         if all exponents of a Dimension equal zero.
+ */
+template <typename DimensionT>
+struct HasOnlyZeroExponentsT
+  : std::conditional_t<meta::typelist::AllOf<typename DimensionT::baseDimTags, HasZeroExponentT>,
+                       std::true_type, std::false_type> {};
+
+template <typename DimensionT>
+constexpr bool HasOnlyZeroExponents = HasOnlyZeroExponentsT<DimensionT>::value;
+
 /**
  * @struct DimensionAt
  * @brief  DimensionAt provides an alias for the dimension at a certain position

@@ -69,6 +69,15 @@ template <typename Tag1, typename Tag2>
 struct DimensionTagLess
   : std::conditional_t<(Tag1::index < Tag2::index), std::true_type, std::false_type> {};
 
+/**
+ * @struct HasZeroExponentT
+ * @brief  provides a compile-time boolean indicating if a \link #BaseDimensionTag \endlink
+ *         zero as exponent.
+ */
+template <typename BaseDimTag>
+struct HasZeroExponentT
+  : std::conditional_t<std::ratio_equal_v<ExponentOf<BaseDimTag>, std::ratio<0>>, std::true_type, std::false_type> {};
+
 /** 
  * @struct HasIndexT
  * @brief  HasIndexT defines a nested template metafunction
