@@ -42,6 +42,13 @@ TEST(Unit, ConversionDaysToSeconds)
   EXPECT_EQ(sec.value(), expectedValue);
 }
 
+TEST(Unit, ConversionYardsToMeters)
+{
+  constexpr meters yardInMeters = 1.0_yd;
+  constexpr double expectedValue = 0.9144;
+  EXPECT_EQ(yardInMeters.value(), expectedValue);
+}
+
 TEST(Unit, ConversionSecondsToDays)
 {
   constexpr auto   s = 108000.0_s;
@@ -57,6 +64,16 @@ TEST(Unit, ConversionSecondsToYears)
   constexpr double expectedValue = 1.0 / 31556952.0;
   EXPECT_EQ(y.value(), expectedValue);
 }
+
+TEST(Unit, ConversionWithScaling)
+{
+  using myVelocityUnit = unit::Velocity<double, std::ratio<3600>, std::kilo, std::ratio<3, 2>>;
+
+  auto v         = 12.0_kmh;
+  myVelocityUnit u = v;
+  EXPECT_EQ(u.value(), 12.0 / 1.5);
+}
+
 
 TEST(Unit, AdditionSeconds)
 {
@@ -105,6 +122,12 @@ TEST(Unit, DivisionByScalar)
   EXPECT_EQ(s1.value(), expectedValue);
 }
 
+TEST(Unit, DivisionOfUnitsYieldingNumericalValue)
+{
+  auto value = 200.0_kmh / 10.0_kmh;
+  EXPECT_TRUE((std::is_same_v<decltype(value), double>));
+}
+
 TEST(Unit, DivisionOfUnitsNoConversion)
 {
   constexpr auto   mPerS         = 200.0_m / 10.0_s;
@@ -125,6 +148,18 @@ TEST(Unit, DivisionOfUnitsMultipleConversions)
   constexpr kilometersPerHour kmh           = len / t;
   constexpr double            expectedValue = 2.53 * 36.0;
   EXPECT_EQ(kmh.value(), expectedValue);
+}
+
+TEST(Unit, InvertSecondTestValue)
+{
+  constexpr auto freq = 1.0 / 2.0_s;
+  EXPECT_EQ(freq.value(), 0.5);
+}
+
+TEST(Unit, InvertSecondTestType)
+{
+  auto freq = 1.0 / 2.0_s;
+  EXPECT_TRUE((std::is_same_v<decltype(freq), hertz>));
 }
 
 

@@ -192,8 +192,6 @@ auto Unit<T, UnitSystemT>::operator/=(value_type v) -> Unit&
   return *this;
 }
 
-
-
 /** 
  * @brief   Templated plus operator.
  * @remarks Only enabled if source and dest unit have the same dimensions, e.g. the same exponent list.
@@ -217,7 +215,6 @@ constexpr auto operator-(UnitT1 const& unit1, UnitT2 const& unit2) noexcept -> U
 }
 
 
-
 template <typename UnitT>
 using BaseUnit = Unit<typename UnitT::value_type, unit::BaseUnitGenerator<typename UnitT::unitSystem>>;
 
@@ -226,11 +223,9 @@ using MultiplicationType =
   Unit<CommonType<UnitT1, UnitT2>,
        unit::arithmetic::MultiplicationType<typename UnitT1::unitSystem, typename UnitT2::unitSystem>>;
 
-template <typename UnitT1, typename UnitT2>
-using DivisionType =
-  Unit<CommonType<UnitT1, UnitT2>,
-       unit::arithmetic::DivisionType<typename UnitT1::unitSystem, typename UnitT2::unitSystem>>;
-
+/** 
+ * @brief Templated multiplication of units.
+ */
 template <typename UnitT1, typename UnitT2>
 auto constexpr operator*(UnitT1 const& unit1, UnitT2 const& unit2) noexcept -> MultiplicationType<UnitT1, UnitT2>
 {
@@ -239,6 +234,16 @@ auto constexpr operator*(UnitT1 const& unit1, UnitT2 const& unit2) noexcept -> M
 }
 
 template <typename UnitT1, typename UnitT2>
+using DivisionType = std::conditional_t<
+  HasOnlyZeroExponents<DivisionType<DimensionOf<UnitT1>, DimensionOf<UnitT2>>>,
+  CommonType<UnitT1, UnitT2>,
+  Unit<CommonType<UnitT1, UnitT2>,
+       unit::arithmetic::DivisionType<typename UnitT1::unitSystem, typename UnitT2::unitSystem>>>;
+
+/**
+ * @brief Templated division of units.
+ */
+template <typename UnitT1, typename UnitT2>
 auto constexpr operator/(UnitT1 const& unit1, UnitT2 const& unit2) -> DivisionType<UnitT1, UnitT2>
 {
   using returnType = DivisionType<UnitT1, UnitT2>;
@@ -246,15 +251,29 @@ auto constexpr operator/(UnitT1 const& unit1, UnitT2 const& unit2) -> DivisionTy
 }
 
 
+template <typename UnitT>
+using UnitInversionType = Unit<typename UnitT::value_type, unit::arithmetic::InversionType<typename UnitT::unitSystem>>;
 
+template <typename UnitT>
+auto constexpr invertUnit(UnitT const& unit) -> UnitInversionType<UnitT>
+{
+  return UnitInversionType<UnitT>{1.0 / unit.value()};
+}
+
+template <typename UnitT/*, typename T, typename = std::void_t<typename UnitT::value_type>*/>
+auto constexpr operator/(typename UnitT::value_type v, UnitT const& unit) -> UnitInversionType<UnitT>
+{
+  return UnitInversionType<UnitT>{v / unit.value()};
+}
 
 
 
 // ---------------------------------------------------
 // convenient alias templates for time units
-template <typename Rep, typename Period = std::ratio<1>>
-using Time = Unit<double, unit::TimeUnitGenerator<Period>>;
+template <typename Rep, typename Period = std::ratio<1>, typename Scaling = std::ratio<1>>
+using Time = Unit<double, unit::TimeUnitGenerator<Period, Scaling>>;
 
+using femtoseconds = Time<double, std::femto>;
 using picoseconds  = Time<double, std::pico>;
 using nanoseconds  = Time<double, std::nano>;
 using microseconds = Time<double, std::micro>;
@@ -269,53 +288,30 @@ using years        = Time<double, std::ratio<31556952>>;
 
 // literal operators
 namespace literals {
-
-/** 
- * @brief Literal operator for picoseconds.
- */
+/** @brief Literal operator for femtoseconds. */
+constexpr auto operator"" _fs(long double fs) noexcept { return femtoseconds(fs);}
+/** @brief Literal operator for picoseconds. */
 constexpr auto operator"" _ps(long double ps) noexcept { return picoseconds(ps);}
-
-/** 
- * @brief Literal operator for nanoseconds.
- */
+/** @brief Literal operator for nanoseconds. */
 constexpr auto operator"" _ns(long double ns) noexcept { return nanoseconds(ns);}
-
-/** 
- * @brief Literal operator for microseconds.
- */
+/** @brief Literal operator for microseconds. */
 constexpr auto operator"" _us(long double us) noexcept { return microseconds(us);}
-
-/** 
- * @brief Literal operator for milliseconds.
- */
+/** @brief Literal operator for milliseconds. */
 constexpr auto operator"" _ms(long double ms) noexcept { return milliseconds(ms);}
-
-/** 
- * @brief Literal operator for seconds.
- */
+/** @brief Literal operator for seconds. */
 constexpr auto operator"" _s(long double s) noexcept { return seconds(s);}
-
-/** 
- * @brief Literal operator for minutes.
- */
+/** @brief Literal operator for minutes. */
 constexpr auto operator"" _min(long double min) noexcept { return minutes(min);}
-
-/** 
- * @brief Literal operator for hours.
- */
+/** @brief Literal operator for hours. */
 constexpr auto operator"" _h(long double h) noexcept { return hours(h);}
-
-/** 
- * @brief Literal operator for days.
- */
+/** @brief Literal operator for days. */
 constexpr auto operator"" _d(long double d) noexcept { return days(d);}
-
 }
 
 // ---------------------------------------------------
 // convenient alias templates for length units
-template <typename Rep, typename Period = std::ratio<1>>
-using Length = Unit<double, unit::LengthUnitGenerator<Period>>;
+template <typename Rep, typename Period = std::ratio<1>, typename Scaling = std::ratio<1>>
+using Length = Unit<double, unit::LengthUnitGenerator<Period, Scaling>>;
 
 using picometers  = Length<double, std::pico>;
 using nanometers  = Length<double, std::nano>;
@@ -326,37 +322,80 @@ using decimeters  = Length<double, std::deci>;
 using meters      = Length<double>;
 using kilometers  = Length<double, std::kilo>;
 using inch        = Length<double, std::ratio<254LL, 10'000LL>>;
-using point       = Length<double, std::ratio<127LL, 360'000LL>>;
+using points      = Length<double, std::ratio<127LL, 360'000LL>>;
 using pica        = Length<double, std::ratio<127LL, 30'000LL>>;
 using lightyear   = Length<double, std::ratio<9'460'730'472'580'800LL>>;
 using mile        = Length<double, std::ratio<1'609'344LL, 1'000LL>>;
+using yards       = Length<double, std::ratio<9'144LL, 10'000LL>>;
+
 
 // literal operators
 namespace literals {
-constexpr auto operator"" _nm(long double nm) { return nanometers(nm);}
-constexpr auto operator"" _mm(long double mm) { return millimeters(mm);}
-constexpr auto operator"" _cm(long double cm) { return centimeters(cm);}
-constexpr auto operator"" _m (long double m)  { return meters(m);}
-constexpr auto operator"" _km(long double km) { return kilometers(km);}
-constexpr auto operator"" _in(long double in) { return inch(in);}
-constexpr auto operator"" _pt(long double pt) { return point(pt);}
-constexpr auto operator"" _pc(long double pc) { return pica(pc);  }
-constexpr auto operator"" _mile(long double mi) { return mile(mi);  }
-
-
+/** @brief Literal operator for nanometers. */
+constexpr auto operator"" _nm(long double nm) noexcept { return nanometers(nm);}
+/** @brief Literal operator for millimeters. */
+constexpr auto operator"" _mm(long double mm) noexcept { return millimeters(mm);}
+/** @brief Literal operator for centimeters. */
+constexpr auto operator"" _cm(long double cm) noexcept { return centimeters(cm);}
+/** @brief Literal operator for meters. */
+constexpr auto operator"" _m (long double m)  noexcept { return meters(m);}
+/** @brief Literal operator for kilometers. */
+constexpr auto operator"" _km(long double km) noexcept { return kilometers(km);}
+/** @brief Literal operator for inch. */
+constexpr auto operator"" _in(long double in) noexcept { return inch(in);}
+/** @brief Literal operator for points. */
+constexpr auto operator"" _pt(long double pt) noexcept { return points(pt);}
+/** @brief Literal operator for pica. */
+constexpr auto operator"" _pc(long double pc) noexcept { return pica(pc);  }
+/** @brief Literal operator for mile. */
+constexpr auto operator"" _mile(long double mi) noexcept { return mile(mi);  }
+/** @brief Literal operator for yards. */
+constexpr auto operator"" _yd(long double yd) noexcept { return yards(yd);  }
 }
 
 
 // ---------------------------------------------------
 // convenient alias templates for Velocity units
-template <typename Rep, typename TimePeriod = std::ratio<1>, typename LengthPeriod = std::ratio<1>>
-using Velocity = Unit<double, unit::VelocityUnitGenerator<TimePeriod, LengthPeriod>>;
+template <typename Rep, typename TimePeriod = std::ratio<1>, typename LengthPeriod = std::ratio<1>, typename Scaling = std::ratio<1>>
+using Velocity = Unit<double, unit::VelocityUnitGenerator<TimePeriod, LengthPeriod, Scaling>>;
 
 using metersPerSecond   = Velocity<double>;
 using kilometersPerHour = Velocity<double, std::ratio<3600>, std::kilo>;
 
 namespace literals {
-constexpr auto operator"" _kmh(long double kmh) { return kilometersPerHour(kmh);}
+/** @brief Literal operator for kilometers per hour. */
+constexpr auto operator"" _kmh(long double kmh) noexcept { return kilometersPerHour(kmh);}
+}
+
+
+// ---------------------------------------------------
+// convenient alias templates for frequency units
+template <typename Rep, typename Period = std::ratio<1>, typename Scaling = std::ratio<1>>
+using Frequency = Unit<double, unit::FrequencyUnitGenerator<Period, Scaling>>;
+
+using hertz      = Frequency<double>;
+using kilohertz  = Frequency<double, std::kilo>;
+using megahertz  = Frequency<double, std::mega>;
+using gigahertz  = Frequency<double, std::giga>;
+using terahertz  = Frequency<double, std::tera>;
+using petahertz  = Frequency<double, std::peta>;
+using exahertz   = Frequency<double, std::exa>;
+
+namespace literals {
+/** @brief Literal operator for hertz. */
+constexpr auto operator"" _Hz(long double Hz) noexcept { return hertz(Hz);}
+/** @brief Literal operator for kilohertz. */
+constexpr auto operator"" _kHz(long double kHz) noexcept { return kilohertz(kHz);}
+/** @brief Literal operator for megahertz. */
+constexpr auto operator"" _MHz(long double MHz) noexcept { return megahertz(MHz);}
+/** @brief Literal operator for gigahertz. */
+constexpr auto operator"" _GHz(long double GHz) noexcept { return gigahertz(GHz);}
+/** @brief Literal operator for terahertz. */
+constexpr auto operator"" _THz(long double THz) noexcept { return terahertz(THz);}
+/** @brief Literal operator for petahertz. */
+constexpr auto operator"" _PHz(long double PHz) noexcept { return petahertz(PHz);}
+/** @brief Literal operator for exahertz. */
+constexpr auto operator"" _EHz(long double EHz) noexcept { return exahertz(EHz);}
 }
 
 

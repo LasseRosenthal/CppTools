@@ -87,7 +87,7 @@ struct UnitSystem {
 template <typename UnitSystemT>
 struct BaseUnitGeneratorT {
   using unitDimensionBaseTags = meta::typelist::Transform<typename UnitSystemT::unitSystemBaseTags, UnitSystemBaseTagUnityPeriodT>;
-  using type                  = UnitSystem<unitDimensionBaseTags>;
+  using type                  = UnitSystem<unitDimensionBaseTags, typename UnitSystemT::scalingFactor>;
 };
 
 template <typename UnitSystemT>
