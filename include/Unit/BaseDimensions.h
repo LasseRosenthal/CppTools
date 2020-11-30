@@ -111,6 +111,18 @@ template <typename Exponent>
 struct DimensionTagGeneratorT<8, Exponent> : meta::IdentityT<PixelTag<Exponent>> {};
 
 
+/**
+ * @struct InvertBaseTagT
+ * @brief  provides a type alias for a BaseDimensionTag that arises through multiplication
+ *         of the exponent of a given BaseDimensionTag with minus one.
+ */
+template <typename BaseDimTag>
+struct InvertBaseTagT : meta::IdentityT<DimensionTagGenerator<BaseDimTag::index, meta::Negative<ExponentOf<BaseDimTag>>>>{};
+
+template <typename BaseDimTag>
+using InvertBaseTag = typename InvertBaseTagT<BaseDimTag>::type;
+
+
 }   // namespace dimension
 }   // namespace unit
 

@@ -74,6 +74,21 @@ TEST(Unit, AdditionSecondsWithDays)
   EXPECT_EQ(s1.value(), expectedValue);
 }
 
+TEST(Unit, AdditionSecondsWithDaysFreeOperator)
+{
+  constexpr auto   s             = 3.256_s + 1.0_d;
+  constexpr double expectedValue = 86403.256;
+  EXPECT_EQ(s.value(), expectedValue);
+}
+
+TEST(Unit, SubtractionMileWithMeters)
+{
+  constexpr meters met = 1.0_mile - 2.5_m;
+  constexpr double expectedValue = 1609.344 - 2.5;
+  EXPECT_EQ(met.value(), expectedValue);
+}
+
+
 TEST(Unit, MultiplicationWithScalar)
 {
   auto s1 = 3.2_s;

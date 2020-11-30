@@ -61,6 +61,13 @@ using MultiplicationType =
 template <typename UnitSystemT1, typename UnitSystemT2>
 using DivisionType = UnitSystemForDimension<dimension::DivisionType<DimensionOf<UnitSystemT1>, DimensionOf<UnitSystemT2>>>;
 
+/**
+ * @brief InversionType is an alias for the UnitSystem that results from the inversion
+ *        of a unit system.
+ */
+template <typename UnitSystemT>
+using InversionType = UnitSystemForDimension<dimension::InversionType<DimensionOf<UnitSystemT>>, meta::Invert<ScalingOf<UnitSystemT>>>;
+
 
 }   // namespace arithmetic
 }   // namespace unit

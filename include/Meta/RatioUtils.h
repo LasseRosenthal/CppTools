@@ -70,20 +70,15 @@ template <typename Ratio, int Exponent>
 using RatioPow = typename RatioPowT<Ratio, Exponent>::type;
 
 template <typename Ratio, int Exponent>
-struct RatioPowT<Ratio, Exponent, std::enable_if_t<(Exponent >= 0)>>  {
-  using type = std::ratio_multiply<Ratio, RatioPow<Ratio, Exponent - 1>>; 
-};
+struct RatioPowT<Ratio, Exponent, std::enable_if_t<(Exponent >= 0)>> 
+  : IdentityT<std::ratio_multiply<Ratio, RatioPow<Ratio, Exponent - 1>>> {};
 
 template <typename Ratio, int Exponent>
-struct RatioPowT<Ratio, Exponent, std::enable_if_t<(Exponent < 0)>>  {
-  using type = std::ratio<RatioPow<Ratio, -Exponent>::den,
-                          RatioPow<Ratio, -Exponent>::num>;
-};
+struct RatioPowT<Ratio, Exponent, std::enable_if_t<(Exponent < 0)>>
+  : IdentityT<std::ratio<RatioPow<Ratio, -Exponent>::den, RatioPow<Ratio, -Exponent>::num>> {};
 
 template <typename Ratio>
-struct RatioPowT<Ratio, 0> {
-  using type = std::ratio<1>;
-};
+struct RatioPowT<Ratio, 0> : IdentityT<std::ratio<1>> {};
 
 template <typename Ratio, int Exponent>
 using RatioPow = typename RatioPowT<Ratio, Exponent>::type;
@@ -102,10 +97,14 @@ using Invert = typename InvertT<Ratio>::type;
  * @struct NegativeT
  * @brief  NegativeT computes the negative value of a given ratio.
  */
+template <typename Ratio, typename = void>
+struct NegativeT;
+
 template <typename Ratio>
-struct NegativeT {
-  using type = std::ratio<-Ratio::num, Ratio::den>;
-};
+struct NegativeT<Ratio, std::enable_if_t<Ratio::num == 0>> : IdentityT<Ratio> {};
+
+template <typename Ratio>
+struct NegativeT<Ratio, std::enable_if_t<Ratio::num != 0>> : IdentityT<std::ratio<-Ratio::num, Ratio::den>> {};
 
 template <typename Ratio>
 using Negative = typename NegativeT<Ratio>::type;

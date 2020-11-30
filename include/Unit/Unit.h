@@ -87,6 +87,10 @@ private:
 template <typename UnitT1, typename Unit2>
 using CommonType = std::common_type_t<typename UnitT1::value_type, typename Unit2::value_type>;
 
+template <typename UnitT1, typename UnitT2>
+using EnableForSameDimensions = RequiresSameDimension<typename UnitT1::unitSystem, typename UnitT2::unitSystem>;
+
+
 /** 
  * @brief UnitCast converts a Unit to a different Unit with same dimension.
  */
@@ -186,6 +190,30 @@ auto Unit<T, UnitSystemT>::operator/=(value_type v) -> Unit&
 {
   val /= v;
   return *this;
+}
+
+
+
+/** 
+ * @brief   Templated plus operator.
+ * @remarks Only enabled if source and dest unit have the same dimensions, e.g. the same exponent list.
+ */
+template <typename UnitT1, typename UnitT2, typename = EnableForSameDimensions<UnitT1, UnitT2>>
+constexpr auto operator+(UnitT1 const& unit1, UnitT2 const& unit2) noexcept -> UnitT1
+{
+  UnitT1 copy{unit1};
+  return copy += unit2;
+}
+
+/** 
+ * @brief   Templated plus operator.
+ * @remarks Only enabled if source and dest unit have the same dimensions, e.g. the same exponent list.
+ */
+template <typename UnitT1, typename UnitT2, typename = EnableForSameDimensions<UnitT1, UnitT2>>
+constexpr auto operator-(UnitT1 const& unit1, UnitT2 const& unit2) noexcept -> UnitT1
+{
+  UnitT1 copy{unit1};
+  return copy -= unit2;
 }
 
 
@@ -313,6 +341,9 @@ constexpr auto operator"" _km(long double km) { return kilometers(km);}
 constexpr auto operator"" _in(long double in) { return inch(in);}
 constexpr auto operator"" _pt(long double pt) { return point(pt);}
 constexpr auto operator"" _pc(long double pc) { return pica(pc);  }
+constexpr auto operator"" _mile(long double mi) { return mile(mi);  }
+
+
 }
 
 

@@ -63,6 +63,22 @@ TEST(UnitSystem, Multiplication)
   using generatedSystem    = arithmetic::MultiplicationType<UnitSystem1, UnitSystem2>;
   EXPECT_TRUE((std::is_same_v<generatedSystem, expectedUnitSystem>));
 }
+
+TEST(UnitSystem, InversionType)
+{
+  using D1 = DimensionGenerator<TimeTag<std::ratio<-3, 7>>, LengthTag<std::ratio<2>>,
+                                MassTag<std::ratio<1, 3>>, StorageAmountTag<std::ratio<3, 7>>>;
+  using scaling = std::ratio<2, 3>;
+
+  using D3 = DimensionGenerator<TimeTag<std::ratio<3, 7>>, LengthTag<std::ratio<-2>>,
+                                MassTag<std::ratio<-1, 3>>, StorageAmountTag<std::ratio<-3, 7>>>;
+
+  using UnitSystem1        = arithmetic::UnitSystemForDimension<D1, scaling>;
+  using expectedUnitSystem = arithmetic::UnitSystemForDimension<D3, std::ratio<3, 2>>;
+  using generatedSystem    = arithmetic::InversionType<UnitSystem1>;
+  EXPECT_TRUE((std::is_same_v<generatedSystem, expectedUnitSystem>));
+}
+
  
  
 // *************************************************************************** // 

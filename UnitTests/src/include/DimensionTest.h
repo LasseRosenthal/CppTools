@@ -121,6 +121,26 @@ TEST(Dimension, MultiplicationType)
   EXPECT_TRUE((std::is_same_v<generatedType, expectedType>));
 }
 
+TEST(Dimension, InversionTypeOneTag)
+{
+  using D             = DimensionGenerator<TimeTag<std::ratio<1>>>;
+  using generatedType = unit::dimension::InversionType<D>;
+  using expectedType  = DimensionGenerator<TimeTag<std::ratio<-1>>>;
+  EXPECT_TRUE((std::is_same_v<generatedType, expectedType>));
+}
+
+TEST(Dimension, InversionType)
+{
+  using D = DimensionGenerator<TimeTag<std::ratio<-3, 7>>, LengthTag<std::ratio<2>>,
+                               MassTag<std::ratio<1, 3>>, StorageAmountTag<std::ratio<3, 7>>>;
+
+  using generatedType = unit::dimension::InversionType<D>;
+  using expectedType =
+    DimensionGenerator<TimeTag<std::ratio<3, 7>>, LengthTag<std::ratio<-2>>,
+                       MassTag<std::ratio<-1, 3>>, StorageAmountTag<std::ratio<-3, 7>>>;
+  EXPECT_TRUE((std::is_same_v<generatedType, expectedType>));
+}
+
 
  
  

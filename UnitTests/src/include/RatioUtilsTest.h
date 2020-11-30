@@ -69,9 +69,14 @@ TEST(RatioUtils, Invert)
   EXPECT_TRUE((std::ratio_equal_v<Invert<std::ratio<4143, 30003>>, std::ratio<30003, 4143>>));
 }
 
-TEST(RatioUtils, Negative)
+TEST(RatioUtils, NegativeNumeratorNotZero)
 {
   EXPECT_TRUE((std::ratio_equal_v<Negative<std::ratio<4143, 30003>>, std::ratio<-4143, 30003>>));
+}
+
+TEST(RatioUtils, NegativeNumeratorZero)
+{
+  EXPECT_TRUE((std::ratio_equal_v<Negative<std::ratio<0>>, std::ratio<0>>));
 }
 
 TEST(RatioUtils, RatioPower)

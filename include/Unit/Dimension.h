@@ -32,8 +32,8 @@ namespace dimension {
  * @struct Dimension
  * @brief  Dimension defines a dimension as a composition
  *         of several base dimensions.
- * @tparam BaseDimTagList a /link #typelist /endlink of different
- *         /link #BaseDimensionTag /endlink structures.
+ * @tparam BaseDimTagList a \link #typelist \endlink of different
+ *         \link #BaseDimensionTag \endlink structures.
  */
 template <typename BaseDimTagList>
 struct Dimension {
@@ -57,7 +57,7 @@ using ExponentsOf = typename ExponentsOfT<DimensionT>::type;
  * @brief  DimensionAt provides an alias for the dimension at a certain position
  *         of a given list of base dimension tags. If the dimension tag list has no element
  *         with the given index, the alias is identical to the tag returned
- *         by /link #DimensionTagGeneratorT /endlink for the given index and a zero exponent.
+ *         by \link #DimensionTagGeneratorT \endlink for the given index and a zero exponent.
  */
 template <std::size_t Index, typename BaseDimTagList>
 using DimensionAt = std::conditional_t<
@@ -134,6 +134,15 @@ using DivisionType =
   Dimension<DimensionTagListGenerator<meta::typelist::TransformBinary<
     ExponentsOf<Dimension1>, ExponentsOf<Dimension2>, std::ratio_subtract>>
   >;
+
+/** 
+ * @brief DivisionType is an alias for the dimension of the quotient of two dimensions.
+ */
+template <typename DimensionT>
+struct InversionTypeT : meta::IdentityT<Dimension<meta::typelist::Transform<typename DimensionT::baseDimTags, InvertBaseTagT>>> {};
+
+template <typename DimensionT>
+using InversionType = typename InversionTypeT<DimensionT>::type;
 
 
 // ---------------------------------------------------
