@@ -114,10 +114,10 @@ TEST(BitField, BitProxyIsSet)
 
   constexpr auto bitProxy0 = b.getBitProxy(0ULL);
 
-  bool isZeroBitSet = bitProxy0;
+  constexpr bool isZeroBitSet = bitProxy0;
   EXPECT_TRUE(isZeroBitSet);
-  constexpr auto bitProxy1 = b.getBitProxy(1ULL);
-  EXPECT_FALSE(bitProxy1.isSet());
+  constexpr bool bitProxy1 = b[1ULL];
+  EXPECT_FALSE(bitProxy1);
   constexpr auto bitProxy2 = b.getBitProxy(2ULL);
   EXPECT_TRUE(bitProxy2.isSet());
 }

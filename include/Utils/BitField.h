@@ -20,6 +20,7 @@
 #include <Utils/miscellaneous.h>
 
 #include <cstddef>
+#include <iterator>
 
 
 namespace cpptools {
@@ -32,21 +33,26 @@ namespace cpptools {
 template <std::size_t Size, std::size_t StartBit = 0Ull>
 class BitField {
 
-template <std::size_t Size>
-using MinimumType = std::conditional_t<Size == 0ULL, void,
-                    std::conditional_t<Size <= 8ULL, std::uint8_t,
-                    std::conditional_t<Size <= 16ULL, std::uint16_t,
-                    std::conditional_t<Size <= 32ULL, std::uint32_t,
-                    std::conditional_t<Size <= 64ULL, std::uint64_t, void>>>>>;
+  template <std::size_t Size>
+  using MinimumType = std::conditional_t<Size == 0ULL, void,
+                      std::conditional_t<Size <= 8ULL, std::uint8_t,
+                      std::conditional_t<Size <= 16ULL, std::uint16_t,
+                      std::conditional_t<Size <= 32ULL, std::uint32_t,
+                      std::conditional_t<Size <= 64ULL, std::uint64_t, void>>>>>;
+
+  template <bool IsConst>
+  class BitProxy;
+
+  template <bool IsConst>
+  class BitFieldIterator;
 
 public:
 
   // ---------------------------------------------------
   // public types
-  using value_type = MinimumType<StartBit + Size>;
-
-  static constexpr value_type mask = (1U << Size) - 1U;        // BitField<3, 2> --> 0000 0111
-  static constexpr value_type cutter = mask << StartBit;  // BitField<3, 2> --> 0001 1100
+  using value_type      = MinimumType<StartBit + Size>;
+  using reference       = BitProxy<false>;
+  using const_reference = BitProxy<true>;
 
   // ---------------------------------------------------
   // constructor
@@ -54,22 +60,23 @@ public:
   constexpr BitField (BitField const& src);
   auto operator=     (value_type) noexcept -> BitField&;
 
+  // ---------------------------------------------------
+  // access operations
   constexpr operator value_type () const noexcept;
-  constexpr auto operator[]     (std::size_t position) const noexcept -> bool;
+  constexpr auto operator[]     (std::size_t position) const noexcept -> const_reference;
+  auto           operator[]     (std::size_t position) noexcept -> reference;
+
  
   template <typename CharT, typename CharTraits = std::char_traits<CharT>>
   auto put (std::basic_ostream<CharT, CharTraits>& ostr) const -> std::basic_ostream<CharT, CharTraits>&;
 
-
-  template <bool IsConst>
-  class BitProxy;
-
   constexpr auto getBitProxy(std::size_t index) const noexcept -> BitProxy<true>;
   auto getBitProxy(std::size_t index) noexcept -> BitProxy<false>;
 
-
-
 private:
+
+  static constexpr value_type mask = (1U << Size) - 1U;   // BitField<3, 2> --> 0000 0111
+  static constexpr value_type cutter = mask << StartBit;  // BitField<3, 2> --> 0001 1100
 
   // ---------------------------------------------------
   // private data
@@ -81,40 +88,37 @@ private:
 };
 
 
+/** 
+ * @class BitProxy
+ * @brief BitProxy is a proxy class defined in class \link #BitField \endlink
+ *        that is used to interact with individual bits.
+ */
 template <std::size_t Size, std::size_t StartBit>
 template <bool IsConst>
 class BitField<Size, StartBit>::BitProxy {
 
-  using value_type = typename BitField<Size, StartBit>::value_type;
+  // ---------------------------------------------------
+  // private constants and types
   static constexpr bool isConst = IsConst;
-
-  template <bool b>
-  struct refTypeT : meta::IdentityT<value_type&> {};
-  template <>
-  struct refTypeT<true> : meta::IdentityT<value_type const&> {};
-
-  template <bool b>
-  using refType = typename refTypeT<b>::type;
-
-  using reference = refType<isConst>;
+  static constexpr auto cutter  = BitField<Size, StartBit>::cutter;
+  using value_type              = typename BitField<Size, StartBit>::value_type;
+  using reference               = std::conditional_t<isConst, value_type const&, value_type&>;
 
 public:
 
   // ---------------------------------------------------
   // constructor
-  constexpr BitProxy(reference val, std::size_t index) noexcept;
-  BitProxy(BitProxy const&) = default;
+  constexpr BitProxy (reference val, std::size_t index) noexcept;
+  BitProxy           (BitProxy const&) = default;
 
   // ---------------------------------------------------
   // access operations
-  auto operator= (bool b) noexcept -> BitProxy&;
-  operator bool  () const noexcept;
-  void flip      () noexcept;
-  auto isSet     () const noexcept -> bool;
+  auto operator=           (bool b) noexcept -> BitProxy&;
+  constexpr operator bool  () const noexcept;
+  void flip                () noexcept;
+  constexpr auto isSet     () const noexcept -> bool;
 
 private:
-
-  static constexpr value_type cutter = BitField<Size, StartBit>::cutter;
 
   // ---------------------------------------------------
   // private data
@@ -141,9 +145,12 @@ inline auto BitField<Size, StartBit>::BitProxy<IsConst>::operator=(bool b) noexc
   return *this;
 }
 
+/**
+ * @brief Returns the value of the refenced bit.
+ */
 template <std::size_t Size, std::size_t StartBit>
 template <bool IsConst>
-inline auto BitField<Size, StartBit>::BitProxy<IsConst>::isSet() const noexcept -> bool
+constexpr auto BitField<Size, StartBit>::BitProxy<IsConst>::isSet() const noexcept -> bool
 {
   return value & mask;
 }
@@ -153,7 +160,7 @@ inline auto BitField<Size, StartBit>::BitProxy<IsConst>::isSet() const noexcept 
  */
 template <std::size_t Size, std::size_t StartBit>
 template <bool IsConst>
-inline BitField<Size, StartBit>::BitProxy<IsConst>::operator bool() const noexcept
+constexpr BitField<Size, StartBit>::BitProxy<IsConst>::operator bool() const noexcept
 {
   return value & mask;
 }
@@ -168,6 +175,29 @@ inline void BitField<Size, StartBit>::BitProxy<IsConst>::flip() noexcept
   *this = *this ? false : true;
 }
 
+
+template <std::size_t Size, std::size_t StartBit>
+template <bool IsConst>
+class BitField<Size, StartBit>::BitFieldIterator {
+
+  using iterator_category = std::forward_iterator_tag;
+  using value_type        = BitField<Size, StartBit>::BitProxy<IsConst>;
+  using difference_type   = std::ptrdiff_t;
+  using pointer           = std::conditional_t<IsConst, value_type const*, value_type*>;
+  using reference         = std::conditional_t<IsConst, value_type const&, value_type&>;
+
+public:
+
+  //auto operator*  () const -> reference;
+  //auto operator-> () const -> pointer;
+  //auto operator++ () -> UPTLayoutIterator&;
+
+
+private:
+
+
+
+};
 
 
 
@@ -206,14 +236,22 @@ constexpr BitField<Size, StartBit>::operator value_type() const noexcept
   return (value >> StartBit) & mask;
 }
 
-/**
+/**
  * @brief  Accesses the bit at a given position.
  * @return returns true if the bit is set, false otherwise.
  */
 template <std::size_t Size, std::size_t StartBit>
-constexpr auto BitField<Size, StartBit>::operator[](std::size_t position) const noexcept -> bool
+constexpr auto BitField<Size, StartBit>::operator[](std::size_t index) const noexcept -> const_reference
 {
-  return value & (1U << (StartBit + position));
+  return const_reference(value, index);
+  //  return value & (1U << (StartBit + position));
+}
+
+template <std::size_t Size, std::size_t StartBit>
+inline auto BitField<Size, StartBit>::operator[](std::size_t index) noexcept -> reference
+{
+  return reference(value, index);
+  //  return value & (1U << (StartBit + position));
 }
 
 
