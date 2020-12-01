@@ -250,9 +250,36 @@ auto constexpr operator/(UnitT1 const& unit1, UnitT2 const& unit2) -> DivisionTy
   return returnType{UnitCast<BaseUnit<UnitT1>>(unit1).value() / UnitCast<BaseUnit<UnitT2>>(unit2).value()};
 }
 
+/**
+ * @brief Multiplication with scalars.
+ */
+template <typename UnitT>
+[[nodiscard]] auto constexpr operator*(UnitT const& unit, typename UnitT::value_type const v) noexcept -> UnitT
+{
+  return UnitT{unit.value() * v};
+}
 
 template <typename UnitT>
-using UnitInversionType = Unit<typename UnitT::value_type, unit::arithmetic::InversionType<typename UnitT::unitSystem>>;
+[[nodiscard]] auto constexpr operator*(typename UnitT::value_type const v, UnitT const& unit) noexcept -> UnitT
+{
+  return unit * v;
+}
+
+/**
+ * @brief Division by a scalar.
+ */
+template <typename UnitT>
+[[nodiscard]] auto constexpr operator/(UnitT const& unit, typename UnitT::value_type const v) -> UnitT
+{
+  return UnitT{unit.value() / v};
+}
+
+//template <typename UnitT>
+//using UnitInversionType = Unit<typename UnitT::value_type, unit::arithmetic::InversionType<typename UnitT::unitSystem>>;
+
+template <typename UnitT>
+using UnitInversionType = Unit<typename UnitT::value_type, unit::arithmetic::InversionOf<typename UnitT::unitSystem>>;
+
 
 template <typename UnitT>
 auto constexpr invertUnit(UnitT const& unit) -> UnitInversionType<UnitT>
@@ -324,10 +351,10 @@ using kilometers  = Length<double, std::kilo>;
 using inch        = Length<double, std::ratio<254LL, 10'000LL>>;
 using points      = Length<double, std::ratio<127LL, 360'000LL>>;
 using pica        = Length<double, std::ratio<127LL, 30'000LL>>;
-using lightyear   = Length<double, std::ratio<9'460'730'472'580'800LL>>;
+using lightyears  = Length<double, std::ratio<9'460'730'472'580'800LL>>;
 using mile        = Length<double, std::ratio<1'609'344LL, 1'000LL>>;
 using yards       = Length<double, std::ratio<9'144LL, 10'000LL>>;
-
+using feets       = Length<double, std::ratio<3'048LL, 10'000LL>>;
 
 // literal operators
 namespace literals {
@@ -351,6 +378,35 @@ constexpr auto operator"" _pc(long double pc) noexcept { return pica(pc);  }
 constexpr auto operator"" _mile(long double mi) noexcept { return mile(mi);  }
 /** @brief Literal operator for yards. */
 constexpr auto operator"" _yd(long double yd) noexcept { return yards(yd);  }
+/** @brief Literal operator for feets. */
+constexpr auto operator"" _ft(long double ft) noexcept { return feets(ft);  }
+}
+
+
+// ---------------------------------------------------
+// convenient alias templates for area units
+template <typename Rep, typename Period = std::ratio<1>, typename Scaling = std::ratio<1>>
+using Area = Unit<double, unit::AreaUnitGenerator<Period, Scaling>>;
+
+using squarecentimeters = Area<double, std::centi>;
+using squaredecimeters  = Area<double, std::deci>;
+using squaremeters      = Area<double>;
+using squareinches      = Area<double, std::ratio<254LL, 10'000LL>>;
+using squarefeets       = Area<double, std::ratio<3'048LL, 10'000LL>>;
+using Acres             = Area<double, std::ratio<3'048LL, 10'000LL>, std::ratio<43'560>>;
+
+// literal operators
+namespace literals {
+/** @brief Literal operator for squarecentimeters. */
+constexpr auto operator"" _qcm (long double qcm)  noexcept { return squarecentimeters(qcm);}
+/** @brief Literal operator for squaredecimeters. */
+constexpr auto operator"" _qdm (long double qdm)  noexcept { return squaredecimeters(qdm);}
+/** @brief Literal operator for squaremeters. */
+constexpr auto operator"" _qm (long double qm)  noexcept { return squaremeters(qm);}
+/** @brief Literal operator for squareinches. */
+constexpr auto operator"" _qin (long double qin)  noexcept { return squareinches(qin);}
+/** @brief Literal operator for Acres. */
+constexpr auto operator"" _ac (long double ac)  noexcept { return Acres(ac);}
 }
 
 
@@ -366,6 +422,71 @@ namespace literals {
 /** @brief Literal operator for kilometers per hour. */
 constexpr auto operator"" _kmh(long double kmh) noexcept { return kilometersPerHour(kmh);}
 }
+
+
+// ---------------------------------------------------
+// convenient alias templates for storage amount units
+template <typename Rep, typename Period = std::ratio<1>, typename Scaling = std::ratio<1>>
+using StorageAmount = Unit<double, unit::StorageAmountUnitGenerator<Period, Scaling>>;
+
+using bits      = StorageAmount<double>;
+using bytes     = StorageAmount<double, std::ratio<8ULL>>;
+using kilobytes = StorageAmount<double, std::ratio<8'000ULL>>;
+using megabytes = StorageAmount<double, std::ratio<8'000'000ULL>>;
+using gigabytes = StorageAmount<double, std::ratio<8'000'000'000ULL>>;
+using terabytes = StorageAmount<double, std::ratio<8'000'000'000'000ULL>>;
+using kibibytes = StorageAmount<double, std::ratio<8ULL * 1'024ULL>>;
+using mebibytes = StorageAmount<double, std::ratio<8ULL * 1'048'576ULL>>;
+using gibibytes = StorageAmount<double, std::ratio<8ULL * 1'073'741'824ULL>>;
+using tebibytes = StorageAmount<double, std::ratio<8ULL * 1'099'511'627'776ULL>>;
+
+namespace literals {
+  /** @brief Literal operator for bits. */
+constexpr auto operator"" _b(long double b) noexcept { return bits(b);}
+/** @brief Literal operator for bytes. */
+constexpr auto operator"" _B(long double b) noexcept { return bytes(b);}
+/** @brief Literal operator for kilobytes. */
+constexpr auto operator"" _kB  (long double kb) noexcept { return kilobytes(kb); }
+/** @brief Literal operator for megabytes. */
+constexpr auto operator"" _MB  (long double mb) noexcept { return megabytes(mb); }
+/** @brief Literal operator for gigabytes. */
+constexpr auto operator"" _GB  (long double gb) noexcept { return gigabytes(gb); }
+/** @brief Literal operator for terabytes. */
+constexpr auto operator"" _TB  (long double tb) noexcept { return terabytes(tb); }
+/** @brief Literal operator for kibibytes. */
+constexpr auto operator"" _KiB (long double kib) noexcept { return kibibytes(kib); }
+/** @brief Literal operator for mebibytes. */
+constexpr auto operator"" _MiB (long double mib) noexcept { return mebibytes(mib); }
+/** @brief Literal operator for gibibytes. */
+constexpr auto operator"" _GiB (long double gib) noexcept { return gibibytes(gib); }
+/** @brief Literal operator for tebibytes. */
+constexpr auto operator"" _TiB (long double tib) noexcept { return tebibytes(tib); }
+}
+
+
+// ---------------------------------------------------
+// convenient alias templates for pixels units
+template <typename Rep, typename Period = std::ratio<1>, typename Scaling = std::ratio<1>>
+using Pixels = Unit<double, unit::PixelsUnitGenerator<Period, Scaling>>;
+
+using pixels = Pixels<double>;
+
+namespace literals {
+/** @brief Literal operator for pixels. */
+constexpr auto operator"" _pix(long double pix) noexcept { return pixels(pix);}
+}   // namespace literals
+
+// ---------------------------------------------------
+// convenient alias templates for PixelDensity units
+template <typename Rep, typename PixelPeriod = std::ratio<1>, typename LengthPeriod = std::ratio<1>, typename Scaling = std::ratio<1>>
+using PixelDensity = Unit<double, unit::ResolutionUnitGenerator<PixelPeriod, LengthPeriod, Scaling>>;
+
+using pixelsPerInch = PixelDensity<double, std::ratio<1>, std::ratio<254LL, 10'000LL>>; 
+
+namespace literals {
+/** @brief Literal operator for pixelsPerInch. */
+constexpr auto operator"" _dpi(long double dpi) noexcept { return pixelsPerInch(dpi);}
+}   // namespace literals
 
 
 // ---------------------------------------------------

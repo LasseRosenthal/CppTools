@@ -68,6 +68,15 @@ using DivisionType = UnitSystemForDimension<dimension::DivisionType<DimensionOf<
 template <typename UnitSystemT>
 using InversionType = UnitSystemForDimension<dimension::InversionType<DimensionOf<UnitSystemT>>, meta::Invert<ScalingOf<UnitSystemT>>>;
 
+template <typename UnitSystemT>
+struct InversionOfT
+  : meta::IdentityT<
+      UnitSystem<meta::typelist::Transform<UnitSystemBaseTagListOf<UnitSystemT>, InversionOfUnitSystemBaseTagT>,
+                 meta::Invert<ScalingOf<UnitSystemT>>>> {};
+
+template <typename UnitSystemT>
+using InversionOf = typename InversionOfT<UnitSystemT>::type;
+
 
 }   // namespace arithmetic
 }   // namespace unit

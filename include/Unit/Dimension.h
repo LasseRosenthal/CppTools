@@ -176,6 +176,8 @@ using Energy          = DimensionGenerator<TimeTag<std::ratio<-2>>, LengthTag<st
 using Power           = DimensionGenerator<TimeTag<std::ratio<-3>>, LengthTag<std::ratio<2>>, MassTag<std::ratio<1>>>;
 using Frequency       = DimensionGenerator<TimeTag<std::ratio<-1>>>;
 using Resolution      = DimensionGenerator<LengthTag<std::ratio<-1>>, PixelTag<std::ratio<1>>>;
+using Area            = DimensionGenerator<LengthTag<std::ratio<2>>>;
+
 
 
 }   // namespace dimension

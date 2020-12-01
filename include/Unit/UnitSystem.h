@@ -72,6 +72,19 @@ template <typename UnitSystemBaseTagT>
 struct UnitSystemBaseTagUnityPeriodT : meta::IdentityT<UnitSystemBaseTag<BaseDimTagOf<UnitSystemBaseTagT>, std::ratio<1>>> {};
 
 /**
+ * @struct InversionOfT
+ * @brief  InversionOfT provides an for the inverted type of a \link #UnitSystemBaseTag \endlink,
+ *         i.e. the internal \link #BaseDimensionTag \endlink and the period are inverted.
+ */
+template <typename UnitSystemBaseTagT>
+struct InversionOfUnitSystemBaseTagT
+  : meta::IdentityT<UnitSystemBaseTag<dimension::InvertBaseTag<BaseDimTagOf<UnitSystemBaseTagT>>,
+                                      meta::Invert<PeriodOf<UnitSystemBaseTagT>>>> {};
+
+template <typename UnitSystemBaseTagT>
+using InversionOfUnitSystemBaseTag = typename InversionOfUnitSystemBaseTagT<UnitSystemBaseTagT>::type;
+
+/**
  * @struct UnitSystem
  * @brief  UnitSystem defines a unit as a composition of several UnitSystemBaseTag.
  */
@@ -92,6 +105,9 @@ struct BaseUnitGeneratorT {
 
 template <typename UnitSystemT>
 using BaseUnitGenerator = typename BaseUnitGeneratorT<UnitSystemT>::type;
+
+template <typename UnitSystemT>
+using UnitSystemBaseTagListOf = typename UnitSystemT::unitSystemBaseTags;
 
 /**
  * @struct DimensionOfT

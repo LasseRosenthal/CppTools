@@ -74,6 +74,37 @@ TEST(Unit, ConversionWithScaling)
   EXPECT_EQ(u.value(), 12.0 / 1.5);
 }
 
+TEST(Unit, ConversionSquareMetersToSquareDecimeters)
+{
+  constexpr auto             fac = 1346.12;
+  constexpr auto sm = fac * 1.0_qm;
+  constexpr squaredecimeters sdm = sm;
+  EXPECT_EQ(sdm.value(), fac * 100.0);
+}
+
+TEST(Unit, ConversionSquareInchToSquareCentimeters)
+{
+  constexpr auto             fac = 3.156;
+  constexpr auto sm = fac * 1.0_qin;
+  constexpr squarecentimeters sdm = sm;
+  EXPECT_EQ(sdm.value(), fac * 6.4516);
+}
+
+TEST(Unit, ConversionAcreToSquareCentimeters)
+{
+  constexpr auto             fac = 1.0;
+  constexpr auto ac = 1.0_ac;
+  constexpr squarecentimeters sdm = ac;
+  EXPECT_EQ(sdm.value(), fac * 40468564.224);
+}
+
+TEST(Unit, Resolution)
+{
+  constexpr auto   res      = 1200.0_dpi;
+  constexpr auto   pix      = res * 1050.0_mm;
+  constexpr int expected = 49607;
+  EXPECT_EQ(std::ceil(pix.value()), expected);
+}
 
 TEST(Unit, AdditionSeconds)
 {
@@ -113,6 +144,35 @@ TEST(Unit, MultiplicationWithScalar)
   constexpr double expectedValue = 6.4;
   EXPECT_EQ(s1.value(), expectedValue);
 }
+
+TEST(Unit, MultiplicationWithScalarFreeOperatorUnitFirst)
+{
+  constexpr auto s1 = 3.2_s;
+  constexpr double factor = 3.4;
+  constexpr auto s2 = s1 * factor;
+  constexpr double expectedValue = factor * 3.2;
+  EXPECT_EQ(s2.value(), expectedValue);
+}
+
+TEST(Unit, MultiplicationWithScalarFreeOperatorScalarFirst)
+{
+  constexpr auto s1 = 3.2_s;
+  constexpr double factor = 3.4;
+  constexpr auto s2 = factor * s1;
+  constexpr double expectedValue = factor * 3.2;
+  EXPECT_EQ(s2.value(), expectedValue);
+}
+
+TEST(Unit, DivisionByScalarFreeOperator)
+{
+  constexpr auto s1 = 3.2_s;
+  constexpr double factor = 3.4;
+  constexpr auto s2 = s1 / factor;
+  constexpr double expectedValue = 3.2 / factor;
+  EXPECT_EQ(s2.value(), expectedValue);
+}
+
+
 
 TEST(Unit, DivisionByScalar)
 {
@@ -160,6 +220,12 @@ TEST(Unit, InvertSecondTestType)
 {
   auto freq = 1.0 / 2.0_s;
   EXPECT_TRUE((std::is_same_v<decltype(freq), hertz>));
+}
+
+TEST(Unit, InvertMilliSecondTestType)
+{
+  auto freq = 1.0 / 2.0_ms;
+  EXPECT_TRUE((std::is_same_v<decltype(freq), kilohertz>));
 }
 
 
