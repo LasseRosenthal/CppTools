@@ -121,6 +121,21 @@ TEST(BitField, BitProxyIsSet)
   constexpr auto bitProxy2 = b.getBitProxy(2ULL);
   EXPECT_TRUE(bitProxy2.isSet());
 }
+
+TEST(BitField, accessViaBeginIterator)
+{
+  using bitField = BitField<3ULL, 2ULL>;
+  bitField b{0b0000'0010};
+  
+  EXPECT_FALSE(b[0]);
+  EXPECT_TRUE(b[1]);
+  EXPECT_FALSE(b[2]);
+
+  auto beg = b.begin();
+  *beg     = true;
+  EXPECT_TRUE(b[0]);
+
+}
  
  
 // *************************************************************************** // 
