@@ -134,7 +134,39 @@ TEST(BitField, accessViaBeginIterator)
   auto beg = b.begin();
   *beg     = true;
   EXPECT_TRUE(b[0]);
+}
 
+TEST(BitField, accessViaBeginIteratorAfterIncrement)
+{
+  using bitField = BitField<3ULL, 0ULL>;
+  bitField b{0b0000'0111};
+  
+  EXPECT_TRUE(b[0]);
+  EXPECT_TRUE(b[1]);
+  EXPECT_TRUE(b[2]);
+
+  auto beg = b.begin();
+  ++beg;
+  *beg     = false;
+  EXPECT_FALSE(b[1]);
+  ++beg;
+  *beg     = false;
+  EXPECT_FALSE(b[2]);
+}
+
+TEST(BitField, rangeBasedForLoop)
+{
+  using bitField = BitField<3ULL, 0ULL>;
+  bitField b{0b0000'0111};
+  
+  EXPECT_TRUE(b[0]);
+  EXPECT_TRUE(b[1]);
+  EXPECT_TRUE(b[2]);
+
+  for(const auto bv : b)
+  {
+    EXPECT_TRUE(bv);
+  }
 }
  
  
