@@ -72,6 +72,12 @@ public:
   auto operator=     (value_type) noexcept -> BitField&;
 
   // ---------------------------------------------------
+  // logical bitwise operations
+  auto operator&=(BitField const& src) noexcept -> BitField&;
+  auto operator|=(BitField const& src) noexcept -> BitField&;
+  auto operator^=(BitField const& src) noexcept -> BitField&;
+
+  // ---------------------------------------------------
   // access operations
   constexpr operator value_type     () const noexcept;
   [[nodiscard]] constexpr auto size () const noexcept -> size_type;
@@ -481,8 +487,7 @@ constexpr BitField<Size, StartBit>::BitField(BitField<Size, StartBit> const& src
 template <std::size_t Size, std::size_t StartBit>
 inline auto BitField<Size, StartBit>::operator=(value_type v) noexcept -> BitField&
 {
-  value &= (v & ~cutter) | ((v & mask) << StartBit);
-//  value = getValue(v);
+  value = (value & ~cutter) | ((v & mask) << StartBit);
   return *this;
 }
 
@@ -503,6 +508,37 @@ template <std::size_t Size, std::size_t StartBit>
 {
   return Size;
 }
+
+/**
+ * @brief Bitwise AND.
+ */
+template <std::size_t Size, std::size_t StartBit>
+auto BitField<Size, StartBit>::operator&=(BitField const& src) noexcept -> BitField&
+{
+  value = value & ~cutter | ((value & cutter) & (src.value & cutter));
+  return *this;
+}
+
+/**
+ * @brief Bitwise OR.
+ */
+template <std::size_t Size, std::size_t StartBit>
+auto BitField<Size, StartBit>::operator|=(BitField const& src) noexcept -> BitField&
+{
+  value = value & ~cutter | ((value & cutter) | (src.value & cutter));
+  return *this;
+}
+
+/**
+ * @brief Bitwise XOR.
+ */
+template <std::size_t Size, std::size_t StartBit>
+auto BitField<Size, StartBit>::operator^=(BitField const& src) noexcept -> BitField&
+{
+  value = value & ~cutter | ((value & cutter) ^ (src.value & cutter));
+  return *this;
+}
+
 
 /**
  * @brief  Accesses the bit at a given position.

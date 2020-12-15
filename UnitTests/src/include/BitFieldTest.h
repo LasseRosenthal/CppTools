@@ -78,6 +78,17 @@ TEST(BitField, AndOperator)
   EXPECT_TRUE(b3 == expected);
 }
 
+TEST(BitField, AndOperatorModifyObject)
+{
+  using bitField = BitField<4ULL, 3ULL>;
+  bitField b1{0b0110'0101};
+  constexpr bitField b2{0b1101'1010};
+  b1 &= b2;
+  constexpr bitField expected{0b0110'0000};
+
+  EXPECT_TRUE(b1 == expected);
+}
+
 TEST(BitField, OrOperator)
 {
   using bitField = BitField<4ULL>;
@@ -89,6 +100,17 @@ TEST(BitField, OrOperator)
   EXPECT_TRUE(b3 == expected);
 }
 
+TEST(BitField, OrOperatorModifyObject)
+{
+  using bitField = BitField<4ULL>;
+  bitField b1{0b0110'0101};
+  constexpr bitField b2{0b1101'0011};
+  b1 |= b2;
+  constexpr bitField expected{0b0110'0111};
+
+  EXPECT_TRUE(b1 == expected);
+}
+
 TEST(BitField, ExOrOperator)
 {
   using bitField = BitField<4ULL>;
@@ -98,6 +120,17 @@ TEST(BitField, ExOrOperator)
   constexpr bitField expected{0b0110'1010};
 
   EXPECT_TRUE(b3 == expected);
+}
+
+TEST(BitField, ExOrOperatorModifyObject)
+{
+  using bitField = BitField<4ULL>;
+  bitField b1{0b0110'0001};
+  constexpr bitField b2{0b1101'1011};
+  b1 ^= b2;
+  constexpr bitField expected{0b0110'1010};
+
+  EXPECT_TRUE(b1 == expected);
 }
 
 TEST(BitField, streamIntoOstream)
