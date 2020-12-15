@@ -19,6 +19,7 @@
 // includes
 #include <Utils/BitField.h>
 
+#include <algorithm>
 #include <string>
 #include <sstream>
  
@@ -357,6 +358,14 @@ TEST(BitField, distanceBetweenIterators)
 
   auto it2 = it + (it1 - it);
   EXPECT_EQ(it2, it1);
+}
+
+TEST(BitField, findIf)
+{
+  using bitField = BitField<7ULL, 0ULL>;
+  bitField b{0b0101'0011};
+  auto firstFalse = std::find_if(b.begin(), b.end(), [](const auto& val) { return val == false; });
+  EXPECT_EQ(std::distance(b.begin(), firstFalse), 2LL);
 }
  
  
