@@ -49,6 +49,57 @@ TEST(BitField, accessOperator)
   EXPECT_FALSE(b[2]);
 }
 
+TEST(BitField, comparisonOperator)
+{
+  using bitField = BitField<4ULL>;
+  constexpr bitField b1{0b0110'0101};
+  constexpr bitField b2{0b1101'0101};
+  EXPECT_TRUE(b1 == b2);
+}
+
+TEST(BitField, BitWiseNot)
+{
+  using bitField = BitField<4ULL, 3ULL>;
+  constexpr bitField b1{0b0110'0101};
+  constexpr auto     b2 = ~b1;
+  constexpr bitField expected{0b0110'1010};
+
+  EXPECT_TRUE(b2 == expected);
+}
+
+TEST(BitField, AndOperator)
+{
+  using bitField = BitField<4ULL, 3ULL>;
+  constexpr bitField b1{0b0110'0101};
+  constexpr bitField b2{0b1101'1010};
+  constexpr auto     b3 = b1 & b2;
+  constexpr bitField expected{0b0110'0000};
+
+  EXPECT_TRUE(b3 == expected);
+}
+
+TEST(BitField, OrOperator)
+{
+  using bitField = BitField<4ULL>;
+  constexpr bitField b1{0b0110'0101};
+  constexpr bitField b2{0b1101'0011};
+  constexpr auto     b3 = b1 | b2;
+  constexpr bitField expected{0b0110'0111};
+
+  EXPECT_TRUE(b3 == expected);
+}
+
+TEST(BitField, ExOrOperator)
+{
+  using bitField = BitField<4ULL>;
+  constexpr bitField b1{0b0110'0001};
+  constexpr bitField b2{0b1101'1011};
+  constexpr auto     b3 = b1 ^ b2;
+  constexpr bitField expected{0b0110'1010};
+
+  EXPECT_TRUE(b3 == expected);
+}
+
 TEST(BitField, streamIntoOstream)
 {
   using bitField = BitField<3ULL, 2ULL>;
@@ -154,6 +205,56 @@ TEST(BitField, accessViaBeginIteratorAfterIncrement)
   EXPECT_FALSE(b[2]);
 }
 
+TEST(BitField, accessViaBeginIndexOperator)
+{
+  using bitField = BitField<3ULL, 0ULL>;
+  bitField b{0b0000'0111};
+  
+  EXPECT_TRUE(b[0]);
+  EXPECT_TRUE(b[1]);
+  EXPECT_TRUE(b[2]);
+
+  for(std::size_t i{}; i < b.size(); ++i)
+  {
+    b[i] = false;
+  }
+
+  for(std::size_t i{}; i < b.size(); ++i)
+  {
+    EXPECT_FALSE(b[i]);
+  }
+}
+
+TEST(BitField, accessViaBeginIndexOperatorMaxSize)
+{
+  using bitField = BitField<8ULL>;
+  bitField b{0b0101'1010};
+
+  for(std::size_t i{}; i < b.size(); ++i)
+  {
+    b[i] = true;
+  }
+
+  for(std::size_t i{}; i < b.size(); ++i)
+  {
+    EXPECT_TRUE(b[i]);
+  }
+}
+
+TEST(BitField, accessViaIteratorArrowOperator)
+{
+  using bitField = BitField<3ULL, 0ULL>;
+  constexpr bitField b{0b0000'0011};
+  
+  constexpr auto it = b.begin();
+
+  EXPECT_TRUE(it->isSet());
+  auto it2 = it + 1;
+  EXPECT_TRUE(it2->isSet());
+  auto it3 = it + 2;
+  EXPECT_FALSE(it3->isSet());
+}
+
 TEST(BitField, rangeBasedForLoop)
 {
   using bitField = BitField<3ULL, 0ULL>;
@@ -186,10 +287,10 @@ TEST(BitField, additionOperator)
 
   auto it2 = it1 + 1LL;
   EXPECT_TRUE(*it2);
-  //it2 = it1 + 2LL;
-  //EXPECT_FALSE(*it2);
-  //it2 = 3 + it1;
-  //EXPECT_FALSE(*it2);
+  it2 = it1 + 2LL;
+  EXPECT_FALSE(*it2);
+  it2 = 3 + it1;
+  EXPECT_FALSE(*it2);
 }
 
 TEST(BitField, indexAccessIterator)
@@ -206,6 +307,23 @@ TEST(BitField, indexAccessIterator)
   EXPECT_TRUE(it[4]);
   EXPECT_FALSE(it[5]);
   EXPECT_TRUE(it[6]);
+}
+
+TEST(BitField, distanceBetweenIterators)
+{
+  using bitField = BitField<7ULL, 0ULL>;
+  bitField b{0b0101'0011};
+
+  auto it = b.begin();
+  EXPECT_EQ(it - it, 0LL);
+
+  constexpr long long n = 5LL;
+  auto it1 = it + n;
+  EXPECT_EQ(it1 - it, n);
+  EXPECT_EQ(it - it1, -n);
+
+  auto it2 = it + (it1 - it);
+  EXPECT_EQ(it2, it1);
 }
  
  
