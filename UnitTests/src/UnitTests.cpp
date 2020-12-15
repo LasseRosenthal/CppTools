@@ -26,3 +26,4 @@
 #include "UnitSystemTest.h"
 #include "AlgorithmsTest.h"
 #include "UnitTest.h"
+#include "StringAlgorithmsTest.h"

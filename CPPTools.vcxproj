@@ -189,6 +189,7 @@
     <ClInclude Include="include\Utils\LambdaOverload.h" />
     <ClInclude Include="include\Utils\miscellaneous.h" />
     <ClInclude Include="include\Utils\MultiTypeMap.h" />
+    <ClInclude Include="include\Utils\StringAlgorithms.h" />
     <ClInclude Include="include\Utils\StringUtils.h" />
     <ClInclude Include="include\Utils\ZipIterator.h" />
     <ClInclude Include="StringUtilsVorlage.h" />

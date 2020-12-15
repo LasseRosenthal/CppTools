@@ -168,6 +168,45 @@ TEST(BitField, rangeBasedForLoop)
     EXPECT_TRUE(bv);
   }
 }
+
+TEST(BitField, additionOperator)
+{
+  using bitField = BitField<7ULL, 0ULL>;
+  bitField b{0b0101'0011};
+  
+  EXPECT_TRUE(b[0]);
+  EXPECT_TRUE(b[1]);
+  EXPECT_FALSE(b[2]);
+  EXPECT_FALSE(b[3]);
+  EXPECT_TRUE(b[4]);
+  EXPECT_FALSE(b[5]);
+  EXPECT_TRUE(b[6]);
+
+  auto it1 = b.begin();
+
+  auto it2 = it1 + 1LL;
+  EXPECT_TRUE(*it2);
+  //it2 = it1 + 2LL;
+  //EXPECT_FALSE(*it2);
+  //it2 = 3 + it1;
+  //EXPECT_FALSE(*it2);
+}
+
+TEST(BitField, indexAccessIterator)
+{
+  using bitField = BitField<7ULL, 0ULL>;
+  bitField b{0b0101'0011};
+  
+  auto it = b.begin();
+
+  EXPECT_TRUE(it[0]);
+  EXPECT_TRUE(it[1]);
+  EXPECT_FALSE(it[2]);
+  EXPECT_FALSE(it[3]);
+  EXPECT_TRUE(it[4]);
+  EXPECT_FALSE(it[5]);
+  EXPECT_TRUE(it[6]);
+}
  
  
 // *************************************************************************** // 

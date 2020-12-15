@@ -162,6 +162,9 @@
     <ClInclude Include="include\Unit\Unit.h">
       <Filter>Header Files\Unit</Filter>
     </ClInclude>
+    <ClInclude Include="include\Utils\StringAlgorithms.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\WinHighResClock.cpp">

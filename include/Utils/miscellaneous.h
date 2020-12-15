@@ -20,7 +20,9 @@
 #include <Meta/Utility.h>
 
 #include <algorithm>
+#include <cmath>
 #include <iterator>
+#include <limits>
 #include <ostream>
 #include <type_traits>
 #include <vector>
@@ -72,6 +74,35 @@ auto getMapKeys(Map const& m) -> std::vector<typename Map::key_type>
   v.reserve(m.size());
   std::transform(m.begin(), m.end(), std::back_inserter(v), [](typename Map::value_type const& val) { return val.first; });
   return v;
+}
+
+/**
+ * @brief  Computes the number of decimal places of a given floating point.
+ * @remark due to the nature of binary floating point representation, the
+ *         return value might incorrect due to rounding errors.
+ */
+template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
+auto numberOfDecimalPlaces(T value) -> std::size_t
+{
+  if constexpr(std::is_floating_point_v<T>)
+  {
+    T tmp           = value - std::floor(value);
+    std::size_t ctr = 0ULL;
+    T factor        = 10.0;
+    while(tmp > 0.0 && ctr < std::numeric_limits<T>::max_digits10)
+    {
+      tmp = value * factor;
+      tmp -= std::floor(tmp);
+      factor *= 10.0;
+      ++ctr;
+    }
+
+    return ctr;
+  }
+  else
+  {
+    return 0ULL;
+  }
 }
 
 /**

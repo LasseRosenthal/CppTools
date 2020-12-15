@@ -92,6 +92,27 @@ TEST(Miscellaneous, getMapKeys)
   EXPECT_EQ(keys, expected);
 }
 
+TEST(Miscellaneous, numberOfDecimalPlacesDouble)
+{
+  const double value = 31.146;
+  constexpr std::size_t expected = 3ULL;
+  EXPECT_EQ(cpptools::numberOfDecimalPlaces(value), expected);
+}
+
+TEST(Miscellaneous, numberOfDecimalPlacesFloat)
+{
+  const float value = 1042.2365;
+  constexpr std::size_t expected = 4ULL;
+  EXPECT_EQ(cpptools::numberOfDecimalPlaces(value), expected);
+}
+
+TEST(Miscellaneous, numberOfDecimalPlacesInt)
+{
+  const int value = 31146;
+  constexpr std::size_t expected = 0ULL;
+  EXPECT_EQ(cpptools::numberOfDecimalPlaces(value), expected);
+}
+
 TEST(Miscellaneous, BinaryRepresentationShort8BitIntZero)
 {
   constexpr std::uint8_t val = 0;

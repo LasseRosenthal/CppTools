@@ -125,7 +125,6 @@ class BitField<Size, StartBit>::BitProxy {
   using size_type               = typename BitField<Size, StartBit>::size_type;
   using difference_type         = std::ptrdiff_t;
 
-
 public:
 
   // ---------------------------------------------------
@@ -146,14 +145,14 @@ private:
 
   // ---------------------------------------------------
   // private data
-  reference  value;
+  reference   value;
   value_type mask;
-  size_type  index;
+  size_type   index;
 
   // ---------------------------------------------------
   // private methods
   auto                  setBit   (bool b) noexcept -> BitProxy&;
-  void                  setMask  (size_type index) noexcept;
+//  void                  setMask  (size_type index) noexcept;
   void                  advance  (difference_type n) noexcept;
   void                  setIndex (size_type i) noexcept;
   constexpr static auto getMask  (size_type index) noexcept -> value_type;
@@ -201,12 +200,12 @@ inline auto BitField<Size, StartBit>::BitProxy<IsConst>::setBit(bool b) noexcept
 
 
 
-template <std::size_t Size, std::size_t StartBit>
-template <bool IsConst>
-inline void BitField<Size, StartBit>::BitProxy<IsConst>::setMask(size_type index) noexcept
-{
-  mask = getMask(index);
-}
+//template <std::size_t Size, std::size_t StartBit>
+//template <bool IsConst>
+//inline void BitField<Size, StartBit>::BitProxy<IsConst>::setMask(size_type index) noexcept
+//{
+//  mask = getMask(index);
+//}
 
 template <std::size_t Size, std::size_t StartBit>
 template <bool IsConst>
@@ -260,21 +259,12 @@ public:
 
   //auto operator-> () const -> pointer;
   auto operator++ () noexcept -> BitFieldIterator&;
-  auto operator++ (int) noexcept -> BitFieldIterator&;
+  auto operator++ (int) noexcept -> BitFieldIterator;
+  auto operator-- () noexcept -> BitFieldIterator&;
+  auto operator-- (int) noexcept -> BitFieldIterator;
   auto operator+= (difference_type n) noexcept -> BitFieldIterator&;
   auto operator-= (difference_type n) noexcept -> BitFieldIterator&;
-
-
-  //friend auto operator<  (BitFieldIterator const&, BitFieldIterator const&) noexcept -> bool;
-  //friend auto operator>  (BitFieldIterator const&, BitFieldIterator const&) noexcept -> bool;
-
-  //template <std::size_t S, std::size_t SB, bool C>
-  //friend auto operator== (BitField<S, SB>::BitFieldIterator<C> const& it1, BitField<S, SB>::BitFieldIterator<C> const& it2) noexcept -> bool
-  //{
-  //  return (&it1.value == &it2.value && it1.index == it2.index);
-  //}
-
-
+  auto operator[] (size_type) noexcept -> value_type;
 
   friend auto operator< (BitFieldIterator const& it1, BitFieldIterator const& it2) noexcept -> bool
   {
@@ -294,13 +284,25 @@ public:
   }
   friend auto operator== (BitFieldIterator const& it1, BitFieldIterator const& it2) noexcept -> bool
   {
-    return (&it1.value == &it2.value && it1.index == it2.index);
+    return it1.index == it2.index;
   }
   friend auto operator!= (BitFieldIterator const& it1, BitFieldIterator const& it2) noexcept -> bool
   {
     return !(it1 == it2);
   }
 
+  // 
+  friend auto operator+(BitFieldIterator const& it, difference_type n) noexcept -> BitFieldIterator
+  {
+    BitFieldIterator temp = it;
+    return temp += n;
+  }
+
+  friend auto operator+(difference_type n, BitFieldIterator const& it) noexcept -> BitFieldIterator
+  {
+    BitFieldIterator temp = it;
+    return temp += n;
+  }
 
   constexpr BitFieldIterator(underlyingValueType& val, size_type i) noexcept;
 
@@ -308,14 +310,14 @@ private:
 
   // ---------------------------------------------------
   // private data
-  underlyingValueType& value;
+//  underlyingValueType& value;
   size_type            index;
   value_type           proxy;
   mutable bool         atEnd;
 
   // ---------------------------------------------------
   // private methods
-  constexpr auto isAtEnd() const noexcept -> bool;
+  [[nodiscard]] constexpr auto isAtEnd() const noexcept -> bool;
   void           advance(difference_type n) noexcept;
 };
 
@@ -323,27 +325,11 @@ private:
 template <std::size_t Size, std::size_t StartBit>
 template <bool IsConst>
 constexpr BitField<Size, StartBit>::BitFieldIterator<IsConst>::BitFieldIterator(underlyingValueType& val, size_type i) noexcept
-  : value {val}
-  , index {std::min(i, size)}
-  , proxy {value, index}
+  : index {std::min(i, size)}
+  , proxy {val, index}
   , atEnd {isAtEnd()}
 {}
 
-template <std::size_t Size, std::size_t StartBit>
-template <bool IsConst>
-inline auto BitField<Size, StartBit>::BitFieldIterator<IsConst>::operator++() noexcept -> BitFieldIterator&
-{
-  advance(1LL);
-  return *this;
-}
-
-template <std::size_t Size, std::size_t StartBit>
-template <bool IsConst>
-inline auto BitField<Size, StartBit>::BitFieldIterator<IsConst>::operator++(int) noexcept -> BitFieldIterator&
-{
-  BitFieldIterator copy{*this};
-  return ++copy;
-}
 
 
 template <std::size_t Size, std::size_t StartBit>
@@ -361,10 +347,81 @@ inline auto BitField<Size, StartBit>::BitFieldIterator<IsConst>::operator-=(diff
   return *this += -n;
 }
 
+/**
+ * @brief  increments the iterator by one element (postfix version).
+ * @return a reference to the incremented iterator.
+ */
+template <std::size_t Size, std::size_t StartBit>
+template <bool IsConst>
+inline auto BitField<Size, StartBit>::BitFieldIterator<IsConst>::operator++() noexcept -> BitFieldIterator&
+{
+  return *this += 1LL;
+}
+
+/**
+ * @brief  increments the iterator by one element (postfix version).
+ * @return a copy of the iterator before it was incremented.
+ */
+template <std::size_t Size, std::size_t StartBit>
+template <bool IsConst>
+inline auto BitField<Size, StartBit>::BitFieldIterator<IsConst>::operator++(int) noexcept -> BitFieldIterator
+{
+  BitFieldIterator copy{*this};
+  return ++copy;
+}
+
+/**
+ * @brief  decrements the iterator by one element (postfix version).
+ * @return a reference to the decremented iterator.
+ */
+template <std::size_t Size, std::size_t StartBit>
+template <bool IsConst>
+inline auto BitField<Size, StartBit>::BitFieldIterator<IsConst>::operator--() noexcept -> BitFieldIterator&
+{
+  return *this -= 1LL;
+}
+
+/**
+ * @brief  increments the iterator by one element (postfix version).
+ * @return a copy of the iterator before it was decremented.
+ */
+template <std::size_t Size, std::size_t StartBit>
+template <bool IsConst>
+inline auto BitField<Size, StartBit>::BitFieldIterator<IsConst>::operator--(int) noexcept -> BitFieldIterator
+{
+  BitFieldIterator copy{*this};
+  return --copy;
+}
+
 
 template <std::size_t Size, std::size_t StartBit>
 template <bool IsConst>
-constexpr auto BitField<Size, StartBit>::BitFieldIterator<IsConst>::isAtEnd() const noexcept -> bool
+inline auto BitField<Size, StartBit>::BitFieldIterator<IsConst>::operator[](size_type i) noexcept -> value_type
+{
+  return *(*this + i);
+}
+
+//template <std::size_t Size, std::size_t StartBit>
+//inline auto operator+(typename BitField<Size, StartBit>::iterator const& it,
+//                      typename BitField<Size, StartBit>::iterator::difference_type n)// -> typename BitField<Size, StartBit>::iterator
+//{
+//  typename BitField<Size, StartBit>::iterator temp = it;
+//  return temp += n;
+//}
+//
+//template <std::size_t Size, std::size_t StartBit>
+//inline auto operator+(typename BitField<Size, StartBit>::iterator::difference_type n,
+//                      typename BitField<Size, StartBit>::iterator const& it)// -> typename BitField<Size, StartBit>::iterator
+//{
+//  typename BitField<Size, StartBit>::iterator temp = it;
+//  return temp += n;
+//}
+
+
+
+template <std::size_t Size, std::size_t StartBit>
+template <bool IsConst>
+[[nodiscard]] constexpr auto BitField<Size, StartBit>::BitFieldIterator<IsConst>::isAtEnd() const noexcept -> bool
 {
   return index >= size;
 }
@@ -378,7 +435,7 @@ inline void BitField<Size, StartBit>::BitFieldIterator<IsConst>::advance(differe
     index += n;
     if(!isAtEnd())
     {
-      proxy.advance(n);
+      proxy.setIndex(index);
     }
     else
     {
@@ -389,14 +446,13 @@ inline void BitField<Size, StartBit>::BitFieldIterator<IsConst>::advance(differe
   {
     if(std::abs(n) <= static_cast<difference_type>(index))
     {
-      index -= n;
-      proxy.advance(n);
+      index += n;
     }
     else
     {
       index = 0ULL;
-      proxy.setIndex(index);
     }
+    proxy.setIndex(index);
   }
 }
 

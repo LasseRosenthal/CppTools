@@ -59,6 +59,7 @@
     <ClInclude Include="src\include\RatioUtilsTest.h" />
     <ClInclude Include="src\include\StackMatrixTest.h" />
     <ClInclude Include="src\include\StackVectorTest.h" />
+    <ClInclude Include="src\include\StringAlgorithmsTest.h" />
     <ClInclude Include="src\include\StringUtilsTest.h" />
     <ClInclude Include="src\include\TestAdressCalculator.h" />
     <ClInclude Include="src\include\TestCTM.h" />
