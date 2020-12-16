@@ -196,7 +196,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ImpoSurfaceSheetRelation.cpp" />
+    <ClCompile Include="src\StringAlgorithms.cpp" />
     <ClCompile Include="src\WinHighResClock.cpp" />
+    <ClCompile Include="StringUtilsVorlage.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

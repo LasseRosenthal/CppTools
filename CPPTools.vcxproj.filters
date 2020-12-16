@@ -43,6 +43,9 @@
     <Filter Include="Header Files\Unit\detail">
       <UniqueIdentifier>{9bdbb979-5064-4884-80c9-f2bf504dcf32}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Utils">
+      <UniqueIdentifier>{34a04d7d-1bdb-4d45-bc75-39a6a2cc68d3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include=".clang-format" />
@@ -172,6 +175,12 @@
     </ClCompile>
     <ClCompile Include="src\ImpoSurfaceSheetRelation.cpp">
       <Filter>Source Files\ArbeitsCode</Filter>
+    </ClCompile>
+    <ClCompile Include="StringUtilsVorlage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StringAlgorithms.cpp">
+      <Filter>Source Files\Utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

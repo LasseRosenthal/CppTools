@@ -189,13 +189,66 @@ TEST(StringAlgorithms, splitAdjacentDelimiter)
   EXPECT_EQ(tokens, expected);
 }
 
- 
 TEST(StringAlgorithms, split)
 {
   const auto s = L"   split;this  string with lots     of;;;;text  into substrings   "s;
   const auto tokens = stringAlgorithms::split(s, [](auto c){ return L' ' == c || L';' == c;});
   const std::vector<std::wstring> expected{L"split"s, L"this"s, L"string"s, L"with"s, L"lots"s, L"of"s, L"text"s, L"into"s, L"substrings"s};
   EXPECT_EQ(tokens, expected);
+}
+
+TEST(StringAlgorithms, strLengthString)
+{
+  const auto s = "Hallo"s;
+  EXPECT_EQ(stringAlgorithms::strLength(s), 5ULL);
+}
+
+TEST(StringAlgorithms, strLengthWstring)
+{
+  const auto s = L"Hallo"s;
+  EXPECT_EQ(stringAlgorithms::strLength(s), 5ULL);
+}
+
+TEST(StringAlgorithms, cstrLengthString)
+{
+  const auto s = "Hallo";
+  EXPECT_EQ(stringAlgorithms::cstrLength(s), 5ULL);
+}
+
+TEST(StringAlgorithms, cstrLengthWstring)
+{
+  const auto s = L"Hallo";
+  EXPECT_EQ(stringAlgorithms::cstrLength(s), 5ULL);
+}
+
+TEST(StringAlgorithms, toMBstringString)
+{
+  const auto s = "Hallo"s;
+  std::unique_ptr<char[]> mbstr(stringAlgorithms::toMBstring(s));
+  EXPECT_STREQ(mbstr.get(), s.c_str());
+}
+
+TEST(StringAlgorithms, toMBstringWString)
+{
+  const auto s = L"Hallo"s;
+  std::unique_ptr<char[]> mbstr(stringAlgorithms::toMBstring(s));
+  EXPECT_STREQ(mbstr.get(), "Hallo");
+}
+
+TEST(StringAlgorithms, wstringToString)
+{
+  const auto s1 = L"asgctgkztikzniuzhucjczhjukujhniukgiuiukgftzghtzhiugtgiz"s;
+  const auto s2 = stringAlgorithms::wstringToString(s1);
+  const auto expected = "asgctgkztikzniuzhucjczhjukujhniukgiuiukgftzghtzhiugtgiz"s;
+  EXPECT_EQ(s2, expected);
+}
+
+TEST(StringAlgorithms, stringToWstring)
+{
+  const auto s1 = "asgctgkztikzniuzhucjczhjukujhniukgiuiukgftzghtzhiugtgiz"s;
+  const auto s2 = stringAlgorithms::stringToWstring(s1);
+  const auto expected = L"asgctgkztikzniuzhucjczhjukujhniukgiuiukgftzghtzhiugtgiz"s;
+  EXPECT_EQ(s2, expected);
 }
  
  

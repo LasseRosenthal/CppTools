@@ -233,7 +233,6 @@ auto lexicalCast(std::string const& valString) -> T
   return valString;
 }
 
-
 /** 
  * @brief 
  */
@@ -254,7 +253,6 @@ inline auto split(std::basic_string<CharT, CharTraits> const& s, Predicate&& pre
   while(pos2 != end)
   {
     tokens.emplace_back(pos1, pos2);
-
     pos1 = std::find_if_not(pos2, end, std::forward<Predicate>(pred));
     pos2 = std::find_if(pos1, end, std::forward<Predicate>(pred));
   }
@@ -267,27 +265,64 @@ inline auto split(std::basic_string<CharT, CharTraits> const& s, Predicate&& pre
   return tokens;
 }
 
-
-template <typename CharT, typename CharTraits = std::char_traits<CharT>>
-inline auto split3(std::basic_string<CharT, CharTraits> const& s, CharT delimiter) -> std::vector<std::basic_string<CharT, CharTraits>>
+/**
+ * @brief   returns the number of characters of the given string s
+ * @param   const STRING_TYPE& s
+ * @returns number of characters stored in s
+ */
+template <typename StrT>
+inline auto strLength(StrT const& s) -> std::size_t
 {
-  using StringT = std::basic_string<CharT, CharTraits>;
-  StringT token;
+  return std::char_traits<typename StrT::value_type>::length(s.c_str());
+}
 
-  std::vector<StringT> tokens;
-  tokens.reserve(std::count(s.begin(), s.end(), delimiter));
+/**
+ * @brief   returns the number of characters of the given multibyte string s
+ * @param   CharT const* c
+ * @returns number of characters stored in c excluding terminating zero byte
+ */
+template <class CharT>
+inline auto cstrLength(CharT const* const c) -> std::size_t
+{
+  return std::char_traits<CharT>::length(c);
+}
 
-  typename StringT::size_type pos1 = 0ULL;
-  typename StringT::size_type pos2 = s.find(delimiter, 0ULL);
-  while(pos2 != StringT::npos)
-  {
-    tokens.push_back(s.substr(pos1, pos2 - pos1));
-    pos1 = pos2 + 1ULL;
-    pos2 = s.find(delimiter, pos1);
-  }
-  tokens.push_back(s.substr(pos1, pos2 - pos1));
+/**
+ * @brief     converts the given string s to multibyte c-string
+ * @param[in] const std::(w)string& s
+ * @returns   char* pointer containing the characters of s
+ */
+auto toMBstring(const std::string& s) -> char*;
+auto toMBstring(const std::wstring& s) -> char*;
 
-  return tokens;
+/**
+ * @brief     converts the given string s to wide character c-string dest
+ * @param[in] const std::(w)string& s
+ * @returns   a wide character c-string containing the characters of s
+ */
+wchar_t* toWCstring(const std::string&);
+wchar_t* toWCstring(const std::wstring&);
+
+/**
+ * converts the given std::wstring s to a std::string
+ * @param   std::wstring const& s
+ * @returns a std::string containing the characters of s
+ */
+inline auto wstringToString(std::wstring const& s) -> std::string
+{
+  std::unique_ptr<char[]> p{stringAlgorithms::toMBstring(s)};
+  return std::string{p.get()};
+}
+
+/**
+ * @brief   converts the given std::string s to std::wstring dest
+ * @param   std::string const& s
+ * @returns a std::wstring containing the characters of s
+ */
+inline auto stringToWstring(const std::string& s) -> std::wstring
+{
+  std::unique_ptr<wchar_t[]> p{stringAlgorithms::toWCstring(s)};
+  return std::wstring{p.get()};
 }
 
 

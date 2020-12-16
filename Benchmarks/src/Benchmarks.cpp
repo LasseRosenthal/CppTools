@@ -17,6 +17,7 @@
 #include <benchmark/benchmark.h>
 #include <Utils/StringUtils.h>
 #include <Utils/miscellaneous.h>
+#include <Utils/StringAlgorithms.h>
 
 #include <random>
 #include <iostream>
@@ -238,6 +239,22 @@ static void BM_getMapKeys(benchmark::State& state)
 }
 
 BENCHMARK(BM_getMapKeys);
+
+
+static void BM_wstringToString(benchmark::State& state)
+{
+  const auto str = L"hallo dies ist ein langer string mit viel schönem Text"s;
+
+  for(auto _ : state)
+  {
+    benchmark::DoNotOptimize(stringAlgorithms::wstringToString(str));
+  }
+  state.SetItemsProcessed(100000);
+}
+
+BENCHMARK(BM_wstringToString);
+
+
 
 
 BENCHMARK_MAIN();
