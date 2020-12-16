@@ -101,7 +101,7 @@ TEST(Miscellaneous, numberOfDecimalPlacesDouble)
 
 TEST(Miscellaneous, numberOfDecimalPlacesFloat)
 {
-  const float value = 1042.2365;
+  const float value = 1042.2365F;
   constexpr std::size_t expected = 4ULL;
   EXPECT_EQ(cpptools::numberOfDecimalPlaces(value), expected);
 }

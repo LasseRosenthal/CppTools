@@ -367,7 +367,33 @@ TEST(BitField, findIf)
   auto firstFalse = std::find_if(b.begin(), b.end(), [](const auto& val) { return val == false; });
   EXPECT_EQ(std::distance(b.begin(), firstFalse), 2LL);
 }
+
+union Flags {
  
+  std::uint16_t raw;
+  BitField<6ULL, 0ULL> f0;
+  BitField<6ULL, 6ULL> f1;
+  BitField<4ULL, 12ULL> f2;
+
+  Flags(std::uint16_t v3)
+    : f2{v3}
+  {}
+};
+
+TEST(BitField, BitfieldsInUnion)
+{
+  Flags flags(0b0000'0000'1100'0100);
+
+  flags.f0 = 0b0000'0111;
+  flags.f1 = 63;
+  //0b1111'0000'1111'1111;
+  flags.f2 = 0b0000'0000'0000'0000;
+
+  EXPECT_EQ(static_cast<std::uint8_t>(flags.f0), 7);
+  EXPECT_EQ(static_cast<std::uint16_t>(flags.f1), 63);
+  EXPECT_EQ(static_cast<std::uint16_t>(flags.f2), 0);
+
+}
  
 // *************************************************************************** // 
 // ******************************* END OF FILE ******************************* // 

@@ -67,15 +67,16 @@ public:
 
   // ---------------------------------------------------
   // constructor
-  constexpr BitField (value_type v = value_type{});
-  constexpr BitField (BitField const& src);
+  constexpr BitField () = default;
+  constexpr BitField (value_type v) noexcept;
+  constexpr BitField (BitField const& src) noexcept;
   auto operator=     (value_type) noexcept -> BitField&;
 
   // ---------------------------------------------------
   // logical bitwise operations
-  auto operator&=(BitField const& src) noexcept -> BitField&;
-  auto operator|=(BitField const& src) noexcept -> BitField&;
-  auto operator^=(BitField const& src) noexcept -> BitField&;
+  auto operator&= (BitField const& src) noexcept -> BitField&;
+  auto operator|= (BitField const& src) noexcept -> BitField&;
+  auto operator^= (BitField const& src) noexcept -> BitField&;
 
   // ---------------------------------------------------
   // access operations
@@ -100,7 +101,7 @@ private:
 
   // ---------------------------------------------------
   // private data
-  value_type value;
+  value_type value{};
 
   // ---------------------------------------------------
   // auxiliary methods
@@ -332,13 +333,13 @@ private:
 
   // ---------------------------------------------------
   // private data
-  size_type    index;
-  value_type   proxy;
+  size_type  index;
+  value_type proxy;
 
   // ---------------------------------------------------
   // private methods
   [[nodiscard]] constexpr auto isAtEnd() const noexcept -> bool;
-  void           advance(difference_type n) noexcept;
+  void advance(difference_type n) noexcept;
 };
 
 
@@ -469,7 +470,7 @@ inline void BitField<Size, StartBit>::BitFieldIterator<IsConst>::advance(differe
  * @brief Constructor. Initializes the bits with the binary representation of the given value.
  */
 template <std::size_t Size, std::size_t StartBit>
-constexpr BitField<Size, StartBit>::BitField(value_type v)
+constexpr BitField<Size, StartBit>::BitField(value_type v) noexcept
   : value {getValue(v)}
 {}
 
@@ -477,7 +478,7 @@ constexpr BitField<Size, StartBit>::BitField(value_type v)
  * @brief Copy Constructor.
  */
 template <std::size_t Size, std::size_t StartBit>
-constexpr BitField<Size, StartBit>::BitField(BitField<Size, StartBit> const& src)
+constexpr BitField<Size, StartBit>::BitField(BitField<Size, StartBit> const& src) noexcept
   : value {getValue(src.value)}
 {}
 
