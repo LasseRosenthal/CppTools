@@ -234,35 +234,25 @@ auto lexicalCast(std::string const& valString) -> T
 }
 
 /** 
- * @brief 
+ * @brief  Compares two null-terminated byte strings lexicographically.
+ * @return Negative value if s1 appears before s2 in lexicographical order.
+ *         Zero if s1 and s2 compare equal.
+ *         Positive value if s1 appears after s2 in lexicographical order.
  */
-template <typename CharT, typename Predicate, typename CharTraits = std::char_traits<CharT>>
-inline auto split(std::basic_string<CharT, CharTraits> const& s, Predicate&& pred) -> std::vector<std::basic_string<CharT, CharTraits>>
+inline auto strComp(const char* const s1, const char* const s2) -> int
 {
-  if(s.empty()) return {};
+  return strcmp(s1, s2);
+}
 
-  using StringT = std::basic_string<CharT, CharTraits>;
-
-  const auto numDelim = std::count_if(s.begin(), s.end(), std::forward<Predicate>(pred));
-  std::vector<StringT> tokens;
-  tokens.reserve(numDelim + 1);
-
-  const auto end = s.end();
-  auto pos1 = std::find_if_not(s.begin(), end, std::forward<Predicate>(pred));
-  auto pos2 = std::find_if(pos1, end, std::forward<Predicate>(pred));
-  while(pos2 != end)
-  {
-    tokens.emplace_back(pos1, pos2);
-    pos1 = std::find_if_not(pos2, end, std::forward<Predicate>(pred));
-    pos2 = std::find_if(pos1, end, std::forward<Predicate>(pred));
-  }
-
-  if(pos1 != end)
-  {
-    tokens.emplace_back(pos1, pos2);
-  }
-
-  return tokens;
+/** 
+ * @brief Compares two null-terminated wide strings lexicographically.
+ * @return Negative value if s1 appears before s2 in lexicographical order.
+ *         Zero if s1 and s2 compare equal.
+ *         Positive value if s1 appears after s2 in lexicographical order. 
+ */
+inline auto strComp(const wchar_t* const s1, const wchar_t* const s2) -> int
+{
+  return wcscmp(s1, s2);
 }
 
 /**
@@ -325,6 +315,43 @@ inline auto stringToWstring(const std::string& s) -> std::wstring
   return std::wstring{p.get()};
 }
 
+
+
+
+
+
+
+/** 
+ * @brief 
+ */
+template <typename CharT, typename Predicate, typename CharTraits = std::char_traits<CharT>>
+inline auto split(std::basic_string<CharT, CharTraits> const& s, Predicate&& pred) -> std::vector<std::basic_string<CharT, CharTraits>>
+{
+  if(s.empty()) return {};
+
+  using StringT = std::basic_string<CharT, CharTraits>;
+
+  const auto numDelim = std::count_if(s.begin(), s.end(), std::forward<Predicate>(pred));
+  std::vector<StringT> tokens;
+  tokens.reserve(numDelim + 1);
+
+  const auto end = s.end();
+  auto pos1 = std::find_if_not(s.begin(), end, std::forward<Predicate>(pred));
+  auto pos2 = std::find_if(pos1, end, std::forward<Predicate>(pred));
+  while(pos2 != end)
+  {
+    tokens.emplace_back(pos1, pos2);
+    pos1 = std::find_if_not(pos2, end, std::forward<Predicate>(pred));
+    pos2 = std::find_if(pos1, end, std::forward<Predicate>(pred));
+  }
+
+  if(pos1 != end)
+  {
+    tokens.emplace_back(pos1, pos2);
+  }
+
+  return tokens;
+}
 
 }   // namespace stringAlgorithms
 
