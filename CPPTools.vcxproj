@@ -186,6 +186,7 @@
     <ClInclude Include="include\Unit\UnitSystemGenerator.h" />
     <ClInclude Include="include\Utils\BitField.h" />
     <ClInclude Include="include\Utils\EnumRange.h" />
+    <ClInclude Include="include\Utils\FloatingPoint.h" />
     <ClInclude Include="include\Utils\LambdaOverload.h" />
     <ClInclude Include="include\Utils\miscellaneous.h" />
     <ClInclude Include="include\Utils\MultiTypeMap.h" />

@@ -20,6 +20,7 @@
 #include <Utils/miscellaneous.h>
 #include <boost/algorithm/string.hpp>
 
+#include <functional>
 #include <iomanip>
 #include <sstream>
 #include <string>
@@ -257,7 +258,7 @@ inline auto strComp(const wchar_t* const s1, const wchar_t* const s2) -> int
 
 /**
  * @brief   returns the number of characters of the given string s
- * @param   const STRING_TYPE& s
+ * @param   const StrT& s
  * @returns number of characters stored in s
  */
 template <typename StrT>
@@ -315,24 +316,70 @@ inline auto stringToWstring(const std::string& s) -> std::wstring
   return std::wstring{p.get()};
 }
 
+/**
+ * @brief   checks if if a given string s1 begins with another string s2
+ * @returns true, if s1 begins with s2. False otherwise.
+ */
+template <typename StrT>
+inline auto beginsWith(StrT&& s1, StrT&& s2) -> bool
+{
+  const auto len1 = s1.length();
+  const auto len2 = s2.length();
+  if(len2 > len1)
+  {
+    return false;
+  }
+  return s1.compare(0ULL, len2, s2) == 0;
+}
 
+/**
+ * @brief   checks if if a given string s1 ends with another string s2
+ * @returns true, if s1 ends with s2. False otherwise.
+ */
+template <typename StrT>
+inline auto endsWith(StrT&& s1, StrT&& s2) -> bool
+{
+  const auto len1 = s1.length();
+  const auto len2 = s2.length();
+  if(len2 > len1)
+  {
+    return false;
+  }
+  return s1.compare(len1 - len2, len2, s2) == 0;
+}
 
+/**
+ * @brief returns the substring between two delimiters
+ */
+template <class StrT, typename Predicate>
+auto substringBetweenDelimiters(StrT const& s, Predicate&& pred) -> StrT
+{
+  const auto end = s.end();
+  const auto pos1 = std::find_if_not(s.begin(), end, std::forward<Predicate>(pred));
+  if(pos1 == end)
+  {
+    return {};
+  }
 
+  const auto pos2 = std::find_if(pos1, end, std::forward<Predicate>(pred));
+  if(pos2 == end)
+  {
+    return {};
+  }
 
-
+  return StrT{pos1, pos2};
+}
 
 /** 
  * @brief 
  */
-template <typename CharT, typename Predicate, typename CharTraits = std::char_traits<CharT>>
-inline auto split(std::basic_string<CharT, CharTraits> const& s, Predicate&& pred) -> std::vector<std::basic_string<CharT, CharTraits>>
+template <typename StrT, typename Predicate>
+auto split(StrT const& s, Predicate&& pred) -> std::vector<StrT>
 {
   if(s.empty()) return {};
 
-  using StringT = std::basic_string<CharT, CharTraits>;
-
   const auto numDelim = std::count_if(s.begin(), s.end(), std::forward<Predicate>(pred));
-  std::vector<StringT> tokens;
+  std::vector<StrT> tokens;
   tokens.reserve(numDelim + 1);
 
   const auto end = s.end();
@@ -352,6 +399,7 @@ inline auto split(std::basic_string<CharT, CharTraits> const& s, Predicate&& pre
 
   return tokens;
 }
+
 
 }   // namespace stringAlgorithms
 

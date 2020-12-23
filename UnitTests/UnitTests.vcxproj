@@ -54,6 +54,7 @@
     <ClInclude Include="src\include\DimensionTest.h" />
     <ClInclude Include="src\include\DummyClass.h" />
     <ClInclude Include="src\include\EnumRangeTest.h" />
+    <ClInclude Include="src\include\FloatingPointTest.h" />
     <ClInclude Include="src\include\ImpoSurfaceSheetRelationTest.h" />
     <ClInclude Include="src\include\MultiTypeMapTest.h" />
     <ClInclude Include="src\include\RatioUtilsTest.h" />

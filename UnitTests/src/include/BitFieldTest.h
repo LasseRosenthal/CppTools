@@ -141,7 +141,7 @@ TEST(BitField, streamIntoOstream)
 
   std::stringstream sstr;
   sstr << b;
-  EXPECT_EQ(sstr.str(), "00011000"s);
+  EXPECT_EQ(sstr.str(), "110"s);
 }
 
 TEST(BitField, BitProxySetBitToTrue)
@@ -150,13 +150,13 @@ TEST(BitField, BitProxySetBitToTrue)
   bitField b{0b0000'0011};
   std::stringstream sstr;
   sstr << b;
-  EXPECT_EQ(sstr.str(), "00001100"s);
+  EXPECT_EQ(sstr.str(), "011"s);
 
   auto bitProxy = b.getBitProxy(2ULL);
   bitProxy      = true;
   sstr.str("");
   sstr << b;
-  EXPECT_EQ(sstr.str(), "00011100"s);
+  EXPECT_EQ(sstr.str(), "111"s);
 }
 
 TEST(BitField, BitProxySetBitToFalse)
@@ -167,18 +167,18 @@ TEST(BitField, BitProxySetBitToFalse)
   bitProxy      = false;
   std::stringstream sstr;
   sstr << b;
-  EXPECT_EQ(sstr.str(), "00011000"s);
+  EXPECT_EQ(sstr.str(), "110"s);
 }
 
 TEST(BitField, BitProxyFlipOneBit)
 {
   using bitField = BitField<3ULL, 2ULL>;
   bitField b{0b0000'0111};
-  auto bitProxy = b.getBitProxy(0ULL);
+  auto bitProxy = b.getBitProxy(1ULL);
   bitProxy.flip();
   std::stringstream sstr;
   sstr << b;
-  EXPECT_EQ(sstr.str(), "00011000"s);
+  EXPECT_EQ(sstr.str(), "101"s);
 }
 
 TEST(BitField, BitProxyFlipZeroBit)
@@ -189,7 +189,7 @@ TEST(BitField, BitProxyFlipZeroBit)
   bitProxy.flip();
   std::stringstream sstr;
   sstr << b;
-  EXPECT_EQ(sstr.str(), "00011100"s);
+  EXPECT_EQ(sstr.str(), "111"s);
 }
 
 TEST(BitField, BitProxyIsSet)

@@ -687,7 +687,18 @@ template <std::size_t Size, std::size_t StartBit>
 template <typename CharT, typename CharTraits>
 inline auto BitField<Size, StartBit>::put(std::basic_ostream<CharT, CharTraits>& ostr) const -> std::basic_ostream<CharT, CharTraits>&
 {
-  cpptools::binaryRep(static_cast<value_type>(value & cutter), ostr);
+//  cpptools::binaryRep(static_cast<value_type>(value & cutter), ostr);
+  std::vector<CharT> v;
+  v.reserve(Size);
+  for(auto b : *this)
+  {
+    v.push_back(b == true ? ostr.widen('1') : ostr.widen('0'));
+  }
+
+  for(auto val = v.crbegin(); val != v.crend(); ++val)
+  {
+    ostr << *val;
+  }
   return ostr;
 }
 

@@ -250,6 +250,72 @@ TEST(StringAlgorithms, stringToWstring)
   const auto expected = L"asgctgkztikzniuzhucjczhjukujhniukgiuiukgftzghtzhiugtgiz"s;
   EXPECT_EQ(s2, expected);
 }
+
+TEST(StringAlgorithms, beginsWithCompareWithEmptyString)
+{
+  const auto s1 = "TestString"s;
+  const auto s2 = ""s;
+  EXPECT_TRUE(stringAlgorithms::beginsWith(s1, s2));
+}
+
+TEST(StringAlgorithms, beginsWithExpectFalse)
+{
+  const auto s1 = "TestString"s;
+  const auto s2 = " Test"s;
+  EXPECT_FALSE(stringAlgorithms::beginsWith(s1, s2));
+}
+
+TEST(StringAlgorithms, beginsWithExpectTrue)
+{
+  const auto s1 = "TestString"s;
+  const auto s2 = "TestS"s;
+  EXPECT_TRUE(stringAlgorithms::beginsWith(s1, s2));
+}
+
+TEST(StringAlgorithms, beginsWithExpectTrueIdenticalStrings)
+{
+  const auto s1 = "TestString"s;
+  const auto s2 = "TestString"s;
+  EXPECT_TRUE(stringAlgorithms::beginsWith(s1, s2));
+}
+
+TEST(StringAlgorithms, endsWithCompareWithEmptyString)
+{
+  const auto s1 = "TestString"s;
+  const auto s2 = ""s;
+  EXPECT_TRUE(stringAlgorithms::endsWith(s1, s2));
+}
+
+TEST(StringAlgorithms, endsWithExpectFalse)
+{
+  const auto s1 = "TestString"s;
+  const auto s2 = "ring "s;
+  EXPECT_FALSE(stringAlgorithms::endsWith(s1, s2));
+}
+
+TEST(StringAlgorithms, endsWithExpectTrue)
+{
+  const auto s1 = "TestString"s;
+  const auto s2 = "estString"s;
+  EXPECT_TRUE(stringAlgorithms::endsWith(s1, s2));
+}
+
+TEST(StringAlgorithms, endsWithExpectTrueIdenticalStrings)
+{
+  const auto s1 = "TestString"s;
+  const auto s2 = "TestString"s;
+  EXPECT_TRUE(stringAlgorithms::endsWith(s1, s2));
+}
+
+TEST(StringAlgorithms, substringBetweenDelimiters)
+{
+  const auto s1 = "%NumWorkers%"s;
+  const auto expected = "NumWorkers"s;
+  const auto subStr = stringAlgorithms::substringBetweenDelimiters(s1, [](const char c){ return c == '%';});
+  EXPECT_EQ(subStr, expected);
+}
+
+
  
  
 // *************************************************************************** // 
