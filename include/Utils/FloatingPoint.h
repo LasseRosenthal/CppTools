@@ -18,6 +18,8 @@
  
 // includes
 #include <Utils/BitField.h>
+
+#include <ostream>
  
 
 namespace cpptools {
@@ -73,16 +75,23 @@ public:
   // construction
   constexpr FloatingPoint (value_type v = 0.0) noexcept;
   constexpr FloatingPoint (intType v) noexcept;
+  constexpr FloatingPoint (intType m, intType c, intType s) noexcept;
 
   // ---------------------------------------------------
   // methods
   [[nodiscard]] constexpr operator value_type () const noexcept;
   [[nodiscard]] constexpr auto mantissa       () const noexcept -> intType;
   [[nodiscard]] constexpr auto exponent       () const noexcept -> intType;
+  [[nodiscard]] constexpr auto characteristic () const noexcept -> intType;
   [[nodiscard]] constexpr auto signBit        () const noexcept -> intType;
   [[nodiscard]] constexpr auto isNegative     () const noexcept -> bool;
   [[nodiscard]] constexpr auto isNan          () const noexcept -> bool;
   [[nodiscard]] constexpr auto isInfinity     () const noexcept -> bool;
+  [[nodiscard]] constexpr auto isNormal       () const noexcept -> bool;
+  [[nodiscard]] constexpr auto isSubNormal    () const noexcept -> bool;
+
+  template <typename CharT, typename CharTraitsT = std::char_traits<CharT>>
+  auto put(std::basic_ostream<CharT, CharTraitsT>& ostr) const -> std::basic_ostream<CharT, CharTraitsT>&;
 
 private:
 
@@ -92,7 +101,7 @@ private:
     value_type value;
     intType bits;
     BitField<IEEESpec::mantissaBits, 0ULL> mantissa_;
-    BitField<IEEESpec::exponentBits, IEEESpec::mantissaBits> exponent_;
+    BitField<IEEESpec::exponentBits, IEEESpec::mantissaBits> characteristic_;
     BitField<IEEESpec::signBits, IEEESpec::mantissaBits + IEEESpec::exponentBits> signBit_;
   };
 };
@@ -115,6 +124,20 @@ constexpr FloatingPoint<FloatT>::FloatingPoint(intType v) noexcept
 {}
 
 /**
+ * @brief Constructor.
+ * @param m the mantissa.
+ * @param e the characteristic.
+ * @param s the sign bit.
+ */
+template <typename FloatT>
+constexpr FloatingPoint<FloatT>::FloatingPoint(intType m, intType c, intType s) noexcept
+  : mantissa_{m}
+{
+  characteristic_ = c;
+  signBit_        = s;
+}
+
+/**
  * @brief Returns the floating point value.
  */
 template <typename FloatT>
@@ -133,12 +156,21 @@ template <typename FloatT>
 }
 
 /**
- * @brief Returns the value of the exponent as an integer value.
+ * @brief Returns the value of the exponent, i.e. the biased characterictisc as an integer value.
  */
 template <typename FloatT>
 [[nodiscard]] constexpr auto FloatingPoint<FloatT>::exponent() const noexcept -> intType
 {
-  return static_cast<intType>(exponent_);
+  return isNormal() ? characteristic() - IEEESpec::bias : characteristic() - IEEESpec::bias + 1;
+}
+
+/**
+ * @brief Returns the value of the characterictisc as an integer value.
+ */
+template <typename FloatT>
+inline constexpr auto FloatingPoint<FloatT>::characteristic() const noexcept -> intType
+{
+  return static_cast<intType>(characteristic_);
 }
 
 /**
@@ -165,7 +197,7 @@ inline constexpr auto FloatingPoint<FloatT>::isNegative() const noexcept -> bool
 template <typename FloatT>
 inline constexpr auto FloatingPoint<FloatT>::isNan() const noexcept -> bool
 {
-  return static_cast<intType>(exponent_) == IEEESpec::maxExponent && mantissa() != 0;
+  return static_cast<intType>(characteristic_) == IEEESpec::maxExponent && mantissa() != 0;
 }
 
 /**
@@ -174,7 +206,41 @@ inline constexpr auto FloatingPoint<FloatT>::isNan() const noexcept -> bool
 template <typename FloatT>
 inline constexpr auto FloatingPoint<FloatT>::isInfinity() const noexcept -> bool
 {
-  return static_cast<intType>(exponent_) == IEEESpec::maxExponent && mantissa() == 0;
+  return static_cast<intType>(characteristic_) == IEEESpec::maxExponent && mantissa() == 0;
+}
+
+/**
+ * @brief Checks if the given number is normal, i.e the characteristic is larger than zero.
+ */
+template <typename FloatT>
+constexpr auto FloatingPoint<FloatT>::isNormal() const noexcept -> bool
+{
+  return characteristic() > 0 && characteristic() != IEEESpec::maxExponent;
+}
+
+/**
+ * @brief Checks if the given number is subNormal, i.e the characteristic is equal to zero.
+ */
+template <typename FloatT>
+inline constexpr auto FloatingPoint<FloatT>::isSubNormal() const noexcept -> bool
+{
+  return characteristic() == 0;
+}
+
+template <typename FloatT>
+template <typename CharT, typename CharTraitsT>
+inline auto FloatingPoint<FloatT>::put(std::basic_ostream<CharT, CharTraitsT>& ostr) const -> std::basic_ostream<CharT, CharTraitsT>&
+{
+  return ostr << signBit_ << ostr.widen(' ') << characteristic_ << ostr.widen(' ') << mantissa_;
+}
+
+/**
+ * @brief Stream operator.
+ */
+template <typename FloatT, typename CharT, typename CharTraitsT>
+auto operator<<(std::basic_ostream<CharT, CharTraitsT>& ostr, FloatingPoint<FloatT> const& f) -> std::basic_ostream<CharT, CharTraitsT>&
+{
+  return f.put(ostr);
 }
 
 
