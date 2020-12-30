@@ -36,22 +36,26 @@ struct IEEE754Specification;
 
 template <>
 struct IEEE754Specification<float> {
-  using intType = std::int32_t;
-  static constexpr std::size_t mantissaBits = 23ULL;
-  static constexpr std::size_t exponentBits = 8ULL;
-  static constexpr std::size_t signBits     = 1ULL;
-  static constexpr intType     bias         = 127;
-  static constexpr intType     maxExponent  = 255;
+  using intType                                  = std::int32_t;
+  static constexpr std::size_t mantissaBits      = 23ULL;
+  static constexpr std::size_t exponentBits      = 8ULL;
+  static constexpr std::size_t signBits          = 1ULL;
+  static constexpr intType     bias              = 127;
+  static constexpr intType     maxCharacteristic = 255;
+  static constexpr intType     maxExponent       = 127;
+  static constexpr intType     maxMantissa       = (1 << mantissaBits) - 1;
 };
 
 template <>
 struct IEEE754Specification<double> {
-  using intType = std::int64_t;
-  static constexpr std::size_t mantissaBits = 52ULL;
-  static constexpr std::size_t exponentBits = 11ULL;
-  static constexpr std::size_t signBits     = 1ULL;
-  static constexpr intType     bias         = 1023;
-  static constexpr intType     maxExponent  = 2047;
+  using intType                                  = std::int64_t;
+  static constexpr std::size_t mantissaBits      = 52ULL;
+  static constexpr std::size_t exponentBits      = 11ULL;
+  static constexpr std::size_t signBits          = 1ULL;
+  static constexpr intType     bias              = 1023LL;
+  static constexpr intType     maxCharacteristic = 2047LL;
+  static constexpr intType     maxExponent       = 1023LL;
+  static constexpr intType     maxMantissa       = (1LL << mantissaBits) - 1LL;
 };
 
 
@@ -92,6 +96,10 @@ public:
 
   template <typename CharT, typename CharTraitsT = std::char_traits<CharT>>
   auto put(std::basic_ostream<CharT, CharTraitsT>& ostr) const -> std::basic_ostream<CharT, CharTraitsT>&;
+
+  static auto maxVal() noexcept -> FloatingPoint;
+  static auto minVal() noexcept -> FloatingPoint;
+
 
 private:
 
@@ -197,7 +205,7 @@ inline constexpr auto FloatingPoint<FloatT>::isNegative() const noexcept -> bool
 template <typename FloatT>
 inline constexpr auto FloatingPoint<FloatT>::isNan() const noexcept -> bool
 {
-  return static_cast<intType>(characteristic_) == IEEESpec::maxExponent && mantissa() != 0;
+  return static_cast<intType>(characteristic_) == IEEESpec::maxCharacteristic && mantissa() != 0;
 }
 
 /**
@@ -206,7 +214,7 @@ inline constexpr auto FloatingPoint<FloatT>::isNan() const noexcept -> bool
 template <typename FloatT>
 inline constexpr auto FloatingPoint<FloatT>::isInfinity() const noexcept -> bool
 {
-  return static_cast<intType>(characteristic_) == IEEESpec::maxExponent && mantissa() == 0;
+  return static_cast<intType>(characteristic_) == IEEESpec::maxCharacteristic && mantissa() == 0;
 }
 
 /**
@@ -215,7 +223,7 @@ inline constexpr auto FloatingPoint<FloatT>::isInfinity() const noexcept -> bool
 template <typename FloatT>
 constexpr auto FloatingPoint<FloatT>::isNormal() const noexcept -> bool
 {
-  return characteristic() > 0 && characteristic() != IEEESpec::maxExponent;
+  return characteristic() > 0 && characteristic() != IEEESpec::maxCharacteristic;
 }
 
 /**
@@ -225,6 +233,24 @@ template <typename FloatT>
 inline constexpr auto FloatingPoint<FloatT>::isSubNormal() const noexcept -> bool
 {
   return characteristic() == 0;
+}
+
+/**
+ * @brief Returns the largest representable floating point number.
+ */
+template <typename FloatT>
+inline auto FloatingPoint<FloatT>::maxVal() noexcept -> FloatingPoint
+{
+  return FloatingPoint(IEEESpec::maxMantissa, IEEESpec::maxCharacteristic - 1, 0);
+}
+
+/**
+ * @brief Returns the smallest representable floating point number.
+ */
+template <typename FloatT>
+inline auto FloatingPoint<FloatT>::minVal() noexcept -> FloatingPoint
+{
+  return FloatingPoint(IEEESpec::maxMantissa, IEEESpec::maxCharacteristic - 1, 1);
 }
 
 template <typename FloatT>
