@@ -19,6 +19,7 @@
 // includes
 #include <Utils/BitField.h>
 
+#include <cmath>
 #include <ostream>
  
 
@@ -36,26 +37,34 @@ struct IEEE754Specification;
 
 template <>
 struct IEEE754Specification<float> {
-  using intType                                  = std::int32_t;
-  static constexpr std::size_t mantissaBits      = 23ULL;
-  static constexpr std::size_t exponentBits      = 8ULL;
-  static constexpr std::size_t signBits          = 1ULL;
-  static constexpr intType     bias              = 127;
-  static constexpr intType     maxCharacteristic = 255;
-  static constexpr intType     maxExponent       = 127;
-  static constexpr intType     maxMantissa       = (1 << mantissaBits) - 1;
+  using intType                                   = std::int32_t;
+  static constexpr std::size_t mantissaBits       = 23ULL;
+  static constexpr std::size_t exponentBits       = 8ULL;
+  static constexpr std::size_t signBits           = 1ULL;
+  static constexpr intType     bias               = 127;
+  static constexpr intType     maxCharacteristic  = 255;
+  static constexpr intType     maxExponent        = 127;
+  static constexpr intType     maxMantissa        = (1 << mantissaBits) - 1;
+  static constexpr intType     maxValInt          = 0b01111111011111111111111111111111;
+  static constexpr intType     minValNormalInt    = 0b00000000100000000000000000000000;
+  static constexpr intType     minValSubNormalInt = 0b00000000000000000000000000000001;
+  static constexpr intType     lowestValInt       = 0b11111111011111111111111111111111;
 };
 
 template <>
 struct IEEE754Specification<double> {
-  using intType                                  = std::int64_t;
-  static constexpr std::size_t mantissaBits      = 52ULL;
-  static constexpr std::size_t exponentBits      = 11ULL;
-  static constexpr std::size_t signBits          = 1ULL;
-  static constexpr intType     bias              = 1023LL;
-  static constexpr intType     maxCharacteristic = 2047LL;
-  static constexpr intType     maxExponent       = 1023LL;
-  static constexpr intType     maxMantissa       = (1LL << mantissaBits) - 1LL;
+  using intType                                   = std::int64_t;
+  static constexpr std::size_t mantissaBits       = 52ULL;
+  static constexpr std::size_t exponentBits       = 11ULL;
+  static constexpr std::size_t signBits           = 1ULL;
+  static constexpr intType     bias               = 1023LL;
+  static constexpr intType     maxCharacteristic  = 2047LL;
+  static constexpr intType     maxExponent        = 1023LL;
+  static constexpr intType     maxMantissa        = (1LL << mantissaBits) - 1LL;
+  static constexpr intType     maxValInt          = 0b0111111111101111111111111111111111111111111111111111111111111111;
+  static constexpr intType     minValNormalInt    = 0b0000000000010000000000000000000000000000000000000000000000000000;
+  static constexpr intType     minValSubNormalInt = 0b0000000000000000000000000000000000000000000000000000000000000001;
+  static constexpr intType     lowestValInt       = 0b1111111111101111111111111111111111111111111111111111111111111111;
 };
 
 
@@ -80,26 +89,43 @@ public:
   constexpr FloatingPoint (value_type v = 0.0) noexcept;
   constexpr FloatingPoint (intType v) noexcept;
   constexpr FloatingPoint (intType m, intType c, intType s) noexcept;
+  constexpr FloatingPoint (FloatingPoint const& src) noexcept;
+  constexpr FloatingPoint (FloatingPoint&& src) noexcept;
+  auto operator=          (FloatingPoint const& src) noexcept -> FloatingPoint&;
+  auto operator=          (FloatingPoint&& src) noexcept -> FloatingPoint&;
 
   // ---------------------------------------------------
   // methods
-  [[nodiscard]] constexpr operator value_type () const noexcept;
-  [[nodiscard]] constexpr auto mantissa       () const noexcept -> intType;
-  [[nodiscard]] constexpr auto exponent       () const noexcept -> intType;
-  [[nodiscard]] constexpr auto characteristic () const noexcept -> intType;
-  [[nodiscard]] constexpr auto signBit        () const noexcept -> intType;
-  [[nodiscard]] constexpr auto isNegative     () const noexcept -> bool;
-  [[nodiscard]] constexpr auto isNan          () const noexcept -> bool;
-  [[nodiscard]] constexpr auto isInfinity     () const noexcept -> bool;
-  [[nodiscard]] constexpr auto isNormal       () const noexcept -> bool;
-  [[nodiscard]] constexpr auto isSubNormal    () const noexcept -> bool;
+  [[nodiscard]] constexpr operator value_type         () const noexcept;
+  [[nodiscard]] constexpr operator intType            () const noexcept;
+  [[nodiscard]] constexpr auto mantissa               () const noexcept -> intType;
+  [[nodiscard]] constexpr auto exponent               () const noexcept -> intType;
+  [[nodiscard]] constexpr auto characteristic         () const noexcept -> intType;
+  [[nodiscard]] constexpr auto signBit                () const noexcept -> intType;
+  [[nodiscard]] constexpr auto isPositive             () const noexcept -> bool;
+  [[nodiscard]] constexpr auto isNegative             () const noexcept -> bool;
+  [[nodiscard]] constexpr auto isZero                 () const noexcept -> bool;
+  [[nodiscard]] constexpr auto isFiniteNumber         () const noexcept -> bool;
+  [[nodiscard]] constexpr auto isNan                  () const noexcept -> bool;
+  [[nodiscard]] constexpr auto isInfinity             () const noexcept -> bool;
+  [[nodiscard]] constexpr auto isNormal               () const noexcept -> bool;
+  [[nodiscard]] constexpr auto isSubNormal            () const noexcept -> bool;
+  [[nodiscard]] constexpr auto next                   () const noexcept -> FloatingPoint;
+  [[nodiscard]] constexpr auto previous               () const noexcept -> FloatingPoint;
+
+  auto epsilon () const noexcept -> FloatingPoint;
+
+  [[nodiscard]] static constexpr auto maxVal          () noexcept -> FloatingPoint;
+  [[nodiscard]] static constexpr auto minValNormal    () noexcept -> FloatingPoint;
+  [[nodiscard]] static constexpr auto minValSubNormal () noexcept -> FloatingPoint;
+  [[nodiscard]] static constexpr auto lowest          () noexcept -> FloatingPoint;
+
+  auto operator++ () noexcept -> FloatingPoint&;
+  auto operator++ (int) noexcept -> FloatingPoint;
+
 
   template <typename CharT, typename CharTraitsT = std::char_traits<CharT>>
   auto put(std::basic_ostream<CharT, CharTraitsT>& ostr) const -> std::basic_ostream<CharT, CharTraitsT>&;
-
-  static auto maxVal() noexcept -> FloatingPoint;
-  static auto minVal() noexcept -> FloatingPoint;
-
 
 private:
 
@@ -116,19 +142,21 @@ private:
 
 
 /**
- * @brief Constructor. 
+ * @brief Constructor.
+ * @param d the double value represented by the FloatingPoint.
  */
 template <typename FloatT>
-constexpr FloatingPoint<FloatT>::FloatingPoint(value_type v) noexcept
-  : value(v)
+constexpr FloatingPoint<FloatT>::FloatingPoint(value_type d) noexcept
+  : value(d)
 {}
 
 /**
- * @brief Constructor. 
+ * @brief Constructor.
+ * @param i the integer value.
  */
 template <typename FloatT>
-constexpr FloatingPoint<FloatT>::FloatingPoint(intType v) noexcept
-  : bits(v)
+constexpr FloatingPoint<FloatT>::FloatingPoint(intType i) noexcept
+  : bits(i)
 {}
 
 /**
@@ -146,12 +174,57 @@ constexpr FloatingPoint<FloatT>::FloatingPoint(intType m, intType c, intType s) 
 }
 
 /**
+ * @brief Copy Constructor.
+ */
+template <typename FloatT>
+constexpr FloatingPoint<FloatT>::FloatingPoint(FloatingPoint const& src) noexcept
+  : value{src.value}
+{}
+
+/**
+ * @brief Move Constructor.
+ */
+template <typename FloatT>
+constexpr FloatingPoint<FloatT>::FloatingPoint(FloatingPoint&& src) noexcept
+  : value{std::move(src.value)}
+{}
+
+/**
+ * @brief Copy assignment.
+ */
+template <typename FloatT>
+inline auto FloatingPoint<FloatT>::operator=(FloatingPoint const& src) noexcept -> FloatingPoint&
+{
+  value = src.value;
+  return *this;
+}
+
+/**
+ * @brief Move assignment.
+ */
+template <typename FloatT>
+inline auto FloatingPoint<FloatT>::operator=(FloatingPoint&& src) noexcept -> FloatingPoint&
+{
+  value = std::move(src.value);
+  return *this;
+}
+
+/**
  * @brief Returns the floating point value.
  */
 template <typename FloatT>
 [[nodiscard]] constexpr FloatingPoint<FloatT>::operator value_type() const noexcept
 {
   return value;
+}
+
+/**
+ * @brief Returns the bits representation of the value interpreted as a signed integer.
+ */
+template <typename FloatT>
+[[nodiscard]] constexpr FloatingPoint<FloatT>::operator intType() const noexcept
+{
+  return bits;
 }
 
 /**
@@ -191,30 +264,58 @@ template <typename FloatT>
 }
 
 /**
- * @brief Checks the given floating point number is negative
+ * @brief Checks the given floating point number is positive.
  */
 template <typename FloatT>
-inline constexpr auto FloatingPoint<FloatT>::isNegative() const noexcept -> bool
+constexpr auto FloatingPoint<FloatT>::isPositive() const noexcept -> bool
+{
+  return signBit() == 0;
+}
+
+/**
+ * @brief Checks the given floating point number is negative.
+ */
+template <typename FloatT>
+constexpr auto FloatingPoint<FloatT>::isNegative() const noexcept -> bool
 {
   return signBit() == 1;
+}
+
+/**
+ * @brief Checks the given floating point equals plus or minus zero.
+ */
+template <typename FloatT>
+inline constexpr auto FloatingPoint<FloatT>::isZero() const noexcept -> bool
+{
+  return mantissa() == 0 && characteristic() == 0;
+}
+
+/**
+ * @brief Checks the given floating point number is a valid number, i.e. the characteristic
+ *        is smaller than \link #IEEESpec::maxCharacteristic \endlink.
+ */
+template <typename FloatT>
+constexpr auto FloatingPoint<FloatT>::isFiniteNumber() const noexcept -> bool
+{
+  return characteristic() != IEEESpec::maxCharacteristic;
 }
 
 /**
  * @brief Checks the given floating point number is NAN (not a number)
  */
 template <typename FloatT>
-inline constexpr auto FloatingPoint<FloatT>::isNan() const noexcept -> bool
+constexpr auto FloatingPoint<FloatT>::isNan() const noexcept -> bool
 {
-  return static_cast<intType>(characteristic_) == IEEESpec::maxCharacteristic && mantissa() != 0;
+  return !isFiniteNumber() && mantissa() != 0;
 }
 
 /**
  * @brief Checks the given floating point number represents inifinity.
  */
 template <typename FloatT>
-inline constexpr auto FloatingPoint<FloatT>::isInfinity() const noexcept -> bool
+constexpr auto FloatingPoint<FloatT>::isInfinity() const noexcept -> bool
 {
-  return static_cast<intType>(characteristic_) == IEEESpec::maxCharacteristic && mantissa() == 0;
+  return !isFiniteNumber() && mantissa() == 0;
 }
 
 /**
@@ -230,27 +331,102 @@ constexpr auto FloatingPoint<FloatT>::isNormal() const noexcept -> bool
  * @brief Checks if the given number is subNormal, i.e the characteristic is equal to zero.
  */
 template <typename FloatT>
-inline constexpr auto FloatingPoint<FloatT>::isSubNormal() const noexcept -> bool
+constexpr auto FloatingPoint<FloatT>::isSubNormal() const noexcept -> bool
 {
   return characteristic() == 0;
+}
+
+/**
+ * @brief Returns the next representable floating point number.
+ */
+//template <typename FloatT>
+//constexpr auto FloatingPoint<FloatT>::next() const noexcept -> FloatingPoint
+//{
+//  return isPositive() ? FloatingPoint(bits + 1);
+//}
+
+/**
+ * @brief Returns the previous representable floating point number.
+ */
+//template <typename FloatT>
+//constexpr auto FloatingPoint<FloatT>::previous() const noexcept -> FloatingPoint
+//{
+//  return isPositive() && isFiniteNumber() ? FloatingPoint(bits - 1);
+//}
+
+template <typename FloatT>
+inline auto FloatingPoint<FloatT>::epsilon() const noexcept -> FloatingPoint
+{
+  return isNormal() ? FloatingPoint(0, 0, 0) : minValSubNormal();
 }
 
 /**
  * @brief Returns the largest representable floating point number.
  */
 template <typename FloatT>
-inline auto FloatingPoint<FloatT>::maxVal() noexcept -> FloatingPoint
+[[nodiscard]] constexpr auto FloatingPoint<FloatT>::maxVal() noexcept -> FloatingPoint
 {
-  return FloatingPoint(IEEESpec::maxMantissa, IEEESpec::maxCharacteristic - 1, 0);
+  return {IEEESpec::maxValInt};
 }
 
 /**
- * @brief Returns the smallest representable floating point number.
+ * @brief Returns the smallest normalized representable positive floating point number.
  */
 template <typename FloatT>
-inline auto FloatingPoint<FloatT>::minVal() noexcept -> FloatingPoint
+[[nodiscard]] constexpr auto FloatingPoint<FloatT>::minValNormal() noexcept -> FloatingPoint
 {
-  return FloatingPoint(IEEESpec::maxMantissa, IEEESpec::maxCharacteristic - 1, 1);
+  return {IEEESpec::minValNormalInt};
+}
+
+/**
+ * @brief Returns the smallest denormalized representable positive floating point number.
+ */
+template <typename FloatT>
+[[nodiscard]] constexpr auto FloatingPoint<FloatT>::minValSubNormal() noexcept -> FloatingPoint
+{
+  return {IEEESpec::minValSubNormalInt};
+}
+
+/**
+ * @brief Returns the lowest representable floating point number.
+ */
+template <typename FloatT>
+[[nodiscard]] constexpr auto FloatingPoint<FloatT>::lowest() noexcept -> FloatingPoint
+{
+  return {IEEESpec::lowestValInt};
+}
+
+/**
+ * @brief Increments the given floating point number.
+ */
+template <typename FloatT>
+inline auto FloatingPoint<FloatT>::operator++() noexcept -> FloatingPoint&
+{
+  if(isPositive() && isFiniteNumber())
+  {
+    ++bits;
+  }
+  else
+  {
+    if(isZero())
+    {
+      bits = IEEESpec::minValSubNormalInt;
+    }
+    else
+    {
+      --bits;
+    }
+  }
+
+  return *this;
+}
+
+template <typename FloatT>
+inline auto FloatingPoint<FloatT>::operator++(int) noexcept -> FloatingPoint
+{
+  FloatingPoint tmp{*this};
+  ++(*this);
+  return tmp;
 }
 
 template <typename FloatT>

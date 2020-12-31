@@ -393,8 +393,9 @@ template <std::size_t Size, std::size_t StartBit>
 template <bool IsConst>
 inline auto BitField<Size, StartBit>::BitFieldIterator<IsConst>::operator++(int) noexcept -> BitFieldIterator
 {
-  BitFieldIterator copy{*this};
-  return ++copy;
+  BitFieldIterator tmp{*this};
+  ++(*this);
+  return tmp;
 }
 
 /**
@@ -416,8 +417,9 @@ template <std::size_t Size, std::size_t StartBit>
 template <bool IsConst>
 inline auto BitField<Size, StartBit>::BitFieldIterator<IsConst>::operator--(int) noexcept -> BitFieldIterator
 {
-  BitFieldIterator copy{*this};
-  return --copy;
+  BitFieldIterator tmp{*this};
+  --(*this);
+  return tmp;
 }
 
 

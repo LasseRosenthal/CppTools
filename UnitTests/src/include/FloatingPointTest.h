@@ -18,7 +18,9 @@
  
 // includes
 #include <Utils/FloatingPoint.h>
+#include <Utils/miscellaneous.h>
 
+#include <iostream>
 #include <limits>
 #include <sstream>
 
@@ -57,6 +59,38 @@ TEST(FloatingPoint, negativeZeroDouble)
   EXPECT_EQ(f.characteristic(), 0);
   EXPECT_EQ(f.signBit(), 1);
   EXPECT_TRUE(f.isNegative());
+}
+
+TEST(FloatingPoint, isZeroNegativeFloat)
+{
+  constexpr cpptools::FloatingPoint<float> f(-0.0F);
+  EXPECT_TRUE(f.isNegative());
+  EXPECT_FALSE(f.isPositive());
+  EXPECT_TRUE(f.isZero());
+}
+
+TEST(FloatingPoint, isZeroNegativeDouble)
+{
+  constexpr cpptools::FloatingPoint<double> f(-0.0);
+  EXPECT_TRUE(f.isNegative());
+  EXPECT_FALSE(f.isPositive());
+  EXPECT_TRUE(f.isZero());
+}
+
+TEST(FloatingPoint, isZeroPositiveFloat)
+{
+  constexpr cpptools::FloatingPoint<float> f(0.0F);
+  EXPECT_FALSE(f.isNegative());
+  EXPECT_TRUE(f.isPositive());
+  EXPECT_TRUE(f.isZero());
+}
+
+TEST(FloatingPoint, isZeroPositiveDouble)
+{
+  constexpr cpptools::FloatingPoint<double> f(0.0);
+  EXPECT_FALSE(f.isNegative());
+  EXPECT_TRUE(f.isPositive());
+  EXPECT_TRUE(f.isZero());
 }
 
 TEST(FloatingPoint, OneFloat)
@@ -148,17 +182,202 @@ TEST(FloatingPoint, streamOperator)
   EXPECT_EQ(sstr.str(), expected);
 }
 
-TEST(FloatingPoint, maxVal)
+TEST(FloatingPoint, maxValFloat)
 {
-  auto maxVal = cpptools::FloatingPoint<float>::maxVal();
+  using type = float;
+  using FloatT = cpptools::FloatingPoint<type>;
+  using intType = FloatT::intType;
 
-  auto maxValInt = static_cast<std::int32_t>(maxVal);
-  auto m         = (std::numeric_limits<float>::max)();
+  auto maxVal = FloatT::maxVal();
 
-  std::int32_t maxIntExpected = *reinterpret_cast<std::int32_t*>(&m);
+  std::cout << maxVal << '\n';
+
+  auto maxValInt = static_cast<intType>(maxVal);
+  cpptools::binaryRep(maxValInt, std::cout);
+  std::cout << '\n';
+
+  auto m         = (std::numeric_limits<type>::max)();
+
+  auto maxIntExpected = *reinterpret_cast<intType*>(&m);
+
+  cpptools::binaryRep(maxIntExpected, std::cout);
+  std::cout << '\n';
 
   EXPECT_EQ(maxValInt, maxIntExpected);
-  EXPECT_EQ(static_cast<float>(maxVal), (std::numeric_limits<float>::max)());
+  EXPECT_EQ(static_cast<type>(maxVal), (std::numeric_limits<type>::max)());
+}
+
+TEST(FloatingPoint, maxValDouble)
+{
+  using type = double;
+  using FloatT = cpptools::FloatingPoint<type>;
+  using intType = FloatT::intType;
+
+  auto maxVal = FloatT::maxVal();
+  auto maxValInt = static_cast<intType>(maxVal);
+  auto m         = (std::numeric_limits<type>::max)();
+  auto maxIntExpected = *reinterpret_cast<intType*>(&m);
+
+  EXPECT_EQ(maxValInt, maxIntExpected);
+  EXPECT_EQ(static_cast<type>(maxVal), (std::numeric_limits<type>::max)());
+}
+
+TEST(FloatingPoint, minValFloat)
+{
+  using type = float;
+  using FloatT = cpptools::FloatingPoint<type>;
+  using intType = FloatT::intType;
+
+  auto minValNormal      = FloatT::minValNormal();
+  auto minValInt         = static_cast<intType>(minValNormal);
+  auto minValExpected    = (std::numeric_limits<type>::min)();
+  auto minValIntExpected = *reinterpret_cast<intType*>(&minValExpected);
+
+  EXPECT_EQ(minValInt, minValIntExpected);
+  EXPECT_EQ(static_cast<type>(minValNormal), minValExpected);
+}
+
+TEST(FloatingPoint, minValDouble)
+{
+  using type = double;
+  using FloatT = cpptools::FloatingPoint<type>;
+  using intType = FloatT::intType;
+
+  auto minValNormal      = FloatT::minValNormal();
+  auto minValInt         = static_cast<intType>(minValNormal);
+  auto minValExpected    = (std::numeric_limits<type>::min)();
+  auto minValIntExpected = *reinterpret_cast<intType*>(&minValExpected);
+
+  EXPECT_EQ(minValInt, minValIntExpected);
+  EXPECT_EQ(static_cast<type>(minValNormal), minValExpected);
+}
+
+TEST(FloatingPoint, minValSubnormalFloat)
+{
+  using type = float;
+  using FloatT = cpptools::FloatingPoint<type>;
+  using intType = FloatT::intType;
+
+  auto minValSubNormal   = FloatT::minValSubNormal();
+  auto minValInt         = static_cast<intType>(minValSubNormal);
+  auto minValExpected    = std::numeric_limits<type>::denorm_min();
+  auto minValIntExpected = *reinterpret_cast<intType*>(&minValExpected);
+
+  EXPECT_EQ(minValInt, minValIntExpected);
+  EXPECT_EQ(static_cast<type>(minValSubNormal), minValExpected);
+}
+
+TEST(FloatingPoint, minValSubnormalDouble)
+{
+  using type = double;
+  using FloatT = cpptools::FloatingPoint<type>;
+  using intType = FloatT::intType;
+
+  auto minValSubNormal   = FloatT::minValSubNormal();
+  auto minValInt         = static_cast<intType>(minValSubNormal);
+  auto minValExpected    = std::numeric_limits<type>::denorm_min();
+  auto minValIntExpected = *reinterpret_cast<intType*>(&minValExpected);
+
+  EXPECT_EQ(minValInt, minValIntExpected);
+  EXPECT_EQ(static_cast<type>(minValSubNormal), minValExpected);
+}
+
+TEST(FloatingPoint, lowestFloat)
+{
+  using type = float;
+  using FloatT = cpptools::FloatingPoint<type>;
+  using intType = FloatT::intType;
+
+  auto lowestVal            = FloatT::lowest();
+  auto lowestValInt         = static_cast<intType>(lowestVal);
+  auto lowestValExpected    = std::numeric_limits<type>::lowest();
+  auto lowestValIntExpected = *reinterpret_cast<intType*>(&lowestValExpected);
+
+  EXPECT_EQ(lowestValInt, lowestValIntExpected);
+  EXPECT_EQ(static_cast<type>(lowestVal), lowestValExpected);
+}
+
+TEST(FloatingPoint, lowestDouble)
+{
+  using type = double;
+  using FloatT = cpptools::FloatingPoint<type>;
+  using intType = FloatT::intType;
+
+  auto lowestVal            = FloatT::lowest();
+  auto lowestValInt         = static_cast<intType>(lowestVal);
+  auto lowestValExpected    = std::numeric_limits<type>::lowest();
+  auto lowestValIntExpected = *reinterpret_cast<intType*>(&lowestValExpected);
+
+  EXPECT_EQ(lowestValInt, lowestValIntExpected);
+  EXPECT_EQ(static_cast<type>(lowestVal), lowestValExpected);
+}
+
+TEST(FloatingPoint, incrementZeroFloat)
+{
+  using type = float;
+  using FloatT = cpptools::FloatingPoint<type>;
+  using intType = FloatT::intType;
+
+  FloatT zero(0.0F);
+  ++zero;
+
+  auto minValInt         = static_cast<intType>(zero);
+  auto minValExpected    = std::numeric_limits<type>::denorm_min();
+  auto minValIntExpected = *reinterpret_cast<intType*>(&minValExpected);
+
+  EXPECT_EQ(minValInt, minValIntExpected);
+  EXPECT_EQ(static_cast<type>(zero), minValExpected);
+}
+
+TEST(FloatingPoint, incrementZeroDouble)
+{
+  using type = double;
+  using FloatT = cpptools::FloatingPoint<type>;
+  using intType = FloatT::intType;
+
+  FloatT zero(0.0);
+  ++zero;
+
+  auto minValInt         = static_cast<intType>(zero);
+  auto minValExpected    = std::numeric_limits<type>::denorm_min();
+  auto minValIntExpected = *reinterpret_cast<intType*>(&minValExpected);
+
+  EXPECT_EQ(minValInt, minValIntExpected);
+  EXPECT_EQ(static_cast<type>(zero), minValExpected);
+}
+
+TEST(FloatingPoint, incrementNegativeZeroFloat)
+{
+  using type = float;
+  using FloatT = cpptools::FloatingPoint<type>;
+  using intType = FloatT::intType;
+
+  FloatT zero(-0.0F);
+  ++zero;
+
+  auto minValInt         = static_cast<intType>(zero);
+  auto minValExpected    = std::numeric_limits<type>::denorm_min();
+  auto minValIntExpected = *reinterpret_cast<intType*>(&minValExpected);
+
+  EXPECT_EQ(minValInt, minValIntExpected);
+  EXPECT_EQ(static_cast<type>(zero), minValExpected);
+}
+
+TEST(FloatingPoint, incrementNegativeZeroDouble)
+{
+  using type = double;
+  using FloatT = cpptools::FloatingPoint<type>;
+  using intType = FloatT::intType;
+
+  FloatT zero(-0.0);
+  zero++;
+
+  auto minValInt         = static_cast<intType>(zero);
+  auto minValExpected    = std::numeric_limits<type>::denorm_min();
+  auto minValIntExpected = *reinterpret_cast<intType*>(&minValExpected);
+
+  EXPECT_EQ(minValInt, minValIntExpected);
+  EXPECT_EQ(static_cast<type>(zero), minValExpected);
 }
 
 
