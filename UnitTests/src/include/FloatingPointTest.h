@@ -400,11 +400,34 @@ TEST(FloatingPoint, nextOfZeroDouble)
 {
   using type = double;
   using FloatT = cpptools::FloatingPoint<type>;
-  constexpr FloatT zero;
+  constexpr FloatT zero(-0.0);
   auto nextOfZero = zero.next();
   constexpr auto minValSubNormal = FloatT::minValSubNormal();
   EXPECT_EQ(static_cast<type>(nextOfZero), static_cast<type>(minValSubNormal));
 }
+
+TEST(FloatingPoint, previousOfZeroFloat)
+{
+  using type   = float;
+  using FloatT = cpptools::FloatingPoint<type>;
+  constexpr FloatT zero;
+  auto             previousOfZero = zero.previous();
+  constexpr auto   minValSubNormal = FloatT::minValSubNormal();
+  EXPECT_EQ(-1.0F*static_cast<type>(previousOfZero), static_cast<type>(minValSubNormal));
+  EXPECT_EQ(FloatT::distanceInULP(previousOfZero, minValSubNormal), 2);
+}
+
+TEST(FloatingPoint, previousOfZeroDouble)
+{
+  using type   = double;
+  using FloatT = cpptools::FloatingPoint<type>;
+  constexpr FloatT zero(-0.0);
+  auto             previousOfZero = zero.previous();
+  constexpr auto   minValSubNormal = FloatT::minValSubNormal();
+  EXPECT_EQ(-1.0*static_cast<type>(previousOfZero), static_cast<type>(minValSubNormal));
+  EXPECT_EQ(FloatT::distanceInULP(previousOfZero, minValSubNormal), 2);
+}
+
 
 TEST(FloatingPoint, distanceInULPBothZeroFloat)
 {
