@@ -18,7 +18,7 @@
  
 // includes
 #include <Utils/miscellaneous.h>
-#include <boost/algorithm/string.hpp>
+//#include <boost/algorithm/string.hpp>
 
 #include <functional>
 #include <iomanip>
@@ -283,16 +283,16 @@ inline auto cstrLength(CharT const* const c) -> std::size_t
  * @param[in] const std::(w)string& s
  * @returns   char* pointer containing the characters of s
  */
-auto toMBstring(const std::string& s) -> char*;
-auto toMBstring(const std::wstring& s) -> char*;
+auto toMBstring(std::string const& s) -> char*;
+auto toMBstring(std::wstring const& s) -> char*;
 
 /**
  * @brief     converts the given string s to wide character c-string dest
  * @param[in] const std::(w)string& s
  * @returns   a wide character c-string containing the characters of s
  */
-wchar_t* toWCstring(const std::string&);
-wchar_t* toWCstring(const std::wstring&);
+wchar_t* toWCstring(std::string const&);
+wchar_t* toWCstring(std::wstring const&);
 
 /**
  * converts the given std::wstring s to a std::string
@@ -310,7 +310,7 @@ inline auto wstringToString(std::wstring const& s) -> std::string
  * @param   std::string const& s
  * @returns a std::wstring containing the characters of s
  */
-inline auto stringToWstring(const std::string& s) -> std::wstring
+inline auto stringToWstring(std::string const& s) -> std::wstring
 {
   std::unique_ptr<wchar_t[]> p{stringAlgorithms::toWCstring(s)};
   return std::wstring{p.get()};
@@ -321,15 +321,15 @@ inline auto stringToWstring(const std::string& s) -> std::wstring
  * @returns true, if s1 begins with s2. False otherwise.
  */
 template <typename StrT>
-inline auto beginsWith(StrT&& s1, StrT&& s2) -> bool
+auto beginsWith(StrT const& s1, StrT const& s2) -> bool
 {
-  const auto len1 = s1.length();
-  const auto len2 = s2.length();
-  if(len2 > len1)
+  const auto length1 = s1.length();
+  const auto length2 = s2.length();
+  if(length2 > length1)
   {
     return false;
   }
-  return s1.compare(0ULL, len2, s2) == 0;
+  return s1.compare(0ULL, length2, s2) == 0;
 }
 
 /**
@@ -337,15 +337,15 @@ inline auto beginsWith(StrT&& s1, StrT&& s2) -> bool
  * @returns true, if s1 ends with s2. False otherwise.
  */
 template <typename StrT>
-inline auto endsWith(StrT&& s1, StrT&& s2) -> bool
+auto endsWith(StrT const& s1, StrT const& s2) -> bool
 {
-  const auto len1 = s1.length();
-  const auto len2 = s2.length();
-  if(len2 > len1)
+  const auto length1 = s1.length();
+  const auto length2 = s2.length();
+  if(length2 > length1)
   {
     return false;
   }
-  return s1.compare(len1 - len2, len2, s2) == 0;
+  return s1.compare(length1 - length2, length2, s2) == 0;
 }
 
 /**
@@ -371,12 +371,15 @@ auto substringBetweenDelimiters(StrT const& s, Predicate&& pred) -> StrT
 }
 
 /** 
- * @brief 
+ * @brief splits a given string into tokens that are delimited by characters that fullfill a given predicate.
  */
 template <typename StrT, typename Predicate>
 auto split(StrT const& s, Predicate&& pred) -> std::vector<StrT>
 {
-  if(s.empty()) return {};
+  if(s.empty())
+  {
+    return {};
+  }
 
   const auto numDelim = std::count_if(s.begin(), s.end(), std::forward<Predicate>(pred));
   std::vector<StrT> tokens;
@@ -452,101 +455,94 @@ auto cropRight(StrT const& s, Predicate&& pred) -> StrT
  * @brief Adds a given character to the left of a given string until its length has reached a given limit.
  */
 template <typename StrT>
-auto padLeft(StrT&& s, typename StrT::value_type c, const std::size_t totalLength) -> StrT
+auto padLeft(StrT&& s, typename StrT::value_type c, std::size_t const resultLength) -> StrT
 {
-  if(const auto len = s.length(); len < totalLength)
+  if(const auto length = s.length(); length < resultLength)
   {
-    s.reserve(totalLength);
-    s.insert(0ULL, totalLength - len, c);
+    s.reserve(resultLength);
+    s.insert(0ULL, resultLength - length, c);
   }
   return std::forward<StrT>(s);
 }
 
 template <typename StrT>
-auto padLeft(StrT& s, typename StrT::value_type c, const std::size_t totalLength) -> StrT
+auto padLeft(StrT& s, typename StrT::value_type c, std::size_t const resultLength) -> StrT
 {
-  if(const auto len = s.length(); len < totalLength)
+  if(const auto length = s.length(); length < resultLength)
   {
-    s.reserve(totalLength);
-    s.insert(0ULL, totalLength - len, c);
+    s.reserve(resultLength);
+    s.insert(0ULL, resultLength - length, c);
   }
   return s;
 }
 
 template <typename StrT>
-auto padLeft(StrT const& s, typename StrT::value_type c, const std::size_t totalLength) -> StrT
+auto padLeft(StrT const& s, typename StrT::value_type c, std::size_t const resultLength) -> StrT
 {
-  const auto len = s.length();
-  if(len >= totalLength)
+  const auto length = s.length();
+  if(length >= resultLength)
   {
     return s;
   }
 
   StrT retVal;
-  retVal.reserve(totalLength);
-  return retVal.append(totalLength - len, c).append(s);
+  retVal.reserve(resultLength);
+  return retVal.append(resultLength - length, c).append(s);
 }
 
 /**
- * @brief Adds a given character to the right of a given string until its length has reached a given limit.
+ * @brief Adds a given character to the right of a given string until its length has reached a given length.
  */
 template <typename StrT>
-auto padRight(StrT&& s, typename StrT::value_type c, const std::size_t totalLength) -> StrT
+auto padRight(StrT&& s, typename StrT::value_type c, std::size_t const resultLength) -> StrT
 {
-  if(const auto len = s.length(); len < totalLength)
+  if(const auto length = s.length(); length < resultLength)
   {
-    s.reserve(totalLength);
-    s.append(totalLength - len, c);
+    s.reserve(resultLength);
+    s.append(resultLength - length, c);
   }
   return std::forward<StrT>(s);
 }
 
 template <typename StrT>
-auto padRight(StrT& s, typename StrT::value_type c, const std::size_t totalLength) -> StrT
+auto padRight(StrT& s, typename StrT::value_type c, std::size_t const resultLength) -> StrT
 {
-  if(const auto len = s.length(); len < totalLength)
+  if(const auto length = s.length(); length < resultLength)
   {
-    s.reserve(totalLength);
-    s.append(totalLength - len, c);
+    s.reserve(resultLength);
+    s.append(resultLength - length, c);
   }
   return s;
 }
 
 template <typename StrT>
-auto padRight(StrT const& s, typename StrT::value_type c, const std::size_t totalLength) -> StrT
+auto padRight(StrT const& s, typename StrT::value_type c, std::size_t const resultLength) -> StrT
 {
-  const auto len = s.length();
-  if(len >= totalLength)
+  const auto length = s.length();
+  if(length >= resultLength)
   {
     return s;
   }
 
   StrT retVal;
-  retVal.reserve(totalLength);
-  return retVal.append(s).append(totalLength - len, c);
+  retVal.reserve(resultLength);
+  return retVal.append(s).append(resultLength - length, c);
 }
 
-
+/**
+ * @brief Adds a given character to the right and left side of a given string until its length has reached a given limit.
+ */
 template <typename StrT>
-auto padBothSides(StrT&& s, typename StrT::value_type c, const std::size_t totalLength) -> StrT
+auto padBothSides(StrT&& s, typename StrT::value_type c, std::size_t const resultLength) -> StrT
 {
-  using CharT = typename StrT::value_type;
-  const auto sLen = s.length();
-  if(sLen >= totalLength)
+  const auto length = s.length();
+  if(length >= resultLength)
   {
     return std::forward<StrT>(s);
   }
-  else if(s.empty())
-  {
-    return StrT(totalLength, c);
-  }
 
-  s.reserve(totalLength);
-  const auto PaddedLengthTotal = totalLength - sLen;
-  const auto paddedLenLeft = PaddedLengthTotal / 2ULL;
-  const auto paddedLenRight = PaddedLengthTotal % 2ULL == 0ULL ? paddedLenLeft : paddedLenLeft + 1;
-
-  return padRight(padLeft(std::forward<StrT>(s), c, sLen + paddedLenLeft), c, sLen + paddedLenLeft + paddedLenRight);
+  s.reserve(resultLength);
+  return padRight(padLeft(std::forward<StrT>(s), c, length + (resultLength - length) / 2ULL), c, resultLength);
 }
 
 

@@ -23,7 +23,7 @@ namespace stringAlgorithms {
 
 
 // string -> char*
-auto toMBstring(const std::string& s) -> char*
+auto toMBstring(std::string const& s) -> char*
 {
   const auto len  = strLength(s) + 1ULL;
   char*      dest = new(std::nothrow) char[len];

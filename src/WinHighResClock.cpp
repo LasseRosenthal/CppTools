@@ -68,9 +68,9 @@ WinHighResClock::ReferenceTimePoint::ReferenceTimePoint()
 // definition of static members
 WinHighResClock::ReferenceTimePoint WinHighResClock::referenceTimePoint;
 static LARGE_INTEGER WinPerfCtrFrequency{};
-static const bool WINfrequencyAvailable           = ::QueryPerformanceFrequency(&WinPerfCtrFrequency) != 0;
-static const ULONGLONG fileTimeIntervalsPerSecond = filetimeDuration::period::den;
-static const double FileTimeTicksPerQPCTicks      = static_cast<double>(fileTimeIntervalsPerSecond) / WinPerfCtrFrequency.QuadPart;
+static const bool WINfrequencyAvailable        = ::QueryPerformanceFrequency(&WinPerfCtrFrequency) != 0;
+constexpr ULONGLONG fileTimeIntervalsPerSecond = filetimeDuration::period::den;
+static const double FileTimeTicksPerQPCTicks   = static_cast<double>(fileTimeIntervalsPerSecond) / WinPerfCtrFrequency.QuadPart;
 
 
 /**
