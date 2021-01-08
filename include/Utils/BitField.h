@@ -58,11 +58,11 @@ public:
   using iterator        = BitFieldIterator<false>;
   using const_iterator  = BitFieldIterator<true>;
 
-  static constexpr value_type mask = (1U << Size) - 1U;   // BitField<3, 2> --> 0000 0111
-  static constexpr value_type cutter = mask << StartBit;  // BitField<3, 2> --> 0001 1100
 
   // ---------------------------------------------------
   // public constants
+  static constexpr value_type mask    = (static_cast<value_type>(1) << Size) - 1;   // BitField<3, 2> --> 0000 0111
+  static constexpr value_type cutter  = mask << StartBit;                           // BitField<3, 2> --> 0001 1100
   static constexpr size_type firstBit = StartBit;
 
   // ---------------------------------------------------

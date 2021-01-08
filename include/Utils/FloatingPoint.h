@@ -38,6 +38,7 @@ struct IEEE754Specification;
 template <>
 struct IEEE754Specification<float> {
   using intType                                   = std::int32_t;
+  static constexpr std::size_t size               = 32ULL;
   static constexpr std::size_t mantissaBits       = 23ULL;
   static constexpr std::size_t exponentBits       = 8ULL;
   static constexpr std::size_t signBits           = 1ULL;
@@ -45,15 +46,17 @@ struct IEEE754Specification<float> {
   static constexpr intType     maxCharacteristic  = 255;
   static constexpr intType     maxExponent        = 127;
   static constexpr intType     maxMantissa        = (1 << mantissaBits) - 1;
-  static constexpr intType     maxValInt          = 0b01111111011111111111111111111111;
-  static constexpr intType     minValNormalInt    = 0b00000000100000000000000000000000;
-  static constexpr intType     minValSubNormalInt = 0b00000000000000000000000000000001;
-  static constexpr intType     lowestValInt       = 0b11111111011111111111111111111111;
+  static constexpr intType     maxValInt          = 0x7F7FFFFF;
+  static constexpr intType     minValNormalInt    = 0x00800000;
+  static constexpr intType     minValSubNormalInt = 0x00000001;
+  static constexpr intType     lowestValInt       = 0xFF7FFFFF;
+  static constexpr intType     MSBValue           = 0x80000000;
 };
 
 template <>
 struct IEEE754Specification<double> {
   using intType                                   = std::int64_t;
+  static constexpr std::size_t size               = 64ULL;
   static constexpr std::size_t mantissaBits       = 52ULL;
   static constexpr std::size_t exponentBits       = 11ULL;
   static constexpr std::size_t signBits           = 1ULL;
@@ -61,10 +64,11 @@ struct IEEE754Specification<double> {
   static constexpr intType     maxCharacteristic  = 2047LL;
   static constexpr intType     maxExponent        = 1023LL;
   static constexpr intType     maxMantissa        = (1LL << mantissaBits) - 1LL;
-  static constexpr intType     maxValInt          = 0b0111111111101111111111111111111111111111111111111111111111111111;
-  static constexpr intType     minValNormalInt    = 0b0000000000010000000000000000000000000000000000000000000000000000;
-  static constexpr intType     minValSubNormalInt = 0b0000000000000000000000000000000000000000000000000000000000000001;
-  static constexpr intType     lowestValInt       = 0b1111111111101111111111111111111111111111111111111111111111111111;
+  static constexpr intType     maxValInt          = 0x7FEFFFFFFFFFFFFFLL;
+  static constexpr intType     minValNormalInt    = 0x0010000000000000LL;
+  static constexpr intType     minValSubNormalInt = 0x0000000000000001LL;
+  static constexpr intType     lowestValInt       = 0xFFEFFFFFFFFFFFFFLL;
+  static constexpr intType     MSBValue           = 0x8000000000000000LL;
 };
 
 
@@ -113,12 +117,15 @@ public:
   [[nodiscard]] constexpr auto next                   () const noexcept -> FloatingPoint;
   [[nodiscard]] constexpr auto previous               () const noexcept -> FloatingPoint;
 
+  [[nodiscard]] static auto distanceInULP (FloatingPoint const& f1, FloatingPoint const& f2) noexcept -> std::size_t;
   auto epsilon () const noexcept -> FloatingPoint;
 
   [[nodiscard]] static constexpr auto maxVal          () noexcept -> FloatingPoint;
   [[nodiscard]] static constexpr auto minValNormal    () noexcept -> FloatingPoint;
   [[nodiscard]] static constexpr auto minValSubNormal () noexcept -> FloatingPoint;
   [[nodiscard]] static constexpr auto lowest          () noexcept -> FloatingPoint;
+  [[nodiscard]] static constexpr auto infinity        () noexcept -> FloatingPoint;
+
 
   auto operator++ () noexcept -> FloatingPoint&;
   auto operator++ (int) noexcept -> FloatingPoint;
@@ -136,8 +143,11 @@ private:
     intType bits;
     BitField<IEEESpec::mantissaBits, 0ULL> mantissa_;
     BitField<IEEESpec::exponentBits, IEEESpec::mantissaBits> characteristic_;
-    BitField<IEEESpec::signBits, IEEESpec::mantissaBits + IEEESpec::exponentBits> signBit_;
+    BitField<IEEESpec::signBits, IEEESpec::size - 1ULL> signBit_;
   };
+
+  auto distanceToZeroInULP    () const noexcept -> intType;
+  static constexpr auto distanceToZeroToIntRep (intType) noexcept -> intType;
 };
 
 
@@ -167,11 +177,8 @@ constexpr FloatingPoint<FloatT>::FloatingPoint(intType i) noexcept
  */
 template <typename FloatT>
 constexpr FloatingPoint<FloatT>::FloatingPoint(intType m, intType c, intType s) noexcept
-  : mantissa_{m}
-{
-  characteristic_ = c;
-  signBit_        = s;
-}
+  : bits{s << (IEEESpec::size - 1ULL) | c << IEEESpec::mantissaBits | m}
+{}
 
 /**
  * @brief Copy Constructor.
@@ -269,7 +276,8 @@ template <typename FloatT>
 template <typename FloatT>
 constexpr auto FloatingPoint<FloatT>::isPositive() const noexcept -> bool
 {
-  return signBit() == 0;
+  return bits >= 0;
+//  return signBit() == 0;
 }
 
 /**
@@ -278,7 +286,8 @@ constexpr auto FloatingPoint<FloatT>::isPositive() const noexcept -> bool
 template <typename FloatT>
 constexpr auto FloatingPoint<FloatT>::isNegative() const noexcept -> bool
 {
-  return signBit() == 1;
+  return bits < 0;
+//  return signBit() == 1;
 }
 
 /**
@@ -339,20 +348,39 @@ constexpr auto FloatingPoint<FloatT>::isSubNormal() const noexcept -> bool
 /**
  * @brief Returns the next representable floating point number.
  */
-//template <typename FloatT>
-//constexpr auto FloatingPoint<FloatT>::next() const noexcept -> FloatingPoint
-//{
-//  return isPositive() ? FloatingPoint(bits + 1);
-//}
+template <typename FloatT>
+constexpr auto FloatingPoint<FloatT>::next() const noexcept -> FloatingPoint
+{
+  return {distanceToZeroToIntRep(distanceToZeroInULP() + 1)};
+
+  //return !isFiniteNumber() ? FloatingPoint{bits} :
+  //        isPositive() ? FloatingPoint{bits + 1} :
+  //        isZero() ? minValSubNormal() : FloatingPoint{bits - 1};
+}
 
 /**
  * @brief Returns the previous representable floating point number.
  */
-//template <typename FloatT>
-//constexpr auto FloatingPoint<FloatT>::previous() const noexcept -> FloatingPoint
-//{
-//  return isPositive() && isFiniteNumber() ? FloatingPoint(bits - 1);
-//}
+template <typename FloatT>
+constexpr auto FloatingPoint<FloatT>::previous() const noexcept -> FloatingPoint
+{
+  return {distanceToZeroToIntRep(distanceToZeroInULP() - 1)};
+}
+
+/**
+ * @brief Returns the distance between f1 and f2 in terms of ulps.
+ */
+template <typename FloatT>
+inline auto FloatingPoint<FloatT>::distanceInULP(FloatingPoint const& f1, FloatingPoint const& f2) noexcept -> std::size_t
+{
+  if((f1.isPositive() && f2.isPositive()) || (f1.isNegative() && f2.isNegative()))
+  {
+    return static_cast<std::size_t>(std::abs(f1.distanceToZeroInULP() - f2.distanceToZeroInULP()));
+  }
+
+  return static_cast<std::size_t>(std::abs(f1.distanceToZeroInULP())) +
+         static_cast<std::size_t>(std::abs(f2.distanceToZeroInULP()));
+}
 
 template <typename FloatT>
 inline auto FloatingPoint<FloatT>::epsilon() const noexcept -> FloatingPoint
@@ -397,26 +425,37 @@ template <typename FloatT>
 }
 
 /**
+ * @brief Returns the floating point number that represents positive infinity.
+ */
+template <typename FloatT>
+[[nodiscard]] constexpr auto FloatingPoint<FloatT>::infinity() noexcept -> FloatingPoint
+{
+  return {0, IEEESpec::maxCharacteristic, 0};
+}
+
+/**
  * @brief Increments the given floating point number.
  */
 template <typename FloatT>
 inline auto FloatingPoint<FloatT>::operator++() noexcept -> FloatingPoint&
 {
-  if(isPositive() && isFiniteNumber())
-  {
-    ++bits;
-  }
-  else
-  {
-    if(isZero())
-    {
-      bits = IEEESpec::minValSubNormalInt;
-    }
-    else
-    {
-      --bits;
-    }
-  }
+  bits = distanceToZeroToIntRep(distanceToZeroInULP() + 1);
+
+  //if(isPositive() && isFiniteNumber())
+  //{
+  //  ++bits;
+  //}
+  //else
+  //{
+  //  if(isZero())
+  //  {
+  //    bits = IEEESpec::minValSubNormalInt;
+  //  }
+  //  else
+  //  {
+  //    --bits;
+  //  }
+  //}
 
   return *this;
 }
@@ -427,6 +466,22 @@ inline auto FloatingPoint<FloatT>::operator++(int) noexcept -> FloatingPoint
   FloatingPoint tmp{*this};
   ++(*this);
   return tmp;
+}
+
+/**
+ * @brief Returns the distance in terms of ulps of the given floating point number to zero.
+ */
+template <typename FloatT>
+inline auto FloatingPoint<FloatT>::distanceToZeroInULP() const noexcept -> intType
+{
+  return bits < 0 ? IEEESpec::MSBValue - bits : bits;
+//  return static_cast<std::size_t>(bits & (~(static_cast<intType>(1) << (IEEESpec::size - 1ULL))));
+}
+
+template <typename FloatT>
+constexpr auto FloatingPoint<FloatT>::distanceToZeroToIntRep(intType i) noexcept -> intType
+{
+  return i >= 0 ? i : IEEESpec::MSBValue - i;
 }
 
 template <typename FloatT>
