@@ -315,6 +315,198 @@ TEST(StringAlgorithms, substringBetweenDelimiters)
   EXPECT_EQ(subStr, expected);
 }
 
+TEST(StringAlgorithms, removeFromLeftConstLValue)
+{
+  const auto s1 = "---++NumWorkers__"s;
+  const auto expected = "NumWorkers__"s;
+  const auto subStr = stringAlgorithms::cropLeft(s1, [](const char c){ return c == '-' || c == '+';});
+  EXPECT_EQ(s1, "---++NumWorkers__"s);
+  EXPECT_EQ(subStr, expected);
+}
+
+TEST(StringAlgorithms, removeFromLeftNonConstLValue)
+{
+  auto s1 = "---++NumWorkers__"s;
+  const auto expected = "NumWorkers__"s;
+  const auto subStr = stringAlgorithms::cropLeft(s1, [](const char c){ return c == '-' || c == '+';});
+  EXPECT_EQ(s1, expected);
+  EXPECT_EQ(subStr, expected);
+}
+
+TEST(StringAlgorithms, removeFromLeftNonConstLValueUseWithoutReturnValue)
+{
+  auto s1 = "---++NumWorkers__"s;
+  const auto expected = "NumWorkers__"s;
+  stringAlgorithms::cropLeft(s1, [](const char c){ return c == '-' || c == '+';});
+  EXPECT_EQ(s1, expected);
+}
+
+TEST(StringAlgorithms, removeFromLeftRValue)
+{
+  auto s1 = "---++NumWorkers__"s;
+  const auto expected = "NumWorkers__"s;
+  const auto subStr = stringAlgorithms::cropLeft(std::move(s1), [](const char c){ return c == '-' || c == '+';});
+  EXPECT_EQ(s1, ""s);
+  EXPECT_EQ(subStr, expected);
+}
+
+TEST(StringAlgorithms, removeFromLeftPureRValue)
+{
+  auto getString = []() { return "---++NumWorkers__"s;};
+
+  const auto expected = "NumWorkers__"s;
+  const auto subStr = stringAlgorithms::cropLeft(getString(), [](const char c){ return c == '-' || c == '+';});
+  EXPECT_EQ(subStr, expected);
+}
+
+TEST(StringAlgorithms, removeFromRightConstLValue)
+{
+  const auto s1 = "---++NumWorkers__##"s;
+  const auto expected = "---++NumWorkers"s;
+  const auto subStr = stringAlgorithms::cropRight(s1, [](const char c){ return c == '_' || c == '#';});
+  EXPECT_EQ(s1, "---++NumWorkers__##"s);
+  EXPECT_EQ(subStr, expected);
+}
+
+TEST(StringAlgorithms, removeFromRightNonConstLValue)
+{
+  auto s1 = "---++NumWorkers__##"s;
+  const auto expected = "---++NumWorkers"s;
+  const auto subStr = stringAlgorithms::cropRight(s1, [](const char c){ return c == '_' || c == '#';});
+  EXPECT_EQ(s1, expected);
+  EXPECT_EQ(subStr, expected);
+}
+
+TEST(StringAlgorithms, removeFromRightNonConstLValueUseWithoutReturnValue)
+{
+  auto s1 = "---++NumWorkers__##"s;
+  const auto expected = "---++NumWorkers"s;
+  stringAlgorithms::cropRight(s1, [](const char c){ return c == '_' || c == '#';});
+  EXPECT_EQ(s1, expected);
+}
+
+TEST(StringAlgorithms, removeFromRightRValue)
+{
+  auto s1 = "---++NumWorkers__##"s;
+  const auto expected = "---++NumWorkers"s;
+  const auto subStr = stringAlgorithms::cropRight(std::move(s1), [](const char c){ return c == '_' || c == '#';});
+  EXPECT_EQ(s1, ""s);
+  EXPECT_EQ(subStr, expected);
+}
+
+TEST(StringAlgorithms, removeFromRightPureRValue)
+{
+  auto getString = []() { return "---++NumWorkers__##"s;};
+
+  const auto expected = "---++NumWorkers"s;
+  const auto subStr = stringAlgorithms::cropRight(getString(), [](const char c){ return c == '_' || c == '#';});
+  EXPECT_EQ(subStr, expected);
+}
+
+TEST(StringAlgorithms, padLeftConstLValue)
+{
+  const auto s1 = "thisIsAString"s;
+  const auto expected = "       thisIsAString"s;
+  const auto subStr = stringAlgorithms::padLeft(s1, ' ', 20);
+  EXPECT_EQ(s1, "thisIsAString"s);
+  EXPECT_EQ(subStr, expected);
+}
+
+TEST(StringAlgorithms, padLeftNonConstLValueUseWithoutReturnValue)
+{
+  auto s1 = "thisIsAString"s;
+  const auto expected = "       thisIsAString"s;
+  stringAlgorithms::padLeft(s1, ' ', 20);
+  EXPECT_EQ(s1, expected);
+}
+
+TEST(StringAlgorithms, padLeftRValue)
+{
+  auto s1 = "thisIsAString"s;
+  const auto expected = "       thisIsAString"s;
+  const auto subStr = stringAlgorithms::padLeft(std::move(s1), ' ', 20);
+  EXPECT_EQ(s1, ""s);
+  EXPECT_EQ(subStr, expected);
+}
+
+TEST(StringAlgorithms, padLeftPureRValue)
+{
+  auto getString = []() { return "thisIsAString"s;};
+  const auto expected = "       thisIsAString"s;
+  const auto subStr = stringAlgorithms::padLeft(getString(), ' ', 20);
+  EXPECT_EQ(subStr, expected);
+}
+
+
+
+
+
+TEST(StringAlgorithms, padRightConstLValue)
+{
+  const auto s1 = "thisIsAString"s;
+  const auto expected = "thisIsAString       "s;
+  const auto subStr = stringAlgorithms::padRight(s1, ' ', 20);
+  EXPECT_EQ(s1, "thisIsAString"s);
+  EXPECT_EQ(subStr, expected);
+}
+
+TEST(StringAlgorithms, padRightNonConstLValueUseWithoutReturnValue)
+{
+  auto s1 = "thisIsAString"s;
+  const auto expected = "thisIsAString       "s;
+  stringAlgorithms::padRight(s1, ' ', 20);
+  EXPECT_EQ(s1, expected);
+}
+
+TEST(StringAlgorithms, padRightRValue)
+{
+  auto s1 = "thisIsAString"s;
+  const auto expected = "thisIsAString       "s;
+  const auto subStr = stringAlgorithms::padRight(std::move(s1), ' ', 20);
+  EXPECT_EQ(s1, ""s);
+  EXPECT_EQ(subStr, expected);
+}
+
+TEST(StringAlgorithms, padRightPureRValue)
+{
+  auto getString = []() { return "thisIsAString"s;};
+  const auto expected = "thisIsAString       "s;
+  const auto subStr = stringAlgorithms::padRight(getString(), ' ', 20);
+  EXPECT_EQ(subStr, expected);
+}
+
+TEST(StringAlgorithms, padBothSidesPureRValueEmptyString)
+{
+  auto getString = []() { return ""s;};
+  const auto expected = "------------------"s;
+  const auto subStr = stringAlgorithms::padBothSides(getString(), '-', 18);
+  EXPECT_EQ(subStr, expected);
+}
+
+TEST(StringAlgorithms, padBothSidesPureRValueStringTooLong)
+{
+  auto getString = []() { return "++++++++++++"s;};
+  const auto expected = "++++++++++++"s;
+  const auto subStr = stringAlgorithms::padBothSides(getString(), '-', 8);
+  EXPECT_EQ(subStr, expected);
+}
+
+TEST(StringAlgorithms, padBothSidesPureRValue)
+{
+  auto getString = []() { return "String"s;};
+  const auto expected = "------String------"s;
+  const auto subStr = stringAlgorithms::padBothSides(getString(), '-', 18);
+  EXPECT_EQ(subStr, expected);
+}
+
+TEST(StringAlgorithms, padBothSidesPureRValuePadRightMore)
+{
+  auto getString = []() { return "String1"s;};
+  const auto expected = "-----String1------"s;
+  const auto subStr = stringAlgorithms::padBothSides(getString(), '-', 18);
+  EXPECT_EQ(subStr, expected);
+}
+
 
  
  

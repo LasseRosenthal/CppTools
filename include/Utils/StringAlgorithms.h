@@ -18,7 +18,7 @@
  
 // includes
 #include <Utils/miscellaneous.h>
-//#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <functional>
 #include <iomanip>
@@ -398,6 +398,155 @@ auto split(StrT const& s, Predicate&& pred) -> std::vector<StrT>
   }
 
   return tokens;
+}
+
+/**
+ * @brief removes all characters from the left side of a given string that fullfill a certain predicat.
+ */
+template <typename StrT, typename Predicate>
+auto cropLeft(StrT&& s, Predicate&& pred) -> StrT
+{
+  if(!s.empty())
+  {
+    if(const auto p = std::find_if_not(s.begin(), s.end(), std::forward<Predicate>(pred)); p != s.end())
+    {
+      s.erase(s.begin(), p);
+    }
+  }
+
+  return std::forward<StrT>(s);
+}
+
+template <typename StrT, typename Predicate>
+auto cropLeft(StrT const& s, Predicate&& pred) -> StrT
+{
+  StrT copy{s};
+  return cropLeft(std::move(copy), std::forward<Predicate>(pred));
+}
+
+/**
+ * @brief removes all characters from the right side of a given string that fullfill a certain predicat.
+ */
+template <typename StrT, typename Predicate>
+auto cropRight(StrT&& s, Predicate&& pred) -> StrT
+{
+  if(!s.empty())
+  {
+    if(const auto p = std::find_if_not(s.rbegin(), s.rend(), std::forward<Predicate>(pred)); p != s.rend())
+    {
+      s.erase(p.base(), s.end());
+    }
+  }
+
+  return std::forward<StrT>(s);
+}
+
+template <typename StrT, typename Predicate>
+auto cropRight(StrT const& s, Predicate&& pred) -> StrT
+{
+  StrT copy{s};
+  return cropRight(std::move(copy), std::forward<Predicate>(pred));
+}
+
+/**
+ * @brief Adds a given character to the left of a given string until its length has reached a given limit.
+ */
+template <typename StrT>
+auto padLeft(StrT&& s, typename StrT::value_type c, const std::size_t totalLength) -> StrT
+{
+  if(const auto len = s.length(); len < totalLength)
+  {
+    s.reserve(totalLength);
+    s.insert(0ULL, totalLength - len, c);
+  }
+  return std::forward<StrT>(s);
+}
+
+template <typename StrT>
+auto padLeft(StrT& s, typename StrT::value_type c, const std::size_t totalLength) -> StrT
+{
+  if(const auto len = s.length(); len < totalLength)
+  {
+    s.reserve(totalLength);
+    s.insert(0ULL, totalLength - len, c);
+  }
+  return s;
+}
+
+template <typename StrT>
+auto padLeft(StrT const& s, typename StrT::value_type c, const std::size_t totalLength) -> StrT
+{
+  const auto len = s.length();
+  if(len >= totalLength)
+  {
+    return s;
+  }
+
+  StrT retVal;
+  retVal.reserve(totalLength);
+  return retVal.append(totalLength - len, c).append(s);
+}
+
+/**
+ * @brief Adds a given character to the right of a given string until its length has reached a given limit.
+ */
+template <typename StrT>
+auto padRight(StrT&& s, typename StrT::value_type c, const std::size_t totalLength) -> StrT
+{
+  if(const auto len = s.length(); len < totalLength)
+  {
+    s.reserve(totalLength);
+    s.append(totalLength - len, c);
+  }
+  return std::forward<StrT>(s);
+}
+
+template <typename StrT>
+auto padRight(StrT& s, typename StrT::value_type c, const std::size_t totalLength) -> StrT
+{
+  if(const auto len = s.length(); len < totalLength)
+  {
+    s.reserve(totalLength);
+    s.append(totalLength - len, c);
+  }
+  return s;
+}
+
+template <typename StrT>
+auto padRight(StrT const& s, typename StrT::value_type c, const std::size_t totalLength) -> StrT
+{
+  const auto len = s.length();
+  if(len >= totalLength)
+  {
+    return s;
+  }
+
+  StrT retVal;
+  retVal.reserve(totalLength);
+  return retVal.append(s).append(totalLength - len, c);
+}
+
+
+template <typename StrT>
+auto padBothSides(StrT&& s, typename StrT::value_type c, const std::size_t totalLength) -> StrT
+{
+  using CharT = typename StrT::value_type;
+  const auto sLen = s.length();
+  if(sLen >= totalLength)
+  {
+    return std::forward<StrT>(s);
+  }
+  else if(s.empty())
+  {
+    return StrT(totalLength, c);
+  }
+
+  s.reserve(totalLength);
+  const auto PaddedLengthTotal = totalLength - sLen;
+  const auto paddedLenLeft = PaddedLengthTotal / 2ULL;
+  const auto paddedLenRight = PaddedLengthTotal % 2ULL == 0ULL ? paddedLenLeft : paddedLenLeft + 1;
+
+  return padRight(padLeft(std::forward<StrT>(s), c, sLen + paddedLenLeft), c, sLen + paddedLenLeft + paddedLenRight);
 }
 
 
