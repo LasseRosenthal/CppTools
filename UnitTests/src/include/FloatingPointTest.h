@@ -602,6 +602,51 @@ TEST(FloatingPoint, almostEqualExpectFalseDifferenceLargerThanMaxULP)
   EXPECT_FALSE(FloatT::almostEqual<maxULP>(f1, f2));
 }
 
+TEST(FloatingPoint, almostEqualDoublesExpectTrueBothIdentical)
+{
+  using type = double;
+  using FloatT = cpptools::FloatingPoint<type>;
+  constexpr double  v1 = 1257.25472;
+  constexpr double  v2 = 1257.25472;
+  EXPECT_TRUE(FloatT::almostEqual(v1, v2));
+}
+
+TEST(FloatingPoint, almostEqualDoublesExpectTrueDifferenceMaxULP)
+{
+  using type = double;
+  using FloatT = cpptools::FloatingPoint<type>;
+  constexpr std::size_t maxULP = 3;
+  constexpr double  v = 1257.25472;
+  FloatT f1(v);
+  for(std::size_t i = 0ULL; i < maxULP; ++i)
+  {
+    ++f1;
+  }
+  constexpr FloatT f2(v);
+
+  const auto v1 = static_cast<double>(f1);
+  const auto v2 = static_cast<double>(f2);
+  EXPECT_TRUE(FloatT::almostEqual<maxULP>(v1, v2));
+}
+
+TEST(FloatingPoint, almostEqualDoublesExpectFalseDifferenceLargerThanMaxULP)
+{
+  using type = double;
+  using FloatT = cpptools::FloatingPoint<type>;
+  constexpr std::size_t maxULP = 3;
+  constexpr double  v = 1257.25472;
+  FloatT f1(v);
+  for(std::size_t i = 0ULL; i < maxULP + 1; ++i)
+  {
+    ++f1;
+  }
+  constexpr FloatT f2(v);
+
+  const auto v1 = static_cast<double>(f1);
+  const auto v2 = static_cast<double>(f2);
+  EXPECT_FALSE(FloatT::almostEqual<maxULP>(v1, v2));
+}
+
  
  
 // *************************************************************************** // 

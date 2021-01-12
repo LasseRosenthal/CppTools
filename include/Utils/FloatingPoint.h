@@ -134,6 +134,9 @@ public:
   template <std::size_t MaxULPDist = 4ULL>
   [[nodiscard]] static auto almostEqual(FloatingPoint const& f1, FloatingPoint const& f2) noexcept -> bool;
 
+  template <std::size_t MaxULPDist = 4ULL>
+  [[nodiscard]] static auto almostEqual(value_type f1, value_type f2) noexcept -> bool;
+
   template <typename CharT, typename CharTraitsT = std::char_traits<CharT>>
   auto put(std::basic_ostream<CharT, CharTraitsT>& ostr) const -> std::basic_ostream<CharT, CharTraitsT>&;
 
@@ -490,13 +493,20 @@ constexpr auto FloatingPoint<FloatT>::distanceToZeroToIntRep(intType i) noexcept
 
 /**
  * @brief Comparison for almost equality. Returns true if the distance of the floating point numbers is less than
- *        a maximum distance which is given by a template parameter.
+ *        a maximum which is given by a template parameter.
  */
 template <typename FloatT>
 template <std::size_t MaxULPDist>
-inline auto FloatingPoint<FloatT>::almostEqual(FloatingPoint const& f1, FloatingPoint const& f2) noexcept -> bool
+inline [[nodiscard]] auto FloatingPoint<FloatT>::almostEqual(FloatingPoint const& f1, FloatingPoint const& f2) noexcept -> bool
 {
   return FloatingPoint<FloatT>::distanceInULP(f1, f2) <= MaxULPDist;
+}
+
+template <typename FloatT>
+template <std::size_t MaxULPDist>
+inline auto FloatingPoint<FloatT>::almostEqual(value_type f1, value_type f2) noexcept -> bool
+{
+  return FloatingPoint<FloatT>::distanceInULP(FloatingPoint<FloatT>(f1), FloatingPoint<FloatT>(f2)) <= MaxULPDist;
 }
 
 template <typename FloatT>
