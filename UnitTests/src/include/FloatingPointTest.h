@@ -463,24 +463,143 @@ TEST(FloatingPoint, distanceInULPZeroToNextFloat)
   EXPECT_EQ(distance, expectedDistance);
 }
 
-TEST(FloatingPoint, distanceInULP)
+TEST(FloatingPoint, distanceInULPBothEqual)
+{
+  using type = double;
+  using FloatT = cpptools::FloatingPoint<type>;
+  constexpr double  v = 1257.25472;
+  constexpr FloatT f1(v);
+  constexpr FloatT f2(v);
+  const auto distance = FloatT::distanceInULP(f1, f2);
+  const std::size_t expectedDistance = 0ULL;
+  EXPECT_EQ(distance, expectedDistance);
+}
+
+TEST(FloatingPoint, distanceInULPBothPositive)
 {
   using type = float;
   using FloatT = cpptools::FloatingPoint<type>;
   FloatT f1;
   FloatT f2;
 
-  for(int i = 0; i < 10265; ++i)
+  constexpr std::size_t i1 = 10265;
+  constexpr std::size_t i2 = 1345;
+  for(std::size_t i = 0ULL; i < i1; ++i)
   {
     ++f1;
   }
-  for(int i = 0; i < 134; ++i)
+  for(std::size_t i = 0ULL; i < i2; ++i)
   {
     ++f2;
   }
   const auto distance = FloatT::distanceInULP(f1, f2);
-  const std::size_t expectedDistance = 10265ULL - 134ULL;
+  constexpr std::size_t expectedDistance = i1 - i2;
   EXPECT_EQ(distance, expectedDistance);
+}
+
+TEST(FloatingPoint, distanceInULPBothNegative)
+{
+  using type = float;
+  using FloatT = cpptools::FloatingPoint<type>;
+  FloatT f1;
+  FloatT f2;
+
+  constexpr std::size_t i1 = 10265;
+  constexpr std::size_t i2 = 1345;
+  for(std::size_t i = 0ULL; i < i1; ++i)
+  {
+    --f1;
+  }
+  for(std::size_t i = 0ULL; i < i2; ++i)
+  {
+    --f2;
+  }
+  const auto distance = FloatT::distanceInULP(f1, f2);
+  constexpr std::size_t expectedDistance = i1 - i2;
+  EXPECT_EQ(distance, expectedDistance);
+}
+
+TEST(FloatingPoint, distanceInULPDifferentSigns)
+{
+  using type = float;
+  using FloatT = cpptools::FloatingPoint<type>;
+  FloatT f1;
+  FloatT f2;
+
+  constexpr std::size_t i1 = 10265;
+  constexpr std::size_t i2 = 1345;
+  for(std::size_t i = 0ULL; i < i1; ++i)
+  {
+    --f1;
+  }
+  for(std::size_t i = 0ULL; i < i2; ++i)
+  {
+    ++f2;
+  }
+  const auto distance = FloatT::distanceInULP(f1, f2);
+  constexpr std::size_t expectedDistance = i1 + i2;
+  EXPECT_EQ(distance, expectedDistance);
+}
+
+TEST(FloatingPoint, equalityOperatorExpectTrue)
+{
+  using type = double;
+  using FloatT = cpptools::FloatingPoint<type>;
+  constexpr double  v = 1257.25472;
+  constexpr FloatT f1(v);
+  constexpr FloatT f2(v);
+  EXPECT_EQ(f1, f2);
+}
+
+TEST(FloatingPoint, equalityOperatorExpectFalse)
+{
+  using type = double;
+  using FloatT = cpptools::FloatingPoint<type>;
+  constexpr double  v = 1257.25472;
+  FloatT f1(v);
+  ++f1;
+  constexpr FloatT f2(v);
+  EXPECT_NE(f1, f2);
+}
+
+TEST(FloatingPoint, almostEqualExpectTrueBothIdentical)
+{
+  using type = double;
+  using FloatT = cpptools::FloatingPoint<type>;
+  constexpr double  v = 1257.25472;
+  FloatT f1(v);
+  constexpr FloatT f2(v);
+  EXPECT_TRUE(FloatT::almostEqual(f1, f2));
+}
+
+TEST(FloatingPoint, almostEqualExpectTrueDifferenceMaxULP)
+{
+  using type = double;
+  using FloatT = cpptools::FloatingPoint<type>;
+  constexpr std::size_t maxULP = 3;
+  constexpr double  v = 1257.25472;
+  FloatT f1(v);
+  for(std::size_t i = 0ULL; i < maxULP; ++i)
+  {
+    ++f1;
+  }
+  constexpr FloatT f2(v);
+  EXPECT_TRUE(FloatT::almostEqual<maxULP>(f1, f2));
+}
+
+TEST(FloatingPoint, almostEqualExpectFalseDifferenceLargerThanMaxULP)
+{
+  using type = double;
+  using FloatT = cpptools::FloatingPoint<type>;
+  constexpr std::size_t maxULP = 3;
+  constexpr double  v = 1257.25472;
+  FloatT f1(v);
+  for(std::size_t i = 0ULL; i < maxULP + 1; ++i)
+  {
+    ++f1;
+  }
+  constexpr FloatT f2(v);
+  EXPECT_FALSE(FloatT::almostEqual<maxULP>(f1, f2));
 }
 
  

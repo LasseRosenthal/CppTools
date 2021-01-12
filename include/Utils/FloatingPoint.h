@@ -126,10 +126,13 @@ public:
   [[nodiscard]] static constexpr auto lowest          () noexcept -> FloatingPoint;
   [[nodiscard]] static constexpr auto infinity        () noexcept -> FloatingPoint;
 
-
   auto operator++ () noexcept -> FloatingPoint&;
   auto operator++ (int) noexcept -> FloatingPoint;
+  auto operator-- () noexcept -> FloatingPoint&;
+  auto operator-- (int) noexcept -> FloatingPoint;
 
+  template <std::size_t MaxULPDist = 4ULL>
+  [[nodiscard]] static auto almostEqual(FloatingPoint const& f1, FloatingPoint const& f2) noexcept -> bool;
 
   template <typename CharT, typename CharTraitsT = std::char_traits<CharT>>
   auto put(std::basic_ostream<CharT, CharTraitsT>& ostr) const -> std::basic_ostream<CharT, CharTraitsT>&;
@@ -440,23 +443,6 @@ template <typename FloatT>
 inline auto FloatingPoint<FloatT>::operator++() noexcept -> FloatingPoint&
 {
   bits = distanceToZeroToIntRep(distanceToZeroInULP() + 1);
-
-  //if(isPositive() && isFiniteNumber())
-  //{
-  //  ++bits;
-  //}
-  //else
-  //{
-  //  if(isZero())
-  //  {
-  //    bits = IEEESpec::minValSubNormalInt;
-  //  }
-  //  else
-  //  {
-  //    --bits;
-  //  }
-  //}
-
   return *this;
 }
 
@@ -465,6 +451,24 @@ inline auto FloatingPoint<FloatT>::operator++(int) noexcept -> FloatingPoint
 {
   FloatingPoint tmp{*this};
   ++(*this);
+  return tmp;
+}
+
+/**
+ * @brief Decrements the given floating point number.
+ */
+template <typename FloatT>
+inline auto FloatingPoint<FloatT>::operator--() noexcept -> FloatingPoint&
+{
+  bits = distanceToZeroToIntRep(distanceToZeroInULP() - 1);
+  return *this;
+}
+
+template <typename FloatT>
+inline auto FloatingPoint<FloatT>::operator--(int) noexcept -> FloatingPoint
+{
+  FloatingPoint tmp{*this};
+  --(*this);
   return tmp;
 }
 
@@ -484,6 +488,17 @@ constexpr auto FloatingPoint<FloatT>::distanceToZeroToIntRep(intType i) noexcept
   return i >= 0 ? i : IEEESpec::MSBValue - i;
 }
 
+/**
+ * @brief Comparison for almost equality. Returns true if the distance of the floating point numbers is less than
+ *        a maximum distance which is given by a template parameter.
+ */
+template <typename FloatT>
+template <std::size_t MaxULPDist>
+inline auto FloatingPoint<FloatT>::almostEqual(FloatingPoint const& f1, FloatingPoint const& f2) noexcept -> bool
+{
+  return FloatingPoint<FloatT>::distanceInULP(f1, f2) <= MaxULPDist;
+}
+
 template <typename FloatT>
 template <typename CharT, typename CharTraitsT>
 inline auto FloatingPoint<FloatT>::put(std::basic_ostream<CharT, CharTraitsT>& ostr) const -> std::basic_ostream<CharT, CharTraitsT>&
@@ -498,6 +513,25 @@ template <typename FloatT, typename CharT, typename CharTraitsT>
 auto operator<<(std::basic_ostream<CharT, CharTraitsT>& ostr, FloatingPoint<FloatT> const& f) -> std::basic_ostream<CharT, CharTraitsT>&
 {
   return f.put(ostr);
+}
+
+/**
+ * @brief Comparison. Returns true if the floating point numbers are identical, i.e. theri distance in ULPs equals zero.
+ */
+template <typename FloatT>
+inline auto operator==(FloatingPoint<FloatT> const& f1, FloatingPoint<FloatT> const& f2) noexcept -> bool
+{
+  if(f1.isNan() || f2.isNan())
+  {
+    return false;
+  }
+  return FloatingPoint<FloatT>::distanceInULP(f1, f2) == 0ULL;
+}
+
+template <typename FloatT>
+inline auto operator!=(FloatingPoint<FloatT> const& f1, FloatingPoint<FloatT> const& f2) noexcept -> bool
+{
+  return !(f1 == f2);
 }
 
 
