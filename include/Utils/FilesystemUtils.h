@@ -25,7 +25,7 @@ namespace cpptools {
 
 
 /**
- * @brief Extends the filename component without extension of a given path by agiven string.
+ * @brief Extends the filename component without extension of a given path by a given string.
  */
 template <typename StrT>
 auto extendFileName(std::filesystem::path const& p, StrT const& ext) -> std::filesystem::path

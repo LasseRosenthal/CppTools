@@ -33,6 +33,7 @@ TEST(FilesystemUtils, extendFileNameNoParentPathNoExtension)
   const auto p1 = extendFileName(p, L"_bkp"s);
   EXPECT_EQ(p1, expected);
 }
+
 TEST(FilesystemUtils, extendFileNameNoParentPath)
 {
   const fs::path p{LR"(user.config.xml)"};
@@ -41,6 +42,7 @@ TEST(FilesystemUtils, extendFileNameNoParentPath)
   const auto p1 = extendFileName(p, L"_bkp"s);
   EXPECT_EQ(p1, expected);
 }
+
 TEST(FilesystemUtils, extendFileNameIncludingParentPath)
 {
   const fs::path p{LR"(C:\Users\prinect\Documents\user.config.xml)"};
