@@ -99,6 +99,9 @@
     <ClInclude Include="src\include\FloatingPointTest.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="src\include\FilesystemUtilsTest.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
