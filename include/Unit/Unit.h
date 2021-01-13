@@ -243,7 +243,7 @@ using DivisionType = std::conditional_t<
 /**
  * @brief Templated division of units.
  */
-template <typename UnitT1, typename UnitT2, typename = std::void_t<typename UnitT1::value_type, typename UnitT2::value_type>>
+template <typename UnitT1, typename UnitT2, typename = std::void_t<typename UnitT1::value_type, typename UnitT2::value_type, typename UnitT1::unitSystem>>
 auto constexpr operator/(UnitT1 const& unit1, UnitT2 const& unit2) -> DivisionType<UnitT1, UnitT2>
 {
   using returnType = DivisionType<UnitT1, UnitT2>;
