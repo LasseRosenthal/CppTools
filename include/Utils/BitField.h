@@ -58,7 +58,6 @@ public:
   using iterator        = BitFieldIterator<false>;
   using const_iterator  = BitFieldIterator<true>;
 
-
   // ---------------------------------------------------
   // public constants
   static constexpr value_type mask    = (static_cast<value_type>(1) << Size) - 1;   // BitField<3, 2> --> 0000 0111
@@ -227,7 +226,6 @@ constexpr auto BitField<Size, StartBit>::BitProxy<IsConst>::getMask(size_type in
 {
   return 1U << (StartBit + index);
 }
-
 
 
 /** 

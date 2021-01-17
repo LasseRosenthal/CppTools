@@ -647,6 +647,47 @@ TEST(FloatingPoint, almostEqualDoublesExpectFalseDifferenceLargerThanMaxULP)
   EXPECT_FALSE(FloatT::almostEqual<maxULP>(v1, v2));
 }
 
+TEST(FloatingPoint, epsilonFloatOne)
+{
+  using type = float;
+  using FloatT = cpptools::FloatingPoint<type>;
+  FloatT f(1.0F);
+  const auto eps = f.epsilon();
+  constexpr float expected = FLT_EPSILON;
+  EXPECT_EQ(expected, static_cast<type>(eps));
+}
+
+TEST(FloatingPoint, epsilonDoubleOne)
+{
+  using type = double;
+  using FloatT = cpptools::FloatingPoint<type>;
+  FloatT f(1.0F);
+  const auto eps = f.epsilon();
+  constexpr float expected = DBL_EPSILON;
+  EXPECT_EQ(expected, static_cast<type>(eps));
+}
+
+TEST(FloatingPoint, epsilonFloatEight)
+{
+  using type = float;
+  using FloatT = cpptools::FloatingPoint<type>;
+  FloatT f(15.781526F);
+
+  const auto eps = f.epsilon();
+  constexpr float expected = 8.0F*FLT_EPSILON;
+  EXPECT_EQ(expected, static_cast<type>(eps));
+}
+
+TEST(FloatingPoint, epsilonDoubleEight)
+{
+  using type = double;
+  using FloatT = cpptools::FloatingPoint<type>;
+  FloatT f(15.781526F);
+  const auto eps = f.epsilon();
+  constexpr float expected = 8.0F*DBL_EPSILON;
+  EXPECT_EQ(expected, static_cast<type>(eps));
+}
+
  
  
 // *************************************************************************** // 
