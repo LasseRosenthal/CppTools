@@ -46,6 +46,12 @@
     <Filter Include="Source Files\Utils">
       <UniqueIdentifier>{34a04d7d-1bdb-4d45-bc75-39a6a2cc68d3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\XercesUtils">
+      <UniqueIdentifier>{698a6854-29c8-4924-9606-94da17f5280f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\XercesUtils">
+      <UniqueIdentifier>{7b5dd9c0-463f-494d-b980-ab1e2c1e956a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include=".clang-format" />
@@ -173,6 +179,9 @@
     </ClInclude>
     <ClInclude Include="include\Utils\FilesystemUtils.h">
       <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\XercesUtils\XercesTranscoder.h">
+      <Filter>Header Files\XercesUtils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

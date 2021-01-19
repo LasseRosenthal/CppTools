@@ -2,7 +2,7 @@
 #include "pch.h"
 //#include "UtilityTest.h"
 //#include "TestMiscellaneous.h"
-#include "BitFieldTest.h"
+//#include "BitFieldTest.h"
 //#include "ValuelistTest.h"
 //#include "TypelistTest.h"
 //#include "EnumRangeTest.h"
@@ -29,3 +29,4 @@
 //#include "StringAlgorithmsTest.h"
 //#include "FloatingPointTest.h"
 //#include "FilesystemUtilsTest.h"
+#include "XercesUtilsTest.h"

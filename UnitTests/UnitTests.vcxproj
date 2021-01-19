@@ -33,16 +33,16 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>D:\Programs\boost_1_74_0;$(ProjectDir)src\include;$(ProjectDir)..\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Program Files %28x86%29\xerces-c\include;D:\Programs\boost_1_74_0;$(ProjectDir)src\include;$(ProjectDir)..\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>D:\Programs\boost_1_74_0;$(ProjectDir)src\include;$(ProjectDir)..\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Program Files %28x86%29\xerces-c\include;D:\Programs\boost_1_74_0;$(ProjectDir)src\include;$(ProjectDir)..\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\lasse\Documents\Programme\boost_1_74_0;D:\Programs\boost_1_74_0;$(ProjectDir)src\include;$(ProjectDir)..\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Program Files %28x86%29\xerces-c\include;C:\Users\lasse\Documents\Programme\boost_1_74_0;D:\Programs\boost_1_74_0;$(ProjectDir)src\include;$(ProjectDir)..\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Users\lasse\Documents\Programme\boost_1_74_0;D:\Programs\boost_1_74_0;$(ProjectDir)src\include;$(ProjectDir)..\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Program Files %28x86%29\xerces-c\include;C:\Users\lasse\Documents\Programme\boost_1_74_0;D:\Programs\boost_1_74_0;$(ProjectDir)src\include;$(ProjectDir)..\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -75,6 +75,7 @@
     <ClInclude Include="src\include\UnitTest.h" />
     <ClInclude Include="src\include\UtilityTest.h" />
     <ClInclude Include="src\include\ValuelistTest.h" />
+    <ClInclude Include="src\include\XercesUtilsTest.h" />
     <ClInclude Include="src\include\ZipIteratorTest.h" />
   </ItemGroup>
   <ItemGroup>

@@ -102,6 +102,9 @@
     <ClInclude Include="src\include\FilesystemUtilsTest.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="src\include\XercesUtilsTest.h">
+      <Filter>Header Files\XercesUtils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -130,6 +133,9 @@
     </Filter>
     <Filter Include="Header Files\Unit">
       <UniqueIdentifier>{5771bd21-cc3f-42de-8791-34ed71a863c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\XercesUtils">
+      <UniqueIdentifier>{fd357623-2742-4a46-a03f-21b9c5593e2c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

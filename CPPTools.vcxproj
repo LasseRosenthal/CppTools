@@ -72,23 +72,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>D:\Programs\boost_1_74_0\boost;D:\Programs\boost_1_74_0;$(SolutionDir)\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Programs\boost_1_74_0\stage\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files %28x86%29\xerces-c\include;D:\Programs\boost_1_74_0\boost;D:\Programs\boost_1_74_0;$(SolutionDir)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\xerces-c\lib;D:\Programs\boost_1_74_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>D:\Programs\boost_1_74_0\boost;D:\Programs\boost_1_74_0;$(SolutionDir)\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Programs\boost_1_74_0\stage\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files %28x86%29\xerces-c\include;D:\Programs\boost_1_74_0\boost;D:\Programs\boost_1_74_0;$(SolutionDir)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\xerces-c\lib;D:\Programs\boost_1_74_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\lasse\Documents\Programme\boost_1_74_0\boost;C:\Users\lasse\Documents\Programme\boost_1_74_0;D:\Programs\boost_1_74_0\boost;D:\Programs\boost_1_74_0;$(SolutionDir)\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\lasse\Documents\Programme\boost_1_74_0\stage\lib;D:\Programs\boost_1_74_0\stage\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files %28x86%29\xerces-c\include;C:\Users\lasse\Documents\Programme\boost_1_74_0\boost;C:\Users\lasse\Documents\Programme\boost_1_74_0;D:\Programs\boost_1_74_0\boost;D:\Programs\boost_1_74_0;$(SolutionDir)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\xerces-c\lib;C:\Users\lasse\Documents\Programme\boost_1_74_0\stage\lib;D:\Programs\boost_1_74_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>D:\Programs\boost_1_74_0\boost;D:\Programs\boost_1_74_0;$(SolutionDir)\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\lasse\Documents\Programme\boost_1_74_0\stage\lib;D:\Programs\boost_1_74_0\stage\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files %28x86%29\xerces-c\include;D:\Programs\boost_1_74_0\boost;D:\Programs\boost_1_74_0;$(SolutionDir)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\xerces-c\lib;C:\Users\lasse\Documents\Programme\boost_1_74_0\stage\lib;D:\Programs\boost_1_74_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -102,6 +102,10 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalDependencies>xerces-c_3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\xerces-c\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -119,6 +123,10 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalDependencies>xerces-c_3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\xerces-c\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -132,6 +140,10 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalDependencies>xerces-c_3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\xerces-c\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -149,6 +161,10 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalDependencies>xerces-c_3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\xerces-c\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include=".clang-format" />
@@ -194,6 +210,7 @@
     <ClInclude Include="include\Utils\StringAlgorithms.h" />
     <ClInclude Include="include\Utils\StringUtils.h" />
     <ClInclude Include="include\Utils\ZipIterator.h" />
+    <ClInclude Include="include\XercesUtils\XercesTranscoder.h" />
     <ClInclude Include="StringUtilsVorlage.h" />
   </ItemGroup>
   <ItemGroup>
