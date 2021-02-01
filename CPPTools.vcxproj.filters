@@ -183,6 +183,12 @@
     <ClInclude Include="include\XercesUtils\XercesTranscoder.h">
       <Filter>Header Files\XercesUtils</Filter>
     </ClInclude>
+    <ClInclude Include="include\XercesUtils\XercesInitializer.h">
+      <Filter>Header Files\XercesUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\XercesUtils\XercesString.h">
+      <Filter>Header Files\XercesUtils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\WinHighResClock.cpp">
@@ -196,6 +202,9 @@
     </ClCompile>
     <ClCompile Include="src\StringAlgorithms.cpp">
       <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XercesString.cpp">
+      <Filter>Source Files\XercesUtils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

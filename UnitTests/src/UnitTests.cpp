@@ -30,3 +30,9 @@
 //#include "FloatingPointTest.h"
 //#include "FilesystemUtilsTest.h"
 #include "XercesUtilsTest.h"
+
+//int main(int argc, char* argv[])
+//{
+//
+//
+//}

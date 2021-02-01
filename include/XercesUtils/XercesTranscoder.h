@@ -23,7 +23,7 @@
 #include <type_traits>
 
 
-namespace xercesutils {
+namespace xcu {
 
 
 // is XERCES_XMLCH_T defined as wchar_t?
@@ -45,8 +45,8 @@ struct XercesTranscoder;
 template <typename CharT>
 struct XercesTranscoder<CharT, true, false, true> {
   using value_type = char;
-  static auto toXMLCh(const value_type* c) -> ::XMLCh*;
-  static auto toChar(const ::XMLCh* c) -> value_type*;
+  static auto toXMLCh (const value_type* c) -> ::XMLCh*;
+  static auto toChar  (const ::XMLCh* c) -> value_type*;
 };
 
 /**
@@ -112,7 +112,7 @@ inline auto XercesTranscoder<CharT, false, true, wcharEnabled>::toChar(const ::X
 }
 
 
-}   // namespace xercesutils
+}   // namespace xcu
 
 
 // *************************************************************************** // 

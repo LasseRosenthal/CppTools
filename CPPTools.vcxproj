@@ -210,6 +210,8 @@
     <ClInclude Include="include\Utils\StringAlgorithms.h" />
     <ClInclude Include="include\Utils\StringUtils.h" />
     <ClInclude Include="include\Utils\ZipIterator.h" />
+    <ClInclude Include="include\XercesUtils\XercesInitializer.h" />
+    <ClInclude Include="include\XercesUtils\XercesString.h" />
     <ClInclude Include="include\XercesUtils\XercesTranscoder.h" />
     <ClInclude Include="StringUtilsVorlage.h" />
   </ItemGroup>
@@ -217,6 +219,7 @@
     <ClCompile Include="src\ImpoSurfaceSheetRelation.cpp" />
     <ClCompile Include="src\StringAlgorithms.cpp" />
     <ClCompile Include="src\WinHighResClock.cpp" />
+    <ClCompile Include="src\XercesString.cpp" />
     <ClCompile Include="StringUtilsVorlage.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
