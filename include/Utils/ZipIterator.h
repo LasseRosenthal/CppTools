@@ -246,8 +246,7 @@ inline auto ZipIterator<Iters...>::notEqual(ZipIterator const& other,
 template <typename... Iters>
 bool operator!= (ZipIterator<Iters...> const& lhs, ZipIterator<Iters...> const& rhs)
 {
-  return lhs.notEqual(rhs, std::make_index_sequence<sizeof...(Iters)>(),
-                      std::make_index_sequence<sizeof...(Iters)>());
+  return lhs.notEqual(rhs, std::index_sequence_for<Iters...>{}, std::index_sequence_for<Iters...>{});
 }
 
 /**
@@ -357,7 +356,7 @@ inline Zipper<Ts...>::Zipper(Ts&... conts)
 template <typename... Ts>
 inline auto Zipper<Ts...>::begin() -> iterator
 {
-  return begin(std::make_index_sequence<sizeof...(Ts)>());
+  return begin(std::index_sequence_for<Ts...>{});
 }
 
 /**
@@ -367,7 +366,7 @@ inline auto Zipper<Ts...>::begin() -> iterator
 template <typename... Ts>
 inline auto Zipper<Ts...>::begin() const -> const_iterator
 {
-  return cbegin(std::make_index_sequence<sizeof...(Ts)>());
+  return cbegin(std::index_sequence_for<Ts...>{});
 }
 
 /**
@@ -376,7 +375,7 @@ inline auto Zipper<Ts...>::begin() const -> const_iterator
 template <typename... Ts>
 inline auto Zipper<Ts...>::cbegin() const -> const_iterator
 {
-  return cbegin(std::make_index_sequence<sizeof...(Ts)>());
+  return cbegin(std::index_sequence_for<Ts...>{});
 }
 
 /**
@@ -405,7 +404,7 @@ inline auto Zipper<Ts...>::cbegin(std::index_sequence<Is...>) const -> const_ite
 template <typename... Ts>
 inline auto Zipper<Ts...>::end() -> iterator
 {
-  return end(std::make_index_sequence<sizeof...(Ts)>());
+  return end(std::index_sequence_for<Ts...>{});
 }
 
 /**
@@ -415,7 +414,7 @@ inline auto Zipper<Ts...>::end() -> iterator
 template <typename... Ts>
 inline auto Zipper<Ts...>::end() const -> const_iterator
 {
-  return cend(std::make_index_sequence<sizeof...(Ts)>());
+  return cend(std::index_sequence_for<Ts...>{});
 }
 
 /**
@@ -424,7 +423,7 @@ inline auto Zipper<Ts...>::end() const -> const_iterator
 template <typename... Ts>
 inline auto Zipper<Ts...>::cend() const -> const_iterator
 {
-  return cend(std::make_index_sequence<sizeof...(Ts)>());
+  return cend(std::index_sequence_for<Ts...>{});
 }
 
 /**
@@ -447,10 +446,10 @@ inline auto Zipper<Ts...>::cend(std::index_sequence<Is...>) const -> const_itera
   return const_iterator(std::get<Is>(m_conts).cend()...);
 }
 
+
 // deduction guide
 template <typename... Ts>
 Zipper(Ts&...) -> Zipper<Ts...>;
-
 
 
 }   // namespace cpptools

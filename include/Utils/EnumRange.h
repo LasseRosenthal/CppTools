@@ -169,7 +169,7 @@ constexpr auto EnumIterator<E, std::enable_if_t<std::is_enum_v<E>>, enumValues..
 template <typename E, E... enumValues>
 template <typename F>
 constexpr auto EnumIterator<E, std::enable_if_t<std::is_enum_v<E>>, enumValues...>::forEach(F&& f) -> F&& {
-  return forEach(std::forward<F>(f), std::make_index_sequence<sizeof...(enumValues)>());
+  return forEach(std::forward<F>(f), std::index_sequence_for<enumValues...>{});
 }
 
 template <typename E, E... enumValues>

@@ -214,7 +214,7 @@ void MultiIndexVector<T, Dimension, Ordering>::resize(Dimensions... dims)
 {
   totalSize = (... * dims);
   values.resize(totalSize);
-  setDimensions(std::forward_as_tuple(dims...), std::make_index_sequence<sizeof...(Dimensions)>{});
+  setDimensions(std::forward_as_tuple(dims...), std::index_sequence_for<Dimensions...>{});
   arrayAccessor.data       = values.data();
   arrayAccessor.dimensions = dimensions.data();
 }

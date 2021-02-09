@@ -14,6 +14,7 @@
  
 // includes 
 #include <XercesUtils/XercesString.h>
+#include <new>
 
 
 namespace xcu {
@@ -25,12 +26,16 @@ namespace xcu {
 auto XercesString::append(XercesString const& src) -> XercesString&
 {
   const auto newLength = strLength + src.strLength;
-  auto* newBuffer = reinterpret_cast<value_type*>(xercesc::XMLPlatformUtils::fgMemoryManager->allocate(newLength + 1ULL));
-  xercesc::XMLString::copyString(newBuffer, strData.get());
-  xercesc::XMLString::catString(newBuffer, src.strData.get());
+  auto* newBuffer = new(std::nothrow) value_type[newLength + 1ULL];
+//  auto* newBuffer = reinterpret_cast<value_type*>(xercesc::XMLPlatformUtils::fgMemoryManager->allocate(newLength + 1ULL));
 
-  strData.reset(newBuffer);
-  strLength = newLength;
+  if(newBuffer != nullptr)
+  {
+    xercesc::XMLString::copyString(newBuffer, strData.get());
+    xercesc::XMLString::catString(newBuffer, src.strData.get());
+    strData.reset(newBuffer);
+    strLength = newLength;
+  }
 
   return *this;
 }
