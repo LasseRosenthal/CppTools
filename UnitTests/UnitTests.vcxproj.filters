@@ -105,6 +105,9 @@
     <ClInclude Include="src\include\XercesUtilsTest.h">
       <Filter>Header Files\XercesUtils</Filter>
     </ClInclude>
+    <ClInclude Include="src\include\FrameworkTest.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">

@@ -23,6 +23,9 @@
 #include <iostream>
 #include <memory>
 
+#include <immintrin.h>
+
+
 using namespace std::string_literals;
 using namespace multiindex;
 
@@ -44,6 +47,89 @@ private:
 };
 
 
+template <typename FloatT>
+void fillWithRandomNumbers(FloatT* const a1, FloatT* const a2, std::size_t size)
+{
+  std::mt19937 gen;
+  gen.seed(1);
+  constexpr FloatT                       minFloat = -100.0;
+  constexpr FloatT                       maxFloat = 100.0;
+  std::uniform_real_distribution<FloatT> dis(minFloat, maxFloat);
+
+  for(std::size_t i = 0ULL; i < size; ++i)
+  {
+    a1[i] = dis(gen);
+    a2[i] = dis(gen);
+  }
+}
+
+static constexpr std::size_t arraysSize = 8ULL;
+
+static void BM_dotProductSimple(benchmark::State& state)
+{
+  using type = double;
+  type a1[arraysSize];
+  type a2[arraysSize];
+
+  fillWithRandomNumbers(a1, a2, arraysSize);
+
+  for(auto _ : state)
+  {
+    benchmark::DoNotOptimize(multiindex::simpleDotProduct(a1, a2, arraysSize));
+  }
+  state.SetItemsProcessed(100000);
+}
+
+BENCHMARK(BM_dotProductSimple);
+
+inline double horizontalAdd(__m256d v4)
+{
+  //  d1 | d2 | d3 | d4  -->  d1+d2 | d3+d4 = v2
+  const __m128d v2 = _mm_add_pd(_mm256_castpd256_pd128(v4), _mm256_extractf128_pd(v4, 1));
+  // _mm_shuffle_pd(v2, v2, 1) : d1+d2 | d3+d4 -> d3+d4 | d1+d2
+  // v1 = d1+d2 | d3+d4 + d3+d4 | d1+d2 = d1+d2+d3+d4 | d3+d4+d1+d2
+  const __m128d v1 = _mm_add_pd(v2, _mm_shuffle_pd(v2, v2, 1));
+  return _mm_cvtsd_f64(v1);
+}
+
+double dotProdSIMD(double const* p1, double const* p2, std::size_t size)
+{
+  const auto end = p1 + size;
+
+  __m256d resultVector = _mm256_set1_pd(0.0);
+  while(p1 < end)
+  {
+    const __m256d leftLane = _mm256_loadu_pd(p1);
+    const __m256d rightLane = _mm256_loadu_pd(p2);
+    resultVector = _mm256_fmadd_pd(leftLane, rightLane, resultVector);
+
+    p1 += 4;
+    p2 += 4;
+  }
+
+  return horizontalAdd(resultVector);
+}
+
+static void BM_dotProdSIMD(benchmark::State& state)
+{
+  using type = double;
+  type a1[arraysSize];
+  type a2[arraysSize];
+
+  fillWithRandomNumbers(a1, a2, arraysSize);
+
+  for(auto _ : state)
+  {
+    benchmark::DoNotOptimize(dotProdSIMD(a1, a2, arraysSize));
+  }
+  state.SetItemsProcessed(100000);
+}
+
+BENCHMARK(BM_dotProdSIMD);
+
+
+
+#if 0
 static void BM_stringSplit1(benchmark::State& state)
 {
   auto s = "split this string with lots of text into substrings"s;
@@ -253,7 +339,7 @@ static void BM_wstringToString(benchmark::State& state)
 }
 
 BENCHMARK(BM_wstringToString);
-
+#endif
 
 
 

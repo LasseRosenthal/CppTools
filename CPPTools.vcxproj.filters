@@ -52,6 +52,9 @@
     <Filter Include="Source Files\XercesUtils">
       <UniqueIdentifier>{7b5dd9c0-463f-494d-b980-ab1e2c1e956a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Numerics">
+      <UniqueIdentifier>{ef7de2ed-768c-4441-9f14-b94357eb7e68}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include=".clang-format" />
@@ -188,6 +191,12 @@
     </ClInclude>
     <ClInclude Include="include\XercesUtils\XercesString.h">
       <Filter>Header Files\XercesUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Utils\Framework.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Numerics\linalg.h">
+      <Filter>Header Files\Numerics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

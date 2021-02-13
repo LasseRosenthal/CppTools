@@ -191,6 +191,7 @@
     <ClInclude Include="include\MultiIndexVector\StackVector.h" />
     <ClInclude Include="include\MultiIndexVector\StorageOrdering.h" />
     <ClInclude Include="include\MultiIndexVector\VectorMatrixAlgebra.h" />
+    <ClInclude Include="include\Numerics\linalg.h" />
     <ClInclude Include="include\TransformationMatrix\CTM.h" />
     <ClInclude Include="include\Unit\BaseDimensions.h" />
     <ClInclude Include="include\Unit\BaseDimensionTag.h" />
@@ -204,6 +205,7 @@
     <ClInclude Include="include\Utils\EnumRange.h" />
     <ClInclude Include="include\Utils\FilesystemUtils.h" />
     <ClInclude Include="include\Utils\FloatingPoint.h" />
+    <ClInclude Include="include\Utils\Framework.h" />
     <ClInclude Include="include\Utils\LambdaOverload.h" />
     <ClInclude Include="include\Utils\miscellaneous.h" />
     <ClInclude Include="include\Utils\MultiTypeMap.h" />
