@@ -47,6 +47,15 @@ TEST(EnumBitmask, clearFlag)
   EXPECT_EQ(rc & permissions::copyable, permissions::none);
 }
 
+TEST(EnumBitmask, setFlag)
+{
+  auto rc = permissions::readable;
+  EXPECT_EQ(rc & permissions::copyable, permissions::none);
+
+  rc |= permissions::copyable;
+  EXPECT_EQ(rc & permissions::copyable, permissions::copyable);
+}
+
  
 // *************************************************************************** // 
 // ******************************* END OF FILE ******************************* // 
