@@ -25,11 +25,17 @@
 
 #include <immintrin.h>
 
+#include "linalgBenchmarks.h"
+
 
 using namespace std::string_literals;
 using namespace multiindex;
 
 constexpr auto ordering = storageOrdering::rowMajor;
+
+
+
+ 
 
 class Person {
 public:
@@ -46,7 +52,7 @@ private:
   std::string name;
 };
 
-
+#if 0
 template <typename FloatT>
 void fillWithRandomNumbers(FloatT* const a1, FloatT* const a2, std::size_t size)
 {
@@ -126,7 +132,7 @@ static void BM_dotProdSIMD(benchmark::State& state)
 }
 
 BENCHMARK(BM_dotProdSIMD);
-
+#endif
 
 
 #if 0

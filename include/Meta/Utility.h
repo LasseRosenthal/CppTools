@@ -56,7 +56,6 @@ using FirstTypeOf = typename FirstTypeOfT<Ts...>::type;
  */
 struct InvalidType {};
 
-
 /**
  * @brief Boolean constant to determine if a number is a power of two.
  */

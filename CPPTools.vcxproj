@@ -168,6 +168,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include=".clang-format" />
+    <None Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ArbeitsCode\ImpoSurfaceSheetRelation.h" />
@@ -202,6 +203,7 @@
     <ClInclude Include="include\Unit\UnitSystem.h" />
     <ClInclude Include="include\Unit\UnitSystemGenerator.h" />
     <ClInclude Include="include\Utils\BitField.h" />
+    <ClInclude Include="include\Utils\EnumBitmask.h" />
     <ClInclude Include="include\Utils\EnumRange.h" />
     <ClInclude Include="include\Utils\FilesystemUtils.h" />
     <ClInclude Include="include\Utils\FloatingPoint.h" />

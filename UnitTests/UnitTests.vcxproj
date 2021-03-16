@@ -53,11 +53,13 @@
     <ClInclude Include="src\include\CompileTimeArithmeticTest.h" />
     <ClInclude Include="src\include\DimensionTest.h" />
     <ClInclude Include="src\include\DummyClass.h" />
+    <ClInclude Include="src\include\EnumBitmaskTest.h" />
     <ClInclude Include="src\include\EnumRangeTest.h" />
     <ClInclude Include="src\include\FilesystemUtilsTest.h" />
     <ClInclude Include="src\include\FloatingPointTest.h" />
     <ClInclude Include="src\include\FrameworkTest.h" />
     <ClInclude Include="src\include\ImpoSurfaceSheetRelationTest.h" />
+    <ClInclude Include="src\include\linalgTest.h" />
     <ClInclude Include="src\include\MultiTypeMapTest.h" />
     <ClInclude Include="src\include\RatioUtilsTest.h" />
     <ClInclude Include="src\include\StackMatrixTest.h" />
@@ -118,7 +120,7 @@
     </Link>
     <PostBuildEvent>
       <Command>xcopy "C:\Program Files (x86)\xerces-c\bin\xerces-c_3_2.dll" "$(TargetDir)" /y &amp;
-xcopy "D:\Programs\icu\icu4c\bin64\icuuc66d.dll" "$(TargetDir)"</Command>
+xcopy "D:\Programs\icu\icu4c\bin64\icuuc66d.dll" "$(TargetDir)" /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -138,7 +140,7 @@ xcopy "D:\Programs\icu\icu4c\bin64\icuuc66d.dll" "$(TargetDir)"</Command>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "C:\Program Files (x86)\xerces-c\bin\xerces-c_3_2.dll" "$(TargetDir)" /y &amp;
-xcopy "D:\Programs\icu\icu4c\bin64\icuuc66d.dll" "$(TargetDir)"</Command>
+xcopy "D:\Programs\icu\icu4c\bin64\icuuc66d.dll" "$(TargetDir)" /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

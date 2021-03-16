@@ -108,6 +108,12 @@
     <ClInclude Include="src\include\FrameworkTest.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="src\include\linalgTest.h">
+      <Filter>Header Files\Numerics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\EnumBitmaskTest.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -139,6 +145,9 @@
     </Filter>
     <Filter Include="Header Files\XercesUtils">
       <UniqueIdentifier>{fd357623-2742-4a46-a03f-21b9c5593e2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Numerics">
+      <UniqueIdentifier>{0d64b53f-b0eb-4b61-a07e-179c73234fe3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

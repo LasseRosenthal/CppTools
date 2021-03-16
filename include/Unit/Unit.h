@@ -18,6 +18,7 @@
  
 // includes
 #include <Unit/UnitSystemGenerator.h>
+#include <Unit/detail/Arithmetic.h>
 #include <Unit/detail/UnitSystemConversion.h>
  
  
@@ -62,7 +63,10 @@ public:
   template <typename UnitFrom, typename = RequiresSameDimension<UnitFrom>>
   constexpr auto operator= (UnitFrom const& unitFrom) noexcept -> Unit&;
 
-  constexpr auto value() const noexcept -> value_type;
+  // ---------------------------------------------------
+  // get and set methods
+  constexpr auto value    () const noexcept -> value_type;
+  void           setValue (value_type v) noexcept;
 
   // ---------------------------------------------------
   // arithmetic methods
@@ -151,6 +155,15 @@ constexpr auto Unit<T, UnitSystemT>::value() const noexcept -> value_type
 }
 
 /** 
+ * @brief Assigns a new value.
+ */
+template<typename T, typename UnitSystemT>
+inline void Unit<T, UnitSystemT>::setValue(value_type v) noexcept
+{
+  val = v;
+}
+
+/** 
  * @brief Addition with a unit of same dimension.
  */
 template <typename T, typename UnitSystemT>
@@ -220,8 +233,7 @@ using BaseUnit = Unit<typename UnitT::value_type, unit::BaseUnitGenerator<typena
 
 template <typename UnitT1, typename UnitT2>
 using MultiplicationType =
-  Unit<CommonType<UnitT1, UnitT2>,
-       unit::arithmetic::MultiplicationType<typename UnitT1::unitSystem, typename UnitT2::unitSystem>>;
+  Unit<CommonType<UnitT1, UnitT2>, arithmetic::MultiplicationType<typename UnitT1::unitSystem, typename UnitT2::unitSystem>>;
 
 /** 
  * @brief Templated multiplication of units.
@@ -237,8 +249,8 @@ template <typename UnitT1, typename UnitT2>
 using DivisionType = std::conditional_t<
   dimension::HasOnlyZeroExponents<dimension::DivisionType<DimensionOf<UnitT1>, DimensionOf<UnitT2>>>,
   CommonType<UnitT1, UnitT2>,
-  Unit<CommonType<UnitT1, UnitT2>,
-       unit::arithmetic::DivisionType<typename UnitT1::unitSystem, typename UnitT2::unitSystem>>>;
+  Unit<CommonType<UnitT1, UnitT2>, arithmetic::DivisionType<typename UnitT1::unitSystem, typename UnitT2::unitSystem>>
+>;
 
 /**
  * @brief Templated division of units.
