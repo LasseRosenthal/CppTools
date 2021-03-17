@@ -31,6 +31,40 @@
 namespace cpptools {
 
 
+/** 
+ * @brief returns the minimum of an arbitrary number of elements of different types that
+ *        are comparable via the comparison operator <
+ */
+template <typename T>
+[[nodiscard]] constexpr T min(T&& t)
+{
+  return std::forward<T>(t);
+}
+
+template <typename T1, typename T2, typename... Ts>
+[[nodiscard]] constexpr auto min(T1&& head1, T2&& head2, Ts&&... tail) -> std::common_type_t<T1, T2, Ts...>
+{
+  return head1 < head2 ? min(std::forward<T1>(head1), std::forward<Ts>(tail)...)
+                       : min(std::forward<T2>(head2), std::forward<Ts>(tail)...);
+}
+
+/** 
+ * @brief returns the maximum of an arbitrary number of elements of different types that
+ *        are comparable via the comparison operator >
+ */
+template <typename T>
+[[nodiscard]] constexpr T max(T&& t)
+{
+  return std::forward<T>(t);
+}
+
+template <typename T1, typename T2, typename... Ts>
+[[nodiscard]] constexpr auto max(T1&& head1, T2&& head2, Ts&&... tail) -> std::common_type_t<T1, T2, Ts...>
+{
+  return head1 > head2 ? max(std::forward<T1>(head1), std::forward<Ts>(tail)...)
+                       : max(std::forward<T2>(head2), std::forward<Ts>(tail)...);
+}
+
 /**
  * @brief   aligns a value to a given alignment (templated version)
  * @tparam  Alignment the alignment

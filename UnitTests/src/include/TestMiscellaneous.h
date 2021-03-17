@@ -23,7 +23,39 @@
 #include <sstream>
 #include <vector>
  
+
+TEST(Miscellaneous, minCheckValue)
+{
+  constexpr short s = 153;
+  constexpr int   i = 12;
+  constexpr auto m = cpptools::min(s, 1.24F, i);
+  EXPECT_EQ(m, 1.24F);
+}
+
+TEST(Miscellaneous, minCheckType)
+{
+  constexpr short s = 153;
+  constexpr int   i = 12;
+  constexpr auto m = cpptools::min(s, 7LL, i);
+  EXPECT_TRUE((std::is_same_v<std::remove_const_t<decltype(m)>, long long>));
+}
  
+TEST(Miscellaneous, maxCheckValue)
+{
+  constexpr short s = 153;
+  constexpr int   i = 12;
+  constexpr auto m = cpptools::max(s, 1.24F, i);
+  EXPECT_EQ(m, 153);
+}
+
+TEST(Miscellaneous, maxCheckType)
+{
+  constexpr short s = 153;
+  constexpr int   i = 12;
+  constexpr auto m = cpptools::max(s, 7LL, i);
+  EXPECT_TRUE((std::is_same_v<std::remove_const_t<decltype(m)>, long long>));
+}
+
 TEST(Miscellaneous, AlignUp)
 {
   constexpr std::size_t alignment = 7ULL;
