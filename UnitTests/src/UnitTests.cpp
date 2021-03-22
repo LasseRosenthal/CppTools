@@ -1,7 +1,7 @@
 
 #include "pch.h"
 #include "UtilityTest.h"
-#include "TestMiscellaneous.h"
+//#include "TestMiscellaneous.h"
 //#include "BitFieldTest.h"
 //#include "ValuelistTest.h"
 //#include "TypelistTest.h"
@@ -32,7 +32,7 @@
 //#include "XercesUtilsTest.h"
 //#include "FrameworkTest.h"
 //#include "linalgTest.h"
-#include "EnumBitmaskTest.h"
+//#include "EnumBitmaskTest.h"
 
 //int main(int argc, char* argv[])
 //{

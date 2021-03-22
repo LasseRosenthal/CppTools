@@ -17,6 +17,7 @@
  
  
 // includes
+#include <tuple>
 #include <type_traits>
  
  
@@ -35,6 +36,40 @@ struct IdentityT {
 
 template <typename T>
 using Identity = typename IdentityT<T>::type;
+
+/** 
+ * @struct FunctionTraits 
+ * @brief  FunctionTraits is a traits providing information about signatures
+ *         of class member functions.
+ */
+template <typename T, typename = void>
+struct FunctionTraits;
+
+template <typename T>
+struct FunctionTraits<T, std::enable_if_t<std::is_class_v<T>>> : FunctionTraits<decltype(&T::operator())>
+{};
+
+template <typename ClassType, typename ReturnType, typename... Args>
+struct FunctionTraits<ReturnType(ClassType::*)(Args...)>
+{
+  using result_type = ReturnType;
+  template <std::size_t index>
+  using argument_type = std::tuple_element_t<index, std::tuple<Args...>>;
+
+  static constexpr bool is_const_method = false;
+  static constexpr std::size_t arity    = sizeof...(Args);
+};
+
+template <typename ClassType, typename ReturnType, typename... Args>
+struct FunctionTraits<ReturnType(ClassType::*)(Args...) const>
+{
+  using result_type = ReturnType;
+  template <std::size_t index>
+  using argument_type = std::tuple_element_t<index, std::tuple<Args...>>;
+
+  static constexpr bool is_const_method = true;
+  static constexpr std::size_t arity    = sizeof...(Args);
+};
 
 /** 
  * @struct FirstTypeOfT 

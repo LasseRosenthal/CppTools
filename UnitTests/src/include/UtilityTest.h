@@ -20,6 +20,7 @@
 #include "Meta/Utility.h"
 
 #include <string>
+#include <vector>
  
  
 using namespace meta;
@@ -139,6 +140,46 @@ TEST(Utility, AllConvertibleExpectTrueOnlyOneType)
 TEST(Utility, AllConvertibleExpectFalse)
 {
   EXPECT_FALSE((meta::AllConvertible<double, std::string, float, char, long>));
+}
+
+struct Dummy {
+  auto funNonConst(std::string, double const&) -> int;
+  void funConst(std::vector<short>, double const, int) const;
+};
+
+TEST(Utility, FunctionTraitsNonConstMemberFunction)
+{
+  using funTraits = meta::FunctionTraits<decltype(&Dummy::funNonConst)>;
+
+  EXPECT_EQ(funTraits::arity, 2ULL);
+  EXPECT_TRUE((std::is_same_v<funTraits::result_type, int>));
+  EXPECT_TRUE((std::is_same_v<funTraits::argument_type<0ULL>, std::string>));
+  EXPECT_TRUE((std::is_same_v<funTraits::argument_type<1ULL>, double const&>));
+  EXPECT_FALSE(funTraits::is_const_method);
+}
+
+TEST(Utility, FunctionTraitsConstMemberFunction)
+{
+  using funTraits = meta::FunctionTraits<decltype(&Dummy::funConst)>;
+
+  EXPECT_EQ(funTraits::arity, 3ULL);
+  EXPECT_TRUE((std::is_same_v<funTraits::result_type, void>));
+  EXPECT_TRUE((std::is_same_v<funTraits::argument_type<0ULL>, std::vector<short>>));
+  EXPECT_TRUE((std::is_same_v<funTraits::argument_type<1ULL>, double>));
+  EXPECT_TRUE((std::is_same_v<funTraits::argument_type<2ULL>, int>));
+  EXPECT_TRUE(funTraits::is_const_method);
+}
+
+TEST(Utility, FunctionTraitsLambda)
+{
+  auto myFun      = [](std::string const&, int&) -> bool { return true; };
+  using funTraits = meta::FunctionTraits<decltype(myFun)>;
+
+  EXPECT_EQ(funTraits::arity, 2ULL);
+  EXPECT_TRUE((std::is_same_v<funTraits::result_type, bool>));
+  EXPECT_TRUE((std::is_same_v<funTraits::argument_type<0ULL>, std::string const&>));
+  EXPECT_TRUE((std::is_same_v<funTraits::argument_type<1ULL>, int&>));
+  EXPECT_TRUE(funTraits::is_const_method);
 }
 
 
