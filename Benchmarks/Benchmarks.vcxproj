@@ -82,13 +82,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>D:\Programs\boost_1_74_0;D:\Programs\benchmark\include;$(ProjectDir)..\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Programs\benchmark\build\src\$(Configuration);$(ProjectDir)..\$(PlatformShortName)\$(Configuration);$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\lasse\Documents\Programme\boost_1_74_0;C:\Users\lasse\Documents\Programme\benchmark\include;D:\Programs\boost_1_74_0;D:\Programs\benchmark\include;$(ProjectDir)src\include;$(ProjectDir)..\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\lasse\Documents\Programme\benchmark\build\src\$(Configuration);D:\Programs\benchmark\build\src\$(Configuration);$(ProjectDir)..\$(PlatformShortName)\$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\Lasse\source\repos\CPPTools\Benchmarks\src\include;D:\Programs\boost_1_74_0;D:\Programs\benchmark\include;$(ProjectDir)..\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Programs\benchmark\build\src\$(Configuration);$(ProjectDir)..\$(PlatformShortName)\$(Configuration);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)src\include;C:\Users\lasse\Documents\Programme\benchmark\include;C:\Users\Lasse\source\repos\CPPTools\Benchmarks\src\include;C:\Users\lasse\Documents\Programme\boost_1_74_0;D:\Programs\boost_1_74_0;D:\Programs\benchmark\include;$(ProjectDir)..\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\lasse\Documents\Programme\benchmark\build\src\$(Configuration);D:\Programs\benchmark\build\src\$(Configuration);$(ProjectDir)..\$(PlatformShortName)\$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
