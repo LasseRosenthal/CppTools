@@ -182,6 +182,18 @@ TEST(Utility, FunctionTraitsLambda)
   EXPECT_TRUE(funTraits::is_const_method);
 }
 
+TEST(Utility, FunctionTraitsLambdaReturningVoid)
+{
+  auto myFun      = [](std::string const&, int&) { };
+  using funTraits = meta::FunctionTraits<decltype(myFun)>;
+
+  EXPECT_EQ(funTraits::arity, 2ULL);
+  EXPECT_TRUE((std::is_void_v<funTraits::result_type>));
+  EXPECT_TRUE((std::is_same_v<funTraits::argument_type<0ULL>, std::string const&>));
+  EXPECT_TRUE((std::is_same_v<funTraits::argument_type<1ULL>, int&>));
+  EXPECT_TRUE(funTraits::is_const_method);
+}
+
 
 
  
