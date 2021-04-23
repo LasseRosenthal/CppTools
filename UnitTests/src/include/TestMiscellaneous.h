@@ -56,6 +56,24 @@ TEST(Miscellaneous, maxCheckType)
   EXPECT_TRUE((std::is_same_v<std::remove_const_t<decltype(m)>, long long>));
 }
 
+TEST(Miscellaneous, compareArrayExpectTrue)
+{
+  constexpr int a1[]{1, 3, 5, 7, 9};
+  constexpr int a2[]{1, 3, 5, 7, 9};
+  constexpr bool equal = cpptools::compareArray(a1, a2);
+
+  EXPECT_TRUE(equal);
+}
+
+TEST(Miscellaneous, compareArrayExpectFalse)
+{
+  constexpr int a1[]{1, 3, 5, 7, 9};
+  constexpr int a2[]{1, 3, 513, 7, 91};
+  constexpr bool equal = cpptools::compareArray(a1, a2);
+
+  EXPECT_FALSE(equal);
+}
+
 TEST(Miscellaneous, AlignUp)
 {
   constexpr std::size_t alignment = 7ULL;

@@ -40,10 +40,16 @@ class MultiIndexArray {
   static constexpr bool isSuitableForBitOperations = std::is_trivial_v<S> || std::is_standard_layout_v<S>;
 
   template <typename S>
-  using enableForPOD = std::enable_if_t<isSuitableForBitOperations<S>>;
+  using requiresNonPOD = std::enable_if_t<!isSuitableForBitOperations<S> && !std::is_arithmetic_v<S>>;
 
   template <typename S>
-  using enableForNonPOD = std::enable_if_t<!isSuitableForBitOperations<S>>;
+  using requiresPOD = std::enable_if_t<isSuitableForBitOperations<S>>;
+
+  template <typename S>
+  using requiresPODClassType = std::enable_if_t<isSuitableForBitOperations<S> && !std::is_arithmetic_v<S>>;
+
+  template <typename S>
+  using requiresArithmetic = std::enable_if_t<std::is_arithmetic_v<S>>;
 
 public:
 
@@ -69,14 +75,13 @@ public:
   constexpr MultiIndexArray (value_type const& val = value_type{});
   template <typename... Vs, typename = std::enable_if_t<meta::AllConvertible<value_type, Vs...>>>
   constexpr MultiIndexArray (Vs&&... vals);
-  MultiIndexArray           (MultiIndexArray const& src);
-  MultiIndexArray           (MultiIndexArray&& src);
+  constexpr MultiIndexArray (MultiIndexArray const& src);
+  constexpr MultiIndexArray (MultiIndexArray&& src);
   auto operator=            (MultiIndexArray const& src) -> MultiIndexArray&;
   auto operator=            (MultiIndexArray&& src) -> MultiIndexArray&;
-  ~MultiIndexArray          () = default;
   template <typename S, typename Enable = std::enable_if_t<std::is_convertible_v<S, T>>>
-  MultiIndexArray           (MultiIndexArray<S, Ordering, Dimensions...> const& src);
-
+  constexpr MultiIndexArray (MultiIndexArray<S, Ordering, Dimensions...> const& src);
+  ~MultiIndexArray          () = default;
 
   // ---------------------------------------------------
   // public api
@@ -95,9 +100,11 @@ public:
   constexpr auto operator()          (Is... is) const -> const_reference;
   constexpr auto data                () -> pointer;
   constexpr auto data                () const -> const_pointer;
-  template <typename Enable = enableForPOD<T>>
+  template <typename = requiresArithmetic<T>>
+  constexpr auto equals              (MultiIndexArray const& src, int = 0, int = 0) const noexcept -> bool;
+  template <typename Enable = requiresPODClassType<T>>
   auto equals                        (MultiIndexArray const& src) const -> bool;
-  template <typename Enable = enableForNonPOD<T>>
+  template <typename Enable = requiresNonPOD<T>>
   auto equals                        (MultiIndexArray const& src, int = 0) const -> bool;
 
   // ---------------------------------------------------
@@ -130,21 +137,21 @@ private:
 
   // ---------------------------------------------------
   // private methods
-  template <typename Enable = enableForPOD<T>>
+  template <typename Enable = requiresPOD<T>>
   void copyFrom (MultiIndexArray const& src);
-  template <typename Enable = enableForNonPOD<T>>
+  template <typename Enable = requiresNonPOD<T>>
   void copyFrom (MultiIndexArray const& src, int = 0);
 };
 
 
-/**
+/**
  * @brief Convenient alias for matrices.
  */
 template <typename T, storageOrdering Ordering, std::size_t M, std::size_t N>
 using ArrayMatrix = MultiIndexArray<T, Ordering, M, N>;
 
 
-/**
+/**
  * @brief constructor. Construct an array and fills it with a given value.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
@@ -159,7 +166,7 @@ constexpr MultiIndexArray<T, Ordering, Dimensions...>::MultiIndexArray(value_typ
   }
 }
 
-/**
+/**
  * @brief constructor. Construct an array with given values.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
@@ -170,11 +177,11 @@ constexpr MultiIndexArray<T, Ordering, Dimensions...>::MultiIndexArray(Vs&&... v
   , arrayAccessor {dimensions, values}
 {}
 
-/**
+/**
  * @brief copy constructor.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
-MultiIndexArray<T, Ordering, Dimensions...>::MultiIndexArray(MultiIndexArray const& src)
+constexpr MultiIndexArray<T, Ordering, Dimensions...>::MultiIndexArray(MultiIndexArray const& src)
   : dimensions    {Dimensions...}
   , arrayAccessor {dimensions, values}
 {
@@ -184,27 +191,21 @@ MultiIndexArray<T, Ordering, Dimensions...>::MultiIndexArray(MultiIndexArray con
   }
 }
 
-/**
+/**
  * @brief move constructor.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
-MultiIndexArray<T, Ordering, Dimensions...>::MultiIndexArray(MultiIndexArray&& src)
-  : dimensions    {Dimensions...}
-  , arrayAccessor {dimensions, values}
-{
-  for(std::size_t i{}; i < totalSize; ++i)
-  {
-    values[i] = src.values[i];
-  }
-}
+constexpr MultiIndexArray<T, Ordering, Dimensions...>::MultiIndexArray(MultiIndexArray&& src)
+  : MultiIndexArray(src)
+{}
 
-/**
+/**
  * @brief templated copy constructor. Construct an array from an array of a different type
  *        The type of the source array has to be convertible to the type of the destination array.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
 template <typename S, typename>
-MultiIndexArray<T, Ordering, Dimensions...>::MultiIndexArray(MultiIndexArray<S, Ordering, Dimensions...> const& src)
+constexpr MultiIndexArray<T, Ordering, Dimensions...>::MultiIndexArray(MultiIndexArray<S, Ordering, Dimensions...> const& src)
   : dimensions    {Dimensions...}
   , arrayAccessor {dimensions, values}
 {
@@ -214,7 +215,7 @@ MultiIndexArray<T, Ordering, Dimensions...>::MultiIndexArray(MultiIndexArray<S, 
   }
 }
 
-/**
+/**
  * @brief Assignment operator. Replaces the contents of the array with the content of a given array.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
@@ -227,7 +228,7 @@ inline auto MultiIndexArray<T, Ordering, Dimensions...>::operator=(MultiIndexArr
   return *this;
 }
 
-/**
+/**
  * @brief move assignment operator. Replaces the contents of the array with the content of a given array.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
@@ -237,7 +238,7 @@ inline auto MultiIndexArray<T, Ordering, Dimensions...>::operator=(MultiIndexArr
   return *this;
 }
 
-/**
+/**
  * @brief Returns the total size of the array.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
@@ -246,7 +247,7 @@ constexpr auto MultiIndexArray<T, Ordering, Dimensions...>::size() const noexcep
   return totalSize;
 }
 
-/**
+/**
  * @brief Returns the size of the i-th dimension of the array.
  * @param i the zero based index of the dimension.
  */
@@ -256,7 +257,7 @@ constexpr auto MultiIndexArray<T, Ordering, Dimensions...>::size(std::size_t i) 
   return dimensions[i];
 }
 
-/**
+/**
  * @brief Checks if the array is empty, i.e if its size equals zero.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
@@ -265,7 +266,7 @@ constexpr auto MultiIndexArray<T, Ordering, Dimensions...>::empty() const noexce
   return totalSize == 0ULL;
 }
 
-/**
+/**
  * @brief Returns an iterator to the first element of the array.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
@@ -274,7 +275,7 @@ constexpr auto MultiIndexArray<T, Ordering, Dimensions...>::begin() noexcept -> 
   return std::begin(values);
 }
 
-/**
+/**
  * @brief Returns an iterator to the first element following the last element of the array.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
@@ -283,7 +284,7 @@ constexpr auto MultiIndexArray<T, Ordering, Dimensions...>::end() noexcept -> it
   return std::end(values);
 }
 
-/**
+/**
  * @brief Returns a const_iterator to the first element of the array.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
@@ -292,7 +293,7 @@ constexpr auto MultiIndexArray<T, Ordering, Dimensions...>::begin() const noexce
   return std::begin(values);
 }
 
-/**
+/**
  * @brief Returns a const_iterator to the first element following the last element of the array.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
@@ -301,7 +302,7 @@ constexpr auto MultiIndexArray<T, Ordering, Dimensions...>::end() const noexcept
   return std::end(values);
 }
 
-/**
+/**
  * @brief Returns a const_iterator to the first element of the array.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
@@ -310,7 +311,7 @@ constexpr auto MultiIndexArray<T, Ordering, Dimensions...>::cbegin() const noexc
   return std::cbegin(values);
 }
 
-/**
+/**
  * @brief Returns a const_iterator to the first element following the last element of the array.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
@@ -319,7 +320,7 @@ constexpr auto MultiIndexArray<T, Ordering, Dimensions...>::cend() const noexcep
   return std::cend(values);
 }
 
-/**
+/**
  * @brief Index operator. Returns a reference to the element spcified by the given indices.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
@@ -329,7 +330,7 @@ constexpr auto MultiIndexArray<T, Ordering, Dimensions...>::operator()(Is... is)
   return arrayAccessor(is...);
 }
 
-/**
+/**
  * @brief Index operator. Returns a const reference to the element spcified by the given indices.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
@@ -339,7 +340,7 @@ constexpr auto MultiIndexArray<T, Ordering, Dimensions...>::operator()(Is... is)
   return arrayAccessor(is...);
 }
 
-/**
+/**
  * @brief Returns a raw pointer to the underlying array.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
@@ -348,7 +349,7 @@ constexpr auto MultiIndexArray<T, Ordering, Dimensions...>::data() -> pointer
   return values;
 }
 
-/**
+/**
  * @brief Returns a const raw pointer to the underlying array.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
@@ -357,7 +358,15 @@ constexpr auto MultiIndexArray<T, Ordering, Dimensions...>::data() const -> cons
   return values;
 }
 
-/**
+
+template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
+template <typename>
+constexpr auto MultiIndexArray<T, Ordering, Dimensions...>::equals(MultiIndexArray const& src, int, int) const noexcept -> bool
+{
+  return cpptools::compareArray(values, src.values);
+}
+
+/**
  * @brief performs a bitwise comparison of the arrays.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
@@ -367,7 +376,7 @@ inline auto MultiIndexArray<T, Ordering, Dimensions...>::equals(MultiIndexArray 
   return std::memcmp(values, src.values, totalSize * sizeof(T)) == 0;
 }
 
-/**
+/**
  * @brief performs an element wise comparison of the arrays.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
@@ -377,7 +386,7 @@ inline auto MultiIndexArray<T, Ordering, Dimensions...>::equals(MultiIndexArray 
   return std::equal(cbegin(), cend(), src.cbegin());
 }
 
-/**
+/**
  * @brief Assignment operator. Replaces the contents of the array with the content of a given array.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
@@ -387,7 +396,7 @@ inline void MultiIndexArray<T, Ordering, Dimensions...>::copyFrom(MultiIndexArra
   std::memcpy(values, src.values, totalSize * sizeof(T));
 }
 
-/**
+/**
  * @brief Assignment operator. Replaces the contents of the array with the content of a given array.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
@@ -477,11 +486,11 @@ auto MultiIndexArray<T, Ordering, Dimensions...>::put(std::basic_ostream<CharT, 
   return ostr;
 }
 
-/**
+/**
  * @brief comparison operator for MultiIndexArrays.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
-inline auto operator==(MultiIndexArray<T, Ordering, Dimensions...> const& x, MultiIndexArray<T, Ordering, Dimensions...> const& y)
+constexpr auto operator==(MultiIndexArray<T, Ordering, Dimensions...> const& x, MultiIndexArray<T, Ordering, Dimensions...> const& y)
 {
   return x.equals(y);
 }
@@ -492,7 +501,7 @@ inline auto operator!=(MultiIndexArray<T, Ordering, Dimensions...> const& x, Mul
   return !(x == y);
 }
 
-/**
+/**
  * @brief multiplication of MultiIndexArrays with scalars.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
@@ -509,7 +518,7 @@ inline auto operator*(T factor, MultiIndexArray<T, Ordering, Dimensions...> cons
   return x * factor;
 }
 
-/**
+/**
  * @brief division of MultiIndexArrays by a given divisor.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
@@ -520,7 +529,7 @@ inline auto operator/(MultiIndexArray<T, Ordering, Dimensions...> const& x, T di
   return result;
 }
 
-/**
+/**
  * @brief addition of MultiIndexArrays.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
@@ -531,7 +540,7 @@ inline auto operator+(MultiIndexArray<T, Ordering, Dimensions...> const& x, Mult
   return result;
 }
 
-/**
+/**
  * @brief addition of MultiIndexArrays with different types.
  */
 template <typename T, typename S, storageOrdering Ordering, std::size_t... Dimensions, typename = std::enable_if_t<std::is_convertible_v<S, T>>>
@@ -542,7 +551,7 @@ inline auto operator+(MultiIndexArray<T, Ordering, Dimensions...> const& x, Mult
   return result;
 }
 
-/**
+/**
  * @brief subtraction of MultiIndexArrays.
  */
 template <typename T, storageOrdering Ordering, std::size_t... Dimensions>
@@ -553,7 +562,7 @@ inline auto operator-(MultiIndexArray<T, Ordering, Dimensions...> const& x, Mult
   return result;
 }
 
-/**
+/**
  * @brief subtraction of MultiIndexArrays with different types.
  */
 template <typename T, typename S, storageOrdering Ordering, std::size_t... Dimensions, typename = std::enable_if_t<std::is_convertible_v<S, T>>>

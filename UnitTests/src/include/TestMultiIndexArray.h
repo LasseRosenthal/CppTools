@@ -29,7 +29,7 @@ TEST(MultiIndexArray, DefaultConstructor)
   constexpr std::size_t d2 = 12;
   constexpr std::size_t d3 = 135;
 
-  MultiIndexArray<int, storageOrdering::columnMajor, d1, d2, d3> multVec;
+  constexpr MultiIndexArray<int, storageOrdering::columnMajor, d1, d2, d3> multVec;
   EXPECT_FALSE(multVec.empty());
   EXPECT_EQ(multVec.size(), d1*d2*d3);
   EXPECT_EQ(multVec.size(0), d1);
@@ -41,10 +41,26 @@ TEST(MultiIndexArray, CopyContructorTestEquality)
 {
   constexpr std::size_t d1 = 2;
   constexpr std::size_t d2 = 3;
-  MultiIndexArray<int, storageOrdering::columnMajor, d1, d2> multArray1{0,1,2,3,4,5};
-  auto multArray2(multArray1);
 
-  const bool isEqual = multArray1 == multArray2;
+  using arrayType = MultiIndexArray<int, storageOrdering::columnMajor, d1, d2>;
+  constexpr arrayType multArray1{0,1,2,3,4,5};
+  constexpr arrayType multArray2(multArray1);
+
+  constexpr bool isEqual = multArray1 == multArray2;
+  EXPECT_TRUE(isEqual);
+}
+
+TEST(MultiIndexArray, MoveContructorTestEquality)
+{
+  constexpr std::size_t d1 = 2;
+  constexpr std::size_t d2 = 3;
+
+  using arrayType = MultiIndexArray<int, storageOrdering::columnMajor, d1, d2>;
+  constexpr arrayType multArray1{0,1,2,3,4,5};
+  constexpr arrayType multArray2(multArray1);
+  constexpr arrayType multArray3(std::move(multArray2));
+
+  constexpr bool isEqual = multArray1 == multArray3;
   EXPECT_TRUE(isEqual);
 }
 
@@ -55,9 +71,9 @@ TEST(MultiIndexArray, TemplatedCopyContructorTestEquality)
   constexpr MultiIndexArray<int, storageOrdering::columnMajor, d1, d2> multArray1{0,1,2,3,4,5};
   constexpr MultiIndexArray<double, storageOrdering::columnMajor, d1, d2> multArray2{0.0,1.0,2.0,3.0,4.0,5.0};
 
-  MultiIndexArray<double, storageOrdering::columnMajor, d1, d2> multArray3(multArray1);
+  constexpr MultiIndexArray<double, storageOrdering::columnMajor, d1, d2> multArray3(multArray1);
 
-  const bool isEqual = multArray3 == multArray2;
+  constexpr bool isEqual = multArray3 == multArray2;
   EXPECT_TRUE(isEqual);
 }
 
@@ -123,10 +139,10 @@ TEST(MultiIndexArray, DirectDataAccessRowMajor)
   constexpr std::size_t d2 = 3;
   constexpr MultiIndexArray<int, storageOrdering::rowMajor, d1, d2> multVec{0,1,2,3,4,5};
 
-  auto ptr = multVec.data();
+  constexpr auto* ptr = multVec.data();
   for(int i = 0; i < multVec.size(); ++i)
   {
-    EXPECT_EQ(*ptr++, i);
+    EXPECT_EQ(*(ptr + i), i);
   }
 }
 
@@ -136,10 +152,10 @@ TEST(MultiIndexArray, DirectDataAccessColumnMajor)
   constexpr std::size_t d2 = 3;
   constexpr MultiIndexArray<int, storageOrdering::columnMajor, d1, d2> multVec{0,1,2,3,4,5};
 
-  auto ptr = multVec.data();
+  constexpr auto* ptr = multVec.data();
   for(int i = 0; i < multVec.size(); ++i)
   {
-    EXPECT_EQ(*ptr++, i);
+    EXPECT_EQ(*(ptr + i), i);
   }
 }
 
@@ -163,7 +179,7 @@ TEST(MultiIndexArray, ComparisonExpectFalse)
   constexpr MultiIndexArray<int, storageOrdering::columnMajor, d1, d2> multArray1{0,1,2,3,4,5};
   constexpr MultiIndexArray<int, storageOrdering::columnMajor, d1, d2> multArray2{0,1,2,3,4,52};
 
-  const bool isEqual = multArray1 == multArray2;
+  constexpr bool isEqual = multArray1 == multArray2;
   EXPECT_FALSE(isEqual);
 }
 

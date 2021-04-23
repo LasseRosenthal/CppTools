@@ -66,6 +66,25 @@ template <typename T1, typename T2, typename... Ts>
 }
 
 /**
+ * @brief   compares two arrays of arithmetic types at compile time.
+ * @tparam  T the type of the array entries.
+ * @tparam  N the size of the arrays.
+ * @returns true if all entries are equal, false otherwise.
+ * @remark  only enabled if std::is_arithmetic_v<T> evaluates to true.
+ */
+template <typename T, std::size_t N, std::size_t... Is>
+constexpr auto compareArray(T const (&a1)[N], T const (&a2)[N], std::index_sequence<Is...>) noexcept -> bool
+{
+  return (... && (a1[Is] == a2[Is]));
+}
+
+template <typename T, std::size_t N, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
+constexpr auto compareArray(T const (&a1)[N], T const (&a2)[N]) noexcept -> bool
+{
+  return compareArray(a1, a2, std::make_index_sequence<N>{});
+}
+
+/**
  * @brief   aligns a value to a given alignment (templated version)
  * @tparam  Alignment the alignment
  * @param   n the value that is aligned to alignment
@@ -95,7 +114,7 @@ inline auto alignUp(const T n, const T alignment) -> T
   return ((n + alignment - 1) / alignment) * alignment;
 }
 
-/**
+/**
  * @brief   returns a vector containing all keys of the given map.
  * @param   the map whose keys are stored in a vector.
  * @returns a vector containing the keys of the given map.
@@ -113,7 +132,7 @@ auto getMapKeys(Map const& m) -> std::vector<typename Map::key_type>
 /**
  * @brief  Computes the number of decimal places of a given floating point.
  * @remark due to the nature of binary floating point representation, the
- *         return value might incorrect due to rounding errors.
+ *         return value might be incorrect due to rounding errors.
  */
 template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
 auto numberOfDecimalPlaces(T value) -> std::size_t
