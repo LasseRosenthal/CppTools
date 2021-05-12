@@ -27,6 +27,8 @@
 #include <type_traits>
 #include <vector>
 
+#include <Windows.h>
+
 
 namespace cpptools {
 

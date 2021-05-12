@@ -243,10 +243,24 @@ TEST(StringAlgorithms, wstringToString)
   EXPECT_EQ(s2, expected);
 }
 
+TEST(StringAlgorithms, wstringViewToString)
+{
+  const auto s2 = stringAlgorithms::wstringToString(L"asgctgkztikzniuzhucjczhjukujhniukgiuiukgftzghtzhiugtgiz");
+  const auto expected = "asgctgkztikzniuzhucjczhjukujhniukgiuiukgftzghtzhiugtgiz"s;
+  EXPECT_EQ(s2, expected);
+}
+
 TEST(StringAlgorithms, stringToWstring)
 {
   const auto s1 = "asgctgkztikzniuzhucjczhjukujhniukgiuiukgftzghtzhiugtgiz"s;
   const auto s2 = stringAlgorithms::stringToWstring(s1);
+  const auto expected = L"asgctgkztikzniuzhucjczhjukujhniukgiuiukgftzghtzhiugtgiz"s;
+  EXPECT_EQ(s2, expected);
+}
+
+TEST(StringAlgorithms, stringViewToWstring)
+{
+  const auto s2 = stringAlgorithms::stringToWstring("asgctgkztikzniuzhucjczhjukujhniukgiuiukgftzghtzhiugtgiz");
   const auto expected = L"asgctgkztikzniuzhucjczhjukujhniukgiuiukgftzghtzhiugtgiz"s;
   EXPECT_EQ(s2, expected);
 }

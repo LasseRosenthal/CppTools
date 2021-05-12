@@ -18,40 +18,56 @@
  
 // includes
 #include <Utils/FilesystemUtils.h>
- 
-namespace fs = std::filesystem;
+
+#include <fstream>
+
 
 using namespace std::string_literals;
-using namespace cpptools;
- 
 
+namespace fs = std::filesystem;
+ 
 TEST(FilesystemUtils, extendFileNameNoParentPathNoExtension)
 {
-  const fs::path p{LR"(test)"};
-  const fs::path expected{LR"(test_bkp)"};
+  const std::filesystem::path p{LR"(test)"};
+  const std::filesystem::path expected{LR"(test_bkp)"};
 
-  const auto p1 = extendFileName(p, L"_bkp"s);
+  const auto p1 = cpptools::addToFilename(p, L"_bkp"s);
   EXPECT_EQ(p1, expected);
 }
 
 TEST(FilesystemUtils, extendFileNameNoParentPath)
 {
-  const fs::path p{LR"(user.config.xml)"};
-  const fs::path expected{LR"(user.config_bkp.xml)"};
+  const std::filesystem::path p{LR"(user.config.xml)"};
+  const std::filesystem::path expected{LR"(user.config_bkp.xml)"};
 
-  const auto p1 = extendFileName(p, L"_bkp"s);
+  const auto p1 = cpptools::addToFilename(p, L"_bkp"s);
   EXPECT_EQ(p1, expected);
 }
 
 TEST(FilesystemUtils, extendFileNameIncludingParentPath)
 {
-  const fs::path p{LR"(C:\Users\prinect\Documents\user.config.xml)"};
-  const fs::path expected{LR"(C:\Users\prinect\Documents\user.config_bkp.xml)"};
+  const std::filesystem::path p{LR"(C:\Users\prinect\Documents\user.config.xml)"};
+  const std::filesystem::path expected{LR"(C:\Users\prinect\Documents\user.config_bkp.xml)"};
 
-  const auto p1 = extendFileName(p, L"_bkp"s);
+  const auto p1 = cpptools::addToFilename(p, L"_bkp"s);
   EXPECT_EQ(p1, expected);
 }
 
+TEST(FilesystemUtils, deleteDirectoryContent)
+{
+  const std::filesystem::path currentDir = fs::current_path();
+
+  const auto testDir = currentDir / "Test";
+  const auto file         = testDir / "datei.txt";
+
+  fs::create_directories(testDir);
+
+  std::ofstream(file.string());
+
+  cpptools::deleteDirectoryContent(testDir);
+
+  fs::remove_all(testDir);
+}
  
  
 // *************************************************************************** // 

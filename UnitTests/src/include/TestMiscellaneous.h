@@ -22,6 +22,8 @@
 #include <map>
 #include <sstream>
 #include <vector>
+
+using namespace std::string_literals;
  
 
 TEST(Miscellaneous, minCheckValue)

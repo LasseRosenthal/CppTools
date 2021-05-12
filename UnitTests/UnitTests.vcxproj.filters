@@ -114,6 +114,9 @@
     <ClInclude Include="src\include\EnumBitmaskTest.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="src\include\IntegerRangeTest.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -152,5 +155,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="src\include\OSUtilityTest.h">
+      <Filter>Header Files\Utils</Filter>
+    </Text>
   </ItemGroup>
 </Project>

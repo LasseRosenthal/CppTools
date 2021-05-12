@@ -202,6 +202,9 @@
     <ClInclude Include="include\Utils\EnumBitmask.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="include\Utils\IntegerRange.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\WinHighResClock.cpp">
@@ -219,5 +222,13 @@
     <ClCompile Include="src\XercesString.cpp">
       <Filter>Source Files\XercesUtils</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="include\Utils\OSUtility.h">
+      <Filter>Header Files\Utils</Filter>
+    </Text>
+    <Text Include="src\OSUtility.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </Text>
   </ItemGroup>
 </Project>

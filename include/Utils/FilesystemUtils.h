@@ -28,13 +28,27 @@ namespace cpptools {
  * @brief Extends the filename component without extension of a given path by a given string.
  */
 template <typename StrT>
-auto extendFileName(std::filesystem::path const& p, StrT const& ext) -> std::filesystem::path
+auto addToFilename(std::filesystem::path const& p, StrT const& ext) -> std::filesystem::path
 {
   std::filesystem::path extFileName = p.parent_path() / p.stem();
   extFileName += ext;
   extFileName += p.extension();
 
   return extFileName;
+}
+
+/**
+ * @brief Deletes all files and subfolders of a given directory.
+ */
+void deleteDirectoryContent(std::filesystem::path const& dir)
+{
+  for(auto& p : std::filesystem::directory_iterator(dir))
+  {
+    if(std::filesystem::is_regular_file(p))
+    {
+      std::filesystem::remove(p);
+    }
+  }
 }
 
 

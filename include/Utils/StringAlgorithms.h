@@ -24,6 +24,7 @@
 #include <iomanip>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <vector>
 
@@ -283,23 +284,23 @@ inline auto cstrLength(CharT const* const c) -> std::size_t
  * @param[in] const std::(w)string& s
  * @returns   char* pointer containing the characters of s
  */
-auto toMBstring(std::string const& s) -> char*;
-auto toMBstring(std::wstring const& s) -> char*;
+auto toMBstring(std::string_view s) -> char*;
+auto toMBstring(std::wstring_view s) -> char*;
 
 /**
  * @brief     converts the given string s to wide character c-string dest
  * @param[in] const std::(w)string& s
  * @returns   a wide character c-string containing the characters of s
  */
-wchar_t* toWCstring(std::string const&);
-wchar_t* toWCstring(std::wstring const&);
+wchar_t* toWCstring(std::string_view s);
+wchar_t* toWCstring(std::wstring_view s);
 
 /**
  * converts the given std::wstring s to a std::string
  * @param   std::wstring const& s
  * @returns a std::string containing the characters of s
  */
-inline auto wstringToString(std::wstring const& s) -> std::string
+inline auto wstringToString(std::wstring_view s) -> std::string
 {
   std::unique_ptr<char[]> p{stringAlgorithms::toMBstring(s)};
   return std::string{p.get()};
@@ -310,7 +311,7 @@ inline auto wstringToString(std::wstring const& s) -> std::string
  * @param   std::string const& s
  * @returns a std::wstring containing the characters of s
  */
-inline auto stringToWstring(std::string const& s) -> std::wstring
+inline auto stringToWstring(std::string_view s) -> std::wstring
 {
   std::unique_ptr<wchar_t[]> p{stringAlgorithms::toWCstring(s)};
   return std::wstring{p.get()};

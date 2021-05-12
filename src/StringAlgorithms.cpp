@@ -23,9 +23,9 @@ namespace stringAlgorithms {
 
 
 // string -> char*
-auto toMBstring(std::string const& s) -> char*
+auto toMBstring(std::string_view s) -> char*
 {
-  const auto len  = strLength(s) + 1ULL;
+  const auto len  = s.length() + 1ULL;
   char*      dest = new(std::nothrow) char[len];
 
   if(dest != nullptr)
@@ -36,16 +36,16 @@ auto toMBstring(std::string const& s) -> char*
     }
     else
     {
-      strncpy_s(dest, len, s.c_str(), len);
+      strncpy_s(dest, len, s.data(), len);
     }
   }
   return dest;
 }
 
 // wstring -> char*
-auto toMBstring(const std::wstring& s) -> char*
+auto toMBstring(std::wstring_view s) -> char*
 {
-  const auto len  = strLength(s) + 1ULL;
+  const auto len  = s.length() + 1ULL;
   char*      dest = new(std::nothrow) char[len];
   if(dest != nullptr)
   {
@@ -56,16 +56,16 @@ auto toMBstring(const std::wstring& s) -> char*
     else
     {
       std::size_t retval;
-      wcstombs_s(&retval, dest, len, s.c_str(), len);
+      wcstombs_s(&retval, dest, len, s.data(), len);
     }
   }
   return dest;
 }
 
 // string -> wchar_t*
-auto toWCstring(std::string const& s) -> wchar_t*
+auto toWCstring(std::string_view s) -> wchar_t*
 {
-  const auto len  = strLength(s) + 1ULL;
+  const auto len  = s.length() + 1ULL;
   wchar_t*   dest = new(std::nothrow) wchar_t[len];
   if(dest != nullptr)
   {
@@ -76,16 +76,16 @@ auto toWCstring(std::string const& s) -> wchar_t*
     else
     {
       std::size_t retval;
-      mbstowcs_s(&retval, dest, len, s.c_str(), len);
+      mbstowcs_s(&retval, dest, len, s.data(), len);
     }
   }
   return dest;
 }
 
 // wstring -> wchar_t*
-auto toWCstring(std::wstring const& s) -> wchar_t*
+auto toWCstring(std::wstring_view s) -> wchar_t*
 {
-  const auto len  = strLength(s) + 1ULL;
+  const auto len  = s.length() + 1ULL;
   wchar_t*   dest = new(std::nothrow) wchar_t[len];
   if(dest != nullptr)
   {
@@ -95,12 +95,11 @@ auto toWCstring(std::wstring const& s) -> wchar_t*
     }
     else
     {
-      wcscpy_s(dest, len, s.c_str());
+      wcscpy_s(dest, len, s.data());
     }
   }
   return dest;
 }
-
 
 
 }   // namespace stringAlgorithms
