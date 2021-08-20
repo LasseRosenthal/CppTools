@@ -58,6 +58,7 @@ public:
   using iterator        = BitFieldIterator<false>;
   using const_iterator  = BitFieldIterator<true>;
 
+
   // ---------------------------------------------------
   // public constants
   static constexpr value_type mask    = (static_cast<value_type>(1) << Size) - 1;   // BitField<3, 2> --> 0000 0111
@@ -211,7 +212,6 @@ inline void BitField<Size, StartBit>::BitProxy<IsConst>::advance(difference_type
   mask = getMask(index);
 }
 
-
 template <std::size_t Size, std::size_t StartBit>
 template <bool IsConst>
 inline void BitField<Size, StartBit>::BitProxy<IsConst>::setIndex(size_type i) noexcept
@@ -226,6 +226,7 @@ constexpr auto BitField<Size, StartBit>::BitProxy<IsConst>::getMask(size_type in
 {
   return 1U << (StartBit + index);
 }
+
 
 
 /** 
@@ -352,7 +353,7 @@ constexpr BitField<Size, StartBit>::BitFieldIterator<IsConst>::BitFieldIterator(
 {}
 
 /**
- * @brief increments the iterator by one element.
+ * @brief increments the iterator by n elements.
  */
 template <std::size_t Size, std::size_t StartBit>
 template <bool IsConst>
@@ -363,7 +364,7 @@ inline auto BitField<Size, StartBit>::BitFieldIterator<IsConst>::operator+=(diff
 }
 
 /**
- * @brief decrements the iterator by one element.
+ * @brief decrements the iterator by n elements.
  */
 template <std::size_t Size, std::size_t StartBit>
 template <bool IsConst>
@@ -384,7 +385,7 @@ inline auto BitField<Size, StartBit>::BitFieldIterator<IsConst>::operator++() no
 }
 
 /**
- * @brief  increments the iterator by one element (postfix version).
+ * @brief  increments the iterator by one element (präfix version).
  * @return a copy of the iterator before it was incremented.
  */
 template <std::size_t Size, std::size_t StartBit>
@@ -408,7 +409,7 @@ inline auto BitField<Size, StartBit>::BitFieldIterator<IsConst>::operator--() no
 }
 
 /**
- * @brief  increments the iterator by one element (postfix version).
+ * @brief  decrements the iterator by one element (präfix version).
  * @return a copy of the iterator before it was decremented.
  */
 template <std::size_t Size, std::size_t StartBit>
@@ -466,7 +467,7 @@ inline void BitField<Size, StartBit>::BitFieldIterator<IsConst>::advance(differe
 }
 
 
-/**
+/**
  * @brief Constructor. Initializes the bits with the binary representation of the given value.
  */
 template <std::size_t Size, std::size_t StartBit>
@@ -474,7 +475,7 @@ constexpr BitField<Size, StartBit>::BitField(value_type v) noexcept
   : value {getValue(v)}
 {}
 
-/**
+/**
  * @brief Copy Constructor.
  */
 template <std::size_t Size, std::size_t StartBit>
@@ -482,7 +483,7 @@ constexpr BitField<Size, StartBit>::BitField(BitField<Size, StartBit> const& src
   : value {getValue(src.value)}
 {}
 
-/**
+/**
  * @brief Assignment operator.
  */
 template <std::size_t Size, std::size_t StartBit>
@@ -492,7 +493,7 @@ inline auto BitField<Size, StartBit>::operator=(value_type v) noexcept -> BitFie
   return *this;
 }
 
-/**
+/**
  * @brief Conversion operator.
  */
 template <std::size_t Size, std::size_t StartBit>
@@ -501,7 +502,7 @@ constexpr BitField<Size, StartBit>::operator value_type() const noexcept
   return (value >> StartBit) & mask;
 }
 
-/**
+/**
  * @brief Returns the size of the bit field.
  */
 template <std::size_t Size, std::size_t StartBit>
@@ -680,7 +681,7 @@ template <std::size_t Size, std::size_t StartBit>
   return BitField<Size, StartBit>(static_cast<typename BitField<Size, StartBit>::value_type>(b1) ^ static_cast<typename BitField<Size, StartBit>::value_type>(b2));
 }
 
-/**
+/**
  * @brief Prints the binary representation of the BitField into a given stream.
  */
 template <std::size_t Size, std::size_t StartBit>
@@ -702,7 +703,7 @@ inline auto BitField<Size, StartBit>::put(std::basic_ostream<CharT, CharTraits>&
   return ostr;
 }
 
-/**
+/**
  * @brief Stream operator for bit fields.
  */
 template <std::size_t Size, std::size_t StartBit, typename CharT, typename CharTraits = std::char_traits<CharT>>

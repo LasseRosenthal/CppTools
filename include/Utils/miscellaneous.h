@@ -27,11 +27,50 @@
 #include <type_traits>
 #include <vector>
 
-#include <Windows.h>
-
 
 namespace cpptools {
 
+
+/**
+ * @brief Returns an iterator to the last element in a given container satisfying
+ *        a given predicate. If no such element exists, cend() is returned.
+ */
+template <typename Cont, typename Predicate>
+auto findLastIf(Cont const& cont, Predicate&& pred) -> typename Cont::const_iterator
+{
+  if(const auto lastReverse = std::find_if(cont.crbegin(), cont.crend(), std::forward<Predicate>(pred)); 
+     lastReverse != cont.crend())
+  {
+    return std::prev(lastReverse.base());
+  }
+
+  return cont.cend();
+}
+
+/**
+ * @brief Returns an iterator to the last element in a given container satisfying
+ *        a given predicate. If no such element exists, end() is returned.
+ */
+template <typename Cont, typename Predicate>
+auto findLastIf(Cont& cont, Predicate&& pred) -> typename Cont::iterator
+{
+  if(const auto lastReverse = std::find_if(cont.rbegin(), cont.rend(), std::forward<Predicate>(pred)); 
+    lastReverse != cont.rend())
+  {
+    return std::prev(lastReverse.base());
+  }
+
+  return cont.end();
+}
+
+/**
+ * @brief Returns the size of an array of type T via template type deduction.
+ */
+template <typename T, std::size_t N>
+[[nodiscard]] constexpr auto arraySize(const T(&)[N]) noexcept -> std::size_t
+{
+  return N;
+}
 
 /** 
  * @brief returns the minimum of an arbitrary number of elements of different types that
@@ -65,25 +104,6 @@ template <typename T1, typename T2, typename... Ts>
 {
   return head1 > head2 ? max(std::forward<T1>(head1), std::forward<Ts>(tail)...)
                        : max(std::forward<T2>(head2), std::forward<Ts>(tail)...);
-}
-
-/**
- * @brief   compares two arrays of arithmetic types at compile time.
- * @tparam  T the type of the array entries.
- * @tparam  N the size of the arrays.
- * @returns true if all entries are equal, false otherwise.
- * @remark  only enabled if std::is_arithmetic_v<T> evaluates to true.
- */
-template <typename T, std::size_t N, std::size_t... Is>
-constexpr auto compareArray(T const (&a1)[N], T const (&a2)[N], std::index_sequence<Is...>) noexcept -> bool
-{
-  return (... && (a1[Is] == a2[Is]));
-}
-
-template <typename T, std::size_t N, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
-constexpr auto compareArray(T const (&a1)[N], T const (&a2)[N]) noexcept -> bool
-{
-  return compareArray(a1, a2, std::make_index_sequence<N>{});
 }
 
 /**
@@ -134,7 +154,7 @@ auto getMapKeys(Map const& m) -> std::vector<typename Map::key_type>
 /**
  * @brief  Computes the number of decimal places of a given floating point.
  * @remark due to the nature of binary floating point representation, the
- *         return value might be incorrect due to rounding errors.
+ *         return value might incorrect due to rounding errors.
  */
 template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
 auto numberOfDecimalPlaces(T value) -> std::size_t
@@ -157,46 +177,6 @@ auto numberOfDecimalPlaces(T value) -> std::size_t
   else
   {
     return 0ULL;
-  }
-}
-
-/**
- * @brief  prints the binary representation of an arbitrary object into a given stream.
- * @tparam T the type of the object
- * @param  value the object whose binary representation is printed.
- * @param  ostr a reference to the ostream object into which the representation is streamed.
- * @remark works only on little-endian architectures.
- */
-template <typename T, typename CharT, typename CharTraits = std::char_traits<CharT>>
-auto binaryRep(const T& value, std::basic_ostream<CharT, CharTraits>& ostr)
-{
-  constexpr std::size_t byteSize = 8ULL;
-  constexpr std::size_t sizeInBytes = sizeof(T);
-  auto rawPtr = reinterpret_cast<const char*>(&value);
-  CharT bitArray[sizeInBytes * byteSize];
-  auto bitPtr = std::prev(std::end(bitArray));
-
-  for(std::size_t byte{}; byte < sizeInBytes; ++byte, ++rawPtr)
-  {
-    for(std::size_t bit{}; bit < byteSize; ++bit, --bitPtr)
-    {
-      *bitPtr = (*rawPtr >> bit) & 0b0001;
-    }
-  }
-
-  ++bitPtr;
-  const auto space = ostr.widen(' ');
-  for(std::size_t byte{1ULL}; byte <= sizeInBytes; ++byte)
-  {
-    for(std::size_t bit{}; bit < byteSize; ++bit, ++bitPtr)
-    {
-      ostr << static_cast<int>(*bitPtr);
-    }
-
-    if(byte != sizeInBytes)
-    {
-      ostr << space;
-    }
   }
 }
 

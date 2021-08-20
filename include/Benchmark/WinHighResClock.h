@@ -48,7 +48,7 @@ public:
 
   // static member functions
   static auto now       () -> time_point;
-  static auto to_time_t (time_point const& tp) -> time_t;
+  static auto to_time_t (time_point const& tp) -> std::time_t;
 
 private:
 
@@ -75,7 +75,7 @@ inline auto WinHighResClock::now() -> time_point
 /**
  * @brief Converts a given time point to a std::time_t type.
  */
-inline auto WinHighResClock::to_time_t(time_point const& tp) -> time_t
+inline auto WinHighResClock::to_time_t(time_point const& tp) -> std::time_t
 {
   return clockType::to_time_t(tp);
 }

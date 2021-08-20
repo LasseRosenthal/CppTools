@@ -547,7 +547,7 @@ template <typename T>
 void mmProdParColMaj(T* dest, T const* mat1, T const* mat2, std::size_t const m,
                      std::size_t const n, std::size_t const l)
 {
-#define MULTITHREADED 1
+#define MULTITHREADED 0
 
 #if MULTITHREADED
   static auto const hardwareThreads = static_cast<std::size_t>(std::thread::hardware_concurrency());

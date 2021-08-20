@@ -34,9 +34,6 @@
     <Filter Include="Header Files\ArbeitsCode">
       <UniqueIdentifier>{85948b72-97d0-40a6-914f-e62101a9f5de}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\ArbeitsCode">
-      <UniqueIdentifier>{f1da69c1-86d2-416b-ab83-83b3ffc16b64}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Unit">
       <UniqueIdentifier>{51909ff7-29fc-4bf5-967c-ca5f71d95bb5}</UniqueIdentifier>
     </Filter>
@@ -55,6 +52,12 @@
     <Filter Include="Header Files\Numerics">
       <UniqueIdentifier>{ef7de2ed-768c-4441-9f14-b94357eb7e68}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Bitwise">
+      <UniqueIdentifier>{9953538e-82f0-4979-a00a-ee146256dff5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Bitwise\details">
+      <UniqueIdentifier>{d74d46a6-e4ef-4b7d-b60c-23c2048faf60}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include=".clang-format" />
@@ -65,9 +68,6 @@
       <Filter>Header Files\Meta</Filter>
     </ClInclude>
     <ClInclude Include="include\Utils\miscellaneous.h">
-      <Filter>Header Files\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Utils\BitField.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
     <ClInclude Include="include\Meta\Typelist.h">
@@ -205,13 +205,49 @@
     <ClInclude Include="include\Utils\IntegerRange.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="include\Benchmark\CPUTimer.h">
+      <Filter>Header Files\Benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Benchmark\DateTime.h">
+      <Filter>Header Files\Benchmark</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Utils\CountedObject.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Utils\CRTP.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Utils\Signal.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Meta\Traits.h">
+      <Filter>Header Files\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Meta\TupleUtils.h">
+      <Filter>Header Files\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Bitwise\BitField.h">
+      <Filter>Header Files\Bitwise</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Bitwise\BitFieldIterator.h">
+      <Filter>Header Files\Bitwise</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Bitwise\BitProxy.h">
+      <Filter>Header Files\Bitwise</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Bitwise\BitVector.h">
+      <Filter>Header Files\Bitwise</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Bitwise\Bitwise.h">
+      <Filter>Header Files\Bitwise</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Bitwise\details\MultiIndexBitArrayAccessor.h">
+      <Filter>Header Files\Bitwise\details</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\WinHighResClock.cpp">
       <Filter>Source Files\Benchmark</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ImpoSurfaceSheetRelation.cpp">
-      <Filter>Source Files\ArbeitsCode</Filter>
     </ClCompile>
     <ClCompile Include="StringUtilsVorlage.cpp">
       <Filter>Source Files</Filter>
@@ -221,6 +257,12 @@
     </ClCompile>
     <ClCompile Include="src\XercesString.cpp">
       <Filter>Source Files\XercesUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CPUTimer.cpp">
+      <Filter>Source Files\Benchmark</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FilesystemUtils.cpp">
+      <Filter>Source Files\Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -98,6 +98,7 @@ public:
   auto insert   (value_type const&) -> std::pair<iterator, bool>;
   auto find     (key_type const&) -> iterator;
   auto find     (key_type const&) const -> const_iterator;
+  auto contains (key_type const&) const ->  bool;
 
 private:
 
@@ -287,6 +288,16 @@ inline auto MultiTypeMapT<MapType, T, Ts...>::find(key_type const& key) const ->
   return dataMap.find(key);
 }
 
+/** 
+ * @brief  Checks if the container contains with an element whose key is identical
+ *         to the given key.
+ * @return true if there is such an element, otherwise false.
+ */
+template <template<typename...> class MapType, typename T, typename ...Ts>
+inline auto MultiTypeMapT<MapType, T, Ts...>::contains(key_type const& key) const -> bool
+{
+  return dataMap.find(key) != cend();
+}
 
 /** 
  * convenient typedef for multitype maps based on std::unordered_map

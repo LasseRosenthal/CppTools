@@ -197,6 +197,14 @@ TEST(StringAlgorithms, split)
   EXPECT_EQ(tokens, expected);
 }
 
+TEST(StringAlgorithms, splitCommaSeparatedList)
+{
+  const auto s = "B,C,M,Y,X,Z"s;
+  const auto tokens = stringAlgorithms::split(s, [](auto c){ return L',' == c;});
+  const std::vector<std::string> expected{"B"s, "C"s, "M"s, "Y"s, "X"s, "Z"s};
+  EXPECT_EQ(tokens, expected);
+}
+
 TEST(StringAlgorithms, strLengthString)
 {
   const auto s = "Hallo"s;
@@ -321,11 +329,19 @@ TEST(StringAlgorithms, endsWithExpectTrueIdenticalStrings)
   EXPECT_TRUE(stringAlgorithms::endsWith(s1, s2));
 }
 
-TEST(StringAlgorithms, substringBetweenDelimiters)
+TEST(StringAlgorithms, substringBetweenDelimitersOneDelimiter)
 {
   const auto s1 = "%NumWorkers%"s;
   const auto expected = "NumWorkers"s;
   const auto subStr = stringAlgorithms::substringBetweenDelimiters(s1, [](const char c){ return c == '%';});
+  EXPECT_EQ(subStr, expected);
+}
+
+TEST(StringAlgorithms, substringBetweenDelimitersTwoDelimiters)
+{
+  const auto s1 = "XpathComponent[46]"s;
+  const auto expected = "46"s;
+  const auto subStr = stringAlgorithms::substringBetweenDelimiters(s1, [](const char c){ return c == '[' || c == ']';});
   EXPECT_EQ(subStr, expected);
 }
 
@@ -414,6 +430,41 @@ TEST(StringAlgorithms, removeFromRightPureRValue)
 
   const auto expected = "---++NumWorkers"s;
   const auto subStr = stringAlgorithms::cropRight(getString(), [](const char c){ return c == '_' || c == '#';});
+  EXPECT_EQ(subStr, expected);
+}
+
+TEST(StringAlgorithms, cropBothSidesConstLValue)
+{
+  const auto s1 = "---++NumWorkers__##"s;
+  const auto expected = "NumWorkers"s;
+  const auto subStr = stringAlgorithms::cropBothSides(s1, [](const char c){ return c == '_' || c == '#' || c == '-' || c == '+';});
+  EXPECT_EQ(s1, "---++NumWorkers__##"s);
+  EXPECT_EQ(subStr, expected);
+}
+
+TEST(StringAlgorithms, cropBothSidesNonConstLValue)
+{
+  auto s1 = "---++NumWorkers__##"s;
+  const auto expected = "NumWorkers"s;
+  const auto subStr = stringAlgorithms::cropBothSides(s1, [](const char c){ return c == '_' || c == '#' || c == '-' || c == '+';});
+  EXPECT_EQ(s1, expected);
+  EXPECT_EQ(subStr, expected);
+}
+
+TEST(StringAlgorithms, cropBothSidesNonConstRValue)
+{
+  auto s1 = "---++NumWorkers__##"s;
+  const auto expected = "NumWorkers"s;
+  const auto subStr = stringAlgorithms::cropBothSides(std::move(s1), [](const char c){ return c == '_' || c == '#' || c == '-' || c == '+';});
+  EXPECT_EQ(s1, ""s);
+  EXPECT_EQ(subStr, expected);
+}
+
+TEST(StringAlgorithms, cropBothSidesPureRValue)
+{
+  auto getString = []() { return "---++NumWorkers__##"s; };
+  const auto expected = "NumWorkers"s;
+  const auto subStr = stringAlgorithms::cropBothSides(getString(), [](const char c){ return c == '_' || c == '#' || c == '-' || c == '+';});
   EXPECT_EQ(subStr, expected);
 }
 

@@ -18,6 +18,7 @@
  
 // includes 
 #include <Benchmark/StopWatch.h>
+#include <Benchmark/CPUTimer.h>
 
 #include <string>
 #include <vector>
@@ -25,114 +26,11 @@
 using namespace std::string_literals;
  
 
-TEST(Benchmark, UnitRepresentationWeeksWchar)
+TEST(CPUTimer, DefaultConstructor)
 {
-  EXPECT_EQ(std::wstring(benchmark::DurationString<benchmark::weeks, wchar_t>::value), L"week"s);
-}
-
-TEST(Benchmark, unitStringMethodWeeksWchar)
-{
-  EXPECT_EQ(std::wstring(benchmark::unitString(benchmark::weeks::zero())), L"week"s);
-}
-
-TEST(Benchmark, UnitRepresentationDaysWchar)
-{
-  EXPECT_EQ(std::wstring(benchmark::DurationString<benchmark::days, wchar_t>::value), L"d"s);
-}
-
-TEST(Benchmark, unitStringMethodDaysWchar)
-{
-  EXPECT_EQ(std::wstring(benchmark::unitString(benchmark::days::zero())), L"d"s);
-}
-
-TEST(Benchmark, UnitRepresentationHoursWchar)
-{
-  EXPECT_EQ(std::wstring(benchmark::DurationString<benchmark::hours, wchar_t>::value), L"h"s);
-}
-
-TEST(Benchmark, unitStringMethodHoursWchar)
-{
-  EXPECT_EQ(std::wstring(benchmark::unitString(benchmark::hours::zero())), L"h"s);
-}
-
-TEST(Benchmark, UnitRepresentationMinutesWchar)
-{
-  EXPECT_EQ(std::wstring(benchmark::DurationString<benchmark::minutes, wchar_t>::value), L"min"s);
-}
-
-TEST(Benchmark, unitStringMethodMinutesWchar)
-{
-  EXPECT_EQ(std::wstring(benchmark::unitString(benchmark::minutes::zero())), L"min"s);
-}
-
-TEST(Benchmark, UnitRepresentationSecondsWchar)
-{
-  EXPECT_EQ(std::wstring(benchmark::DurationString<benchmark::seconds, wchar_t>::value), L"s"s);
-}
-
-TEST(Benchmark, unitStringMethodSecondsWchar)
-{
-  EXPECT_EQ(std::wstring(benchmark::unitString(benchmark::seconds::zero())), L"s"s);
-}
-
-TEST(Benchmark, UnitRepresentationMilliSecondsWchar)
-{
-  EXPECT_EQ(std::wstring(benchmark::DurationString<benchmark::milliSeconds, wchar_t>::value), L"ms"s);
-}
-
-TEST(Benchmark, unitStringMethodMilliSecondsWchar)
-{
-  EXPECT_EQ(std::wstring(benchmark::unitString(benchmark::milliSeconds::zero())), L"ms"s);
-}
-
-TEST(Benchmark, UnitRepresentationMicroSecondsWchar)
-{
-  EXPECT_EQ(std::wstring(benchmark::DurationString<benchmark::microSeconds, wchar_t>::value), L"mus"s);
-}
-
-TEST(Benchmark, unitStringMethodMicroSecondsWchar)
-{
-  EXPECT_EQ(std::wstring(benchmark::unitString(benchmark::microSeconds::zero())), L"mus"s);
-}
-
-TEST(Benchmark, UnitRepresentationNanoSecondsWchar)
-{
-  EXPECT_EQ(std::wstring(benchmark::DurationString<benchmark::nanoSeconds, wchar_t>::value), L"ns"s);
-}
-
-TEST(Benchmark, unitStringMethodNanoSecondsWchar)
-{
-  EXPECT_EQ(std::wstring(benchmark::unitString(benchmark::nanoSeconds::zero())), L"ns"s);
-}
-
-TEST(Benchmark, UnitRepresentationPicoSecondsWchar)
-{
-  EXPECT_EQ(std::wstring(benchmark::DurationString<benchmark::picoSeconds, wchar_t>::value), L"ps"s);
-}
-
-TEST(Benchmark, unitStringMethodPicoSecondsWchar)
-{
-  EXPECT_EQ(std::wstring(benchmark::unitString(benchmark::picoSeconds::zero())), L"ps"s);
-}
-
-TEST(Benchmark, UnitRepresentationFemtoSecondsChar)
-{
-  EXPECT_EQ(std::string(benchmark::DurationString<benchmark::femtoSeconds, char>::value), "fs"s);
-}
-
-TEST(Benchmark, unitStringMethodFemtoSecondsChar)
-{
-  EXPECT_EQ(std::string(benchmark::unitString<benchmark::femtoSeconds, char>(benchmark::femtoSeconds::zero())), "fs"s);
-}
- 
-TEST(Benchmark, UnitRepresentationFemtoSecondsWchar)
-{
-  EXPECT_EQ(std::wstring(benchmark::DurationString<benchmark::femtoSeconds, wchar_t>::value), L"fs"s);
-}
-
-TEST(Benchmark, unitStringMethodFemtoSecondsWchar)
-{
-  EXPECT_EQ(std::wstring(benchmark::unitString(benchmark::femtoSeconds::zero())), L"fs"s);
+  EXPECT_NO_THROW(
+    benchmark::CPUTimer cpuTimer;
+  );
 }
 
 TEST(Benchmark, WinHighResClockMeasurement)
@@ -184,21 +82,13 @@ TEST(Benchmark, StopWatchStateResetAfterStart)
 TEST(Benchmark, StopWatchLoggingMessageDefault)
 {
   benchmark::StopWatch<> watch;
-  EXPECT_STREQ(watch.loggingMessage(), L"StopWatch");
+  EXPECT_EQ(watch.loggingMessage(), L""s);
 }
 
 TEST(Benchmark, StopWatchLoggingMessageCustom)
 {
-  benchmark::StopWatch<> watch(std::wcout, L"StopWatchLoggingMessageCustom");
-  EXPECT_STREQ(watch.loggingMessage(), L"StopWatchLoggingMessageCustom");
-}
-
-TEST(Benchmark, StopWatchLoggingIntoStringStream)
-{
-  std::wstringstream logStrm;
-  benchmark::StopWatch<std::chrono::high_resolution_clock> watch(logStrm, L"LogIntoStringStream");
-  watch.log<benchmark::milliSeconds>(4);
-  EXPECT_EQ(std::wstring(L"LogIntoStringStream : 0.0000ms\n"), logStrm.str());
+  benchmark::StopWatch<> watch(std::wcout, L"StopWatchLoggingMessageCustom"s);
+  EXPECT_EQ(watch.loggingMessage(), L"StopWatchLoggingMessageCustom"s);
 }
 
 TEST(Benchmark, StopWatchMeasurement)

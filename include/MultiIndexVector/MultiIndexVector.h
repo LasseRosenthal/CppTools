@@ -19,7 +19,6 @@
 // includes
 #include <MultiIndexVector/MultiArrayAccessor.h>
 
-#include <array>
 #include <initializer_list>
 #include <utility>
 #include <vector>

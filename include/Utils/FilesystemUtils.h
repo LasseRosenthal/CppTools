@@ -21,7 +21,7 @@
 #include <filesystem>
 
 
-namespace cpptools {
+namespace fsutils {
 
 
 /**
@@ -38,21 +38,12 @@ auto addToFilename(std::filesystem::path const& p, StrT const& ext) -> std::file
 }
 
 /**
- * @brief Deletes all files and subfolders of a given directory.
+ * @brief Deletes all files in a given directory.
  */
-void deleteDirectoryContent(std::filesystem::path const& dir)
-{
-  for(auto& p : std::filesystem::directory_iterator(dir))
-  {
-    if(std::filesystem::is_regular_file(p))
-    {
-      std::filesystem::remove(p);
-    }
-  }
-}
+void deleteDirectoryFiles(std::filesystem::path const& dir);
 
 
-}   // namespace cpptools
+}   // namespace fsutils
 
 
 // *************************************************************************** // 

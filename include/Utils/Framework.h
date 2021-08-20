@@ -68,25 +68,25 @@ protected:
 };
 
 
-/**
+/**
  * @brief Returns true if the framework has been successfully initialized.
- */
+ */
 inline [[nodiscard]] auto Framework::isInitialized() const noexcept -> bool
 { 
   return success;
 }
 
-/**
+/**
  * @brief Returns a const const reference to the error message string.
- */
+ */
 inline [[nodiscard]] auto Framework::errorMsg() const -> std::string const&
 { 
   return errMsg;
 }
 
-/**
+/**
  * @brief static creation method. Only enabled for types that inherit from Framework.
- */
+ */
 template <typename FrameworkT, typename... Args, typename>
 inline auto Framework::create(Args&& ... args) -> ptr
 {

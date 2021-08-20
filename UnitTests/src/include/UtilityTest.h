@@ -26,9 +26,9 @@
 using namespace meta;
 
 
-/**
+/**
  * @brief  tests of IsPowerOfTwo.
- */
+ */
 TEST(Utility, IsPowerOfTwo)
 {
   EXPECT_TRUE((meta::IsPowerOfTwo<1ULL>));
@@ -79,9 +79,14 @@ TEST(Utility, IsPowerOfTwo)
   EXPECT_FALSE((meta::IsPowerOfTwo<32768ULL + 1ULL>));
 }
 
-/**
+TEST(Utility, TypeOf)
+{
+  EXPECT_TRUE((std::is_same_v<meta::TypeOf<1ULL, short, double const, char>, double const>));
+}
+
+/**
  * @brief  tests of IsOneOf.
- */
+ */
 TEST(Utility, isIntegralExpectTrue)
 {
   EXPECT_TRUE((meta::isArithmetic<const double, int, float, const double, long>));
@@ -181,21 +186,6 @@ TEST(Utility, FunctionTraitsLambda)
   EXPECT_TRUE((std::is_same_v<funTraits::argument_type<1ULL>, int&>));
   EXPECT_TRUE(funTraits::is_const_method);
 }
-
-TEST(Utility, FunctionTraitsLambdaReturningVoid)
-{
-  auto myFun      = [](std::string const&, int&) { };
-  using funTraits = meta::FunctionTraits<decltype(myFun)>;
-
-  EXPECT_EQ(funTraits::arity, 2ULL);
-  EXPECT_TRUE((std::is_void_v<funTraits::result_type>));
-  EXPECT_TRUE((std::is_same_v<funTraits::argument_type<0ULL>, std::string const&>));
-  EXPECT_TRUE((std::is_same_v<funTraits::argument_type<1ULL>, int&>));
-  EXPECT_TRUE(funTraits::is_const_method);
-}
-
-
-
  
  
 // *************************************************************************** // 

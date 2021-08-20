@@ -45,10 +45,6 @@ using Identity = typename IdentityT<T>::type;
 template <typename T, typename = void>
 struct FunctionTraits;
 
-template <typename T>
-struct FunctionTraits<T, std::enable_if_t<std::is_class_v<T>>> : FunctionTraits<decltype(&T::operator())>
-{};
-
 template <typename ClassType, typename ReturnType, typename... Args>
 struct FunctionTraits<ReturnType(ClassType::*)(Args...)>
 {
@@ -71,18 +67,33 @@ struct FunctionTraits<ReturnType(ClassType::*)(Args...) const>
   static constexpr std::size_t arity    = sizeof...(Args);
 };
 
+template <typename T>
+struct FunctionTraits<T, std::enable_if_t<std::is_class_v<T>>> : FunctionTraits<decltype(&T::operator())>
+{};
+
+
+/** 
+ * @brief TypeOf is a template alias providing indexed access to the types of
+ *        a parameter pack.
+ */
+template <std::size_t Index, typename... Ts>
+using TypeOf = std::tuple_element_t<Index, std::tuple<Ts...>>;
+
 /** 
  * @struct FirstTypeOfT 
  * @brief  FirstTypeOfT provides an alias for the first type in a parameter pack
  */
 template <typename... Ts>
-struct FirstTypeOfT;
+using FirstTypeOf = TypeOf<0ULL, Ts...>;
 
-template <typename T, typename... Ts>
-struct FirstTypeOfT<T, Ts...> : meta::IdentityT<T> {};
-
-template <typename... Ts>
-using FirstTypeOf = typename FirstTypeOfT<Ts...>::type;
+//template <typename... Ts>
+//struct FirstTypeOfT;
+//
+//template <typename T, typename... Ts>
+//struct FirstTypeOfT<T, Ts...> : meta::IdentityT<T> {};
+//
+//template <typename... Ts>
+//using FirstTypeOf = typename FirstTypeOfT<Ts...>::type;
 
 /** 
  * @struct InvalidType 
@@ -91,14 +102,14 @@ using FirstTypeOf = typename FirstTypeOfT<Ts...>::type;
  */
 struct InvalidType {};
 
-/**
+/**
  * @brief Boolean constant to determine if a number is a power of two.
  */
 template <std::size_t N>
 constexpr auto IsPowerOfTwo = std::bool_constant<N && !(N & (N - 1ULL))>::value;
 
 
-/**
+/**
  * @brief unaryPredConjunction os an extension of unary predicates to an arbitrary number of types.
  */
 template <template <typename> class Pred, typename... Ts>
@@ -113,7 +124,7 @@ struct unaryPredConjunction<Pred, T1, Ts...> : std::integral_constant<bool, Pred
 {};
 
 
-/**
+/**
  * @brief  Extension of binary predicates to an arbitrary number of types.
  * @remark The predicate is assumed to define a transitive relation.
  */
@@ -126,11 +137,11 @@ struct binaryPredConjunction<BinaryPredicate, T1, T2> : std::integral_constant<b
 
 template <template <typename, typename> class BinaryPredicate, typename T1, typename T2, typename... Ts>
 struct binaryPredConjunction<BinaryPredicate, T1, T2, Ts...> :
-  std::integral_constant<bool, BinaryPredicate<T1, T2>::value&& binaryPredConjunction<BinaryPredicate, T2, Ts...>::value>
+  std::integral_constant<bool, BinaryPredicate<T1, T2>::value && binaryPredConjunction<BinaryPredicate, T2, Ts...>::value>
 {};
 
 
-/**
+/**
  * @brief Variadic Extension of std::is_integral.
  */
 template <typename... Us>
@@ -139,7 +150,7 @@ using isIntegralT = unaryPredConjunction<std::is_integral, Us...>;
 template <typename... Ts>
 constexpr bool isIntegral = isIntegralT<Ts...>::value;
 
-/**
+/**
  * @brief Variadic Extension of std::is_arithmetic.
  */
 template <typename... Us>
@@ -148,7 +159,7 @@ using isArithmeticT = unaryPredConjunction<std::is_arithmetic, Us...>;
 template <typename... Ts>
 constexpr bool isArithmetic = isArithmeticT<Ts...>::value;
 
-/**
+/**
  * @brief Variadic Extension of std::is_floating_point.
  */
 template <typename... Us>
@@ -157,7 +168,7 @@ using isFloatingPointT = unaryPredConjunction<std::is_floating_point, Us...>;
 template <typename... Ts>
 constexpr bool isFloatingPoint = isFloatingPointT<Ts...>::value;
 
-/**
+/**
  * @brief Variadic Extension of std::is_same.
  */
 template <typename... Ts>

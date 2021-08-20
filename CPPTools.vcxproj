@@ -172,13 +172,23 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ArbeitsCode\ImpoSurfaceSheetRelation.h" />
+    <ClInclude Include="include\Benchmark\CPUTimer.h" />
+    <ClInclude Include="include\Benchmark\DateTime.h" />
     <ClInclude Include="include\Benchmark\DurationTypes.h" />
     <ClInclude Include="include\Benchmark\StopWatch.h" />
     <ClInclude Include="include\Benchmark\Utility.h" />
     <ClInclude Include="include\Benchmark\WinHighResClock.h" />
+    <ClInclude Include="include\Bitwise\BitField.h" />
+    <ClInclude Include="include\Bitwise\BitFieldIterator.h" />
+    <ClInclude Include="include\Bitwise\BitProxy.h" />
+    <ClInclude Include="include\Bitwise\BitVector.h" />
+    <ClInclude Include="include\Bitwise\Bitwise.h" />
+    <ClInclude Include="include\Bitwise\details\MultiIndexBitArrayAccessor.h" />
     <ClInclude Include="include\Meta\Algorithms.h" />
     <ClInclude Include="include\Meta\CompileTimeArithmetic.h" />
     <ClInclude Include="include\Meta\RatioUtils.h" />
+    <ClInclude Include="include\Meta\Traits.h" />
+    <ClInclude Include="include\Meta\TupleUtils.h" />
     <ClInclude Include="include\Meta\Typelist.h" />
     <ClInclude Include="include\Meta\Utility.h" />
     <ClInclude Include="include\Meta\Valuelist.h" />
@@ -202,7 +212,8 @@
     <ClInclude Include="include\Unit\Unit.h" />
     <ClInclude Include="include\Unit\UnitSystem.h" />
     <ClInclude Include="include\Unit\UnitSystemGenerator.h" />
-    <ClInclude Include="include\Utils\BitField.h" />
+    <ClInclude Include="include\Utils\CountedObject.h" />
+    <ClInclude Include="include\Utils\CRTP.h" />
     <ClInclude Include="include\Utils\EnumBitmask.h" />
     <ClInclude Include="include\Utils\EnumRange.h" />
     <ClInclude Include="include\Utils\FilesystemUtils.h" />
@@ -212,6 +223,7 @@
     <ClInclude Include="include\Utils\LambdaOverload.h" />
     <ClInclude Include="include\Utils\miscellaneous.h" />
     <ClInclude Include="include\Utils\MultiTypeMap.h" />
+    <ClInclude Include="include\Utils\Signal.h" />
     <ClInclude Include="include\Utils\StringAlgorithms.h" />
     <ClInclude Include="include\Utils\StringUtils.h" />
     <ClInclude Include="include\Utils\ZipIterator.h" />
@@ -221,7 +233,8 @@
     <ClInclude Include="StringUtilsVorlage.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\ImpoSurfaceSheetRelation.cpp" />
+    <ClCompile Include="src\CPUTimer.cpp" />
+    <ClCompile Include="src\FilesystemUtils.cpp" />
     <ClCompile Include="src\StringAlgorithms.cpp" />
     <ClCompile Include="src\WinHighResClock.cpp" />
     <ClCompile Include="src\XercesString.cpp" />

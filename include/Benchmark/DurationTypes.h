@@ -19,6 +19,7 @@
 // includes 
 #include <chrono>
 #include <cstdint>
+#include <string_view>
 
 
 namespace benchmark {
@@ -27,8 +28,8 @@ namespace benchmark {
 // floating point based standard durations
 using RepType = long double;
 
-using weeks        = std::chrono::duration<RepType, std::ratio<604800>>;
-using days         = std::chrono::duration<RepType, std::ratio<86400>>;
+using weeks        = std::chrono::duration<RepType, std::ratio<604'800>>;
+using days         = std::chrono::duration<RepType, std::ratio<86'400>>;
 using hours        = std::chrono::duration<RepType, std::ratio<3600>>;
 using minutes      = std::chrono::duration<RepType, std::ratio<60>>;
 using seconds      = std::chrono::duration<RepType, std::ratio<1>>;
@@ -40,8 +41,11 @@ using femtoSeconds = std::chrono::duration<RepType, std::femto>;
 
 #if defined (_WIN32) || defined (_WIN64)
 
-// FILETIME has a resolution of 100-nanoseconds
-// https://msdn.microsoft.com/de-de/library/windows/desktop/ms724284(v=vs.85).aspx
+/**
+ * filetimeDuration is an alias for a duration having the same layout as FILETIME
+ * @remark FILETIME has a resolution of 100-nanoseconds
+ * @see    https://msdn.microsoft.com/de-de/library/windows/desktop/ms724284(v=vs.85).aspx
+ */
 using filetimeDuration = std::chrono::duration<std::int64_t, std::ratio<1, 10'000'000>>;
 
 #endif
@@ -50,10 +54,10 @@ using filetimeDuration = std::chrono::duration<std::int64_t, std::ratio<1, 10'00
 namespace literals {
 
 
-/**
+/**
  * @brief Literal operator for femtoseconds.
  * @param v the count.
- */
+ */
 constexpr femtoSeconds operator"" _fs(long double v)
 {
   return femtoSeconds(v);
@@ -64,10 +68,10 @@ constexpr femtoSeconds operator"" _fs(unsigned long long v)
   return femtoSeconds(v);
 }
 
-/**
+/**
  * @brief Literal operator for picoseconds.
  * @param v the count.
- */
+ */
 constexpr picoSeconds operator"" _ps(long double v)
 {
   return picoSeconds(v);
@@ -78,10 +82,10 @@ constexpr nanoSeconds operator"" _ps(unsigned long long v)
   return picoSeconds(v);
 }
 
-/**
+/**
  * @brief Literal operator for nanoseconds.
  * @param v the count.
- */
+ */
 constexpr nanoSeconds operator"" _ns(long double v)
 {
   return nanoSeconds(v);
@@ -92,10 +96,10 @@ constexpr nanoSeconds operator"" _ns(unsigned long long v)
   return nanoSeconds(v);
 }
 
-/**
+/**
  * @brief Literal operator for microseconds.
  * @param v the count.
- */
+ */
 constexpr microSeconds operator"" _us(long double v)
 {
   return microSeconds(v);
@@ -106,10 +110,10 @@ constexpr microSeconds operator"" _us(unsigned long long v)
   return microSeconds(v);
 }
 
-/**
+/**
  * @brief Literal operator for milliseconds.
  * @param v the count.
- */
+ */
 constexpr milliSeconds operator"" _ms(long double v)
 {
   return milliSeconds(v);
@@ -120,10 +124,10 @@ constexpr milliSeconds operator"" _ms(unsigned long long v)
   return milliSeconds(v);
 }
 
-/**
+/**
  * @brief Literal operator for seconds.
  * @param v the count.
- */
+ */
 constexpr seconds operator"" _s(long double v)
 {
   return seconds(v);
@@ -134,10 +138,10 @@ constexpr seconds operator"" _s(unsigned long long v)
   return seconds(v);
 }
 
-/**
+/**
  * @brief Literal operator for minutes.
  * @param v the count.
- */
+ */
 constexpr minutes operator"" _min(long double v)
 {
   return minutes(v);
@@ -148,10 +152,10 @@ constexpr minutes operator"" _min(unsigned long long v)
   return minutes(v);
 }
 
-/**
+/**
  * @brief Literal operator for hours.
  * @param v the count.
- */
+ */
 constexpr hours operator"" _h(long double v)
 {
   return hours(v);
@@ -166,130 +170,16 @@ constexpr hours operator"" _h(unsigned long long v)
 }   // namespace literals
 
 
-/** 
- * @struct DurationString.
- * @brief  DurationString provides a string representation of the unit
- *         of a given duration
- */
-template <typename Duration, typename CharT>
-struct DurationString {
-  static constexpr const CharT* value = DurationStringImpl<Duration::period, CharT>::value;
-};
-
-
 template <typename Ratio, typename CharT>
 struct DurationStringImpl;
 
-template <>
-struct DurationStringImpl<std::ratio<604'800>, wchar_t> {
-  static constexpr const wchar_t* value = L"week";
-};
-
-template <>
-struct DurationStringImpl<std::ratio<604'800>, char> {
-  static constexpr const char* value = "week";
-};
-
-template <>
-struct DurationStringImpl<std::ratio<86'400>, wchar_t> {
-  static constexpr const wchar_t* value = L"d";
-};
-
-template <>
-struct DurationStringImpl<std::ratio<86'400>, char> {
-  static constexpr const char* value = "d";
-};
-
-template <>
-struct DurationStringImpl<std::ratio<3600>, wchar_t> {
-  static constexpr const wchar_t* value = L"h";
-};
-
-template <>
-struct DurationStringImpl<std::ratio<3600>, char> {
-  static constexpr const char* value = "h";
-};
-
-template <>
-struct DurationStringImpl<std::ratio<60>, wchar_t> {
-  static constexpr const wchar_t* value = L"min";
-};
-
-template <>
-struct DurationStringImpl<std::ratio<60>, char> {
-  static constexpr const char* value = "min";
-};
-
-template <>
-struct DurationStringImpl<std::ratio<1>, wchar_t> {
-  static constexpr const wchar_t* value = L"s";
-};
-
-template <>
-struct DurationStringImpl<std::ratio<1>, char> {
-  static constexpr const char* value = "s";
-};
-
-template <>
-struct DurationStringImpl<std::milli, wchar_t> {
-  static constexpr const wchar_t* value = L"ms";
-};
-
-template <>
-struct DurationStringImpl<std::milli, char> {
-  static constexpr const char* value = "ms";
-};
-
-template <>
-struct DurationStringImpl<std::micro, wchar_t> {
-  static constexpr const wchar_t* value = L"mus";
-};
-
-template <>
-struct DurationStringImpl<std::micro, char> {
-  static constexpr const char* value = "mus";
-};
-
-template <>
-struct DurationStringImpl<std::ratio<1, 10'000'000>, wchar_t> {
-  static constexpr const wchar_t* value = L"NT-duration";
-};
-
-template <>
-struct DurationStringImpl<std::ratio<1, 10'000'000>, char> {
-  static constexpr const char* value = "NT-duration";
-};
-
-template <>
-struct DurationStringImpl<std::nano, wchar_t> {
-  static constexpr const wchar_t* value = L"ns";
-};
-
-template <>
-struct DurationStringImpl<std::nano, char> {
-  static constexpr const char* value = "ns";
-};
-
-template <>
-struct DurationStringImpl<std::pico, wchar_t> {
-  static constexpr const wchar_t* value = L"ps";
-};
-
-template <>
-struct DurationStringImpl<std::pico, char> {
-  static constexpr const char* value = "ps";
-};
-
-template <>
-struct DurationStringImpl<std::femto, wchar_t> {
-  static constexpr const wchar_t* value = L"fs";
-};
-
-template <>
-struct DurationStringImpl<std::femto, char> {
-  static constexpr const char* value = "fs";
-};
-
+/** 
+* @struct DurationString.
+* @brief  DurationString provides a string representation of the unit
+*         of a given duration
+*/
+template <typename Duration, typename CharT>
+constexpr auto DurationString = DurationStringImpl<Duration::period, CharT>::value;
 
 /** 
  * @brief Convenience method that returns the unit representation
@@ -298,8 +188,119 @@ struct DurationStringImpl<std::femto, char> {
 template <typename Duration, typename CharT = wchar_t>
 constexpr auto unitString(Duration)
 {
-  return DurationString<Duration, CharT>::value;
+  return DurationString<Duration, CharT>;
 }
+
+
+template <>
+struct DurationStringImpl<std::ratio<604'800>, wchar_t> {
+  static constexpr std::wstring_view value{L"week"};
+};
+
+template <>
+struct DurationStringImpl<std::ratio<604'800>, char> {
+  static constexpr std::string_view value{"week"};
+};
+
+template <>
+struct DurationStringImpl<std::ratio<86'400>, wchar_t> {
+  static constexpr std::wstring_view value{L"d"};
+};
+
+template <>
+struct DurationStringImpl<std::ratio<86'400>, char> {
+  static constexpr std::string_view value{"d"};
+};
+
+template <>
+struct DurationStringImpl<std::ratio<3600>, wchar_t> {
+  static constexpr std::wstring_view value{L"h"};
+};
+
+template <>
+struct DurationStringImpl<std::ratio<3600>, char> {
+  static constexpr std::string_view value{"h"};
+};
+
+template <>
+struct DurationStringImpl<std::ratio<60>, wchar_t> {
+  static constexpr std::wstring_view value{L"min"};
+};
+
+template <>
+struct DurationStringImpl<std::ratio<60>, char> {
+  static constexpr std::string_view value{"min"};
+};
+
+template <>
+struct DurationStringImpl<std::ratio<1>, wchar_t> {
+  static constexpr std::wstring_view value{L"s"};
+};
+
+template <>
+struct DurationStringImpl<std::ratio<1>, char> {
+  static constexpr std::string_view value{"s"};
+};
+
+template <>
+struct DurationStringImpl<std::milli, wchar_t> {
+  static constexpr std::wstring_view value{L"ms"};
+};
+
+template <>
+struct DurationStringImpl<std::milli, char> {
+  static constexpr std::string_view value{"ms"};
+};
+
+template <>
+struct DurationStringImpl<std::micro, wchar_t> {
+  static constexpr std::wstring_view value{L"mus"};
+};
+
+template <>
+struct DurationStringImpl<std::micro, char> {
+  static constexpr std::string_view value{"mus"};
+};
+
+template <>
+struct DurationStringImpl<std::ratio<1, 10'000'000>, wchar_t> {
+  static constexpr std::wstring_view value{L"NT-duration"};
+};
+
+template <>
+struct DurationStringImpl<std::ratio<1, 10'000'000>, char> {
+  static constexpr std::string_view value{"NT-duration"};
+};
+
+template <>
+struct DurationStringImpl<std::nano, wchar_t> {
+  static constexpr std::wstring_view value{L"ns"};
+};
+
+template <>
+struct DurationStringImpl<std::nano, char> {
+  static constexpr std::string_view value{"ns"};
+};
+
+template <>
+struct DurationStringImpl<std::pico, wchar_t> {
+  static constexpr std::wstring_view value{L"ps"};
+};
+
+template <>
+struct DurationStringImpl<std::pico, char> {
+  static constexpr std::string_view value{"ps"};
+};
+
+template <>
+struct DurationStringImpl<std::femto, wchar_t> {
+  static constexpr std::wstring_view value{L"fs"};
+};
+
+template <>
+struct DurationStringImpl<std::femto, char> {
+  static constexpr std::string_view value{"fs"};
+};
 
 
 }   // namespace benchmark

@@ -17,7 +17,7 @@
  
  
 // includes
-#include <Utils/BitField.h>
+#include <Bitwise/BitField.h>
 
 #include <cmath>
 #include <ostream>
@@ -391,7 +391,7 @@ inline auto FloatingPoint<FloatT>::distanceInULP(FloatingPoint const& f1, Floati
 template <typename FloatT>
 inline auto FloatingPoint<FloatT>::epsilon() const noexcept -> FloatingPoint
 {
-  return isNormal() ? FloatingPoint((this->next()).value - value) : minValSubNormal();
+  return isNormal() ? FloatingPoint(0, 0, 0) : minValSubNormal();
 }
 
 /**

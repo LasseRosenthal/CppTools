@@ -107,26 +107,26 @@ private:
   static constexpr auto forEach (F&& f, std::index_sequence<Is...>) -> F&&;
 };
 
-/**
+/**
  * @brief constructs the iterator with an enumeration value.
- */
+ */
 template <typename E, E... enumValues>
 constexpr EnumIterator<E, std::enable_if_t<std::is_enum_v<E>>, enumValues...>::EnumIterator(E e)
   : pos {std::distance(values.begin(), std::find(values.begin(), values.end(), e))}
 {}
 
-/**
+/**
  * @brief returns the current value.
- */
+ */
 template <typename E, E... enumValues>
 constexpr auto EnumIterator<E, std::enable_if_t<std::is_enum_v<E>>, enumValues...>::operator*() const -> const reference
 {
   return values[pos];
 }
 
-/**
+/**
  * @brief increment operator (prefix version).
- */
+ */
 template <typename E, E... enumValues>
 constexpr auto EnumIterator<E, std::enable_if_t<std::is_enum_v<E>>, enumValues...>::operator++() const -> EnumIterator const&
 {
@@ -134,9 +134,9 @@ constexpr auto EnumIterator<E, std::enable_if_t<std::is_enum_v<E>>, enumValues..
   return *this;
 }
 
-/**
+/**
  * @brief increment operator (postfix version).
- */
+ */
 template <typename E, E... enumValues>
 constexpr auto EnumIterator<E, std::enable_if_t<std::is_enum_v<E>>, enumValues...>::operator++(int) const -> EnumIterator
 {
@@ -145,9 +145,9 @@ constexpr auto EnumIterator<E, std::enable_if_t<std::is_enum_v<E>>, enumValues..
   return cpy;
 }
 
-/**
+/**
  * @brief begin returns an iterator pointing to the first entry in the static array.
- */
+ */
 template <typename E, E... enumValues>
 constexpr auto EnumIterator<E, std::enable_if_t<std::is_enum_v<E>>, enumValues...>::begin() -> EnumIterator
 {
@@ -156,20 +156,14 @@ constexpr auto EnumIterator<E, std::enable_if_t<std::is_enum_v<E>>, enumValues..
   return e;
 }
 
-/**
+/**
  * @brief end Returns an iterator marking the end of the enumeration range.
  *       This element acts as a placeholder; attempting to access it results in undefined behavior.
- */
+ */
 template <typename E, E... enumValues>
 constexpr auto EnumIterator<E, std::enable_if_t<std::is_enum_v<E>>, enumValues...>::end() -> EnumIterator
 {
   return {};
-}
-
-template <typename E, E... enumValues>
-template <typename F>
-constexpr auto EnumIterator<E, std::enable_if_t<std::is_enum_v<E>>, enumValues...>::forEach(F&& f) -> F&& {
-  return forEach(std::forward<F>(f), std::index_sequence_for<enumValues...>{});
 }
 
 template <typename E, E... enumValues>
@@ -179,6 +173,11 @@ constexpr auto EnumIterator<E, std::enable_if_t<std::is_enum_v<E>>, enumValues..
   return std::forward<F>(f);
 }
 
+template <typename E, E... enumValues>
+template <typename F>
+constexpr auto EnumIterator<E, std::enable_if_t<std::is_enum_v<E>>, enumValues...>::forEach(F&& f) -> F&& {
+  return forEach(std::forward<F>(f), std::make_index_sequence<sizeof...(enumValues)>{});
+}
 
 /** 
  * @class EnumRange
@@ -226,45 +225,45 @@ constexpr EnumRange<E, enumValues...>::EnumRange(value_type first, value_type la
 {}
 
 
-/**
+/**
  * @brief begin returns an iterator pointing to the first enum value in array.
- */
+ */
 template <typename E, E... enumValues>
 constexpr auto EnumRange<E, enumValues...>::begin() -> iterator
 {
   return first;
 }
 
-/**
+/**
  * @brief end returns an iterator pointing to the end of the enumeration range.
- */
+ */
 template <typename E, E... enumValues>
 constexpr auto EnumRange<E, enumValues...>::end() -> iterator
 {
   return last;
 }
 
-/**
+/**
  * @brief begin returns an iterator pointing to the first enum value.
- */
+ */
 template <typename E, E... enumValues>
 constexpr auto EnumRange<E, enumValues...>::begin() const -> const_iterator
 {
   return first;
 }
 
-/**
+/**
  * @brief end returns an iterator pointing to the end of the enumeration range.
- */
+ */
 template <typename E, E... enumValues>
 constexpr auto EnumRange<E, enumValues...>::end() const -> const_iterator
 {
   return last;
 }
 
-/**
+/**
  *  @brief  generic for each method.
- */
+ */
 template <typename E, E... enumValues>
 template <typename F>
 auto constexpr EnumRange<E, enumValues...>::forEach(F&& f) -> F&&

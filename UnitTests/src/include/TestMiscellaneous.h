@@ -22,9 +22,31 @@
 #include <map>
 #include <sstream>
 #include <vector>
-
-using namespace std::string_literals;
  
+
+
+TEST(Miscellaneous, findLastIfExpectEnd)
+{
+  const std::vector<int> values{1, 2, 3, 4, 5, 6, 7};
+  const auto e = cpptools::findLastIf(values, [](int v) { return v < 1; });
+  EXPECT_EQ(e, values.cend());
+}
+
+TEST(Miscellaneous, findLastIfExpectValidValue)
+{
+  std::vector<int> values{1, 2, 3, 4, 5, 6, 7};
+  const auto e = cpptools::findLastIf(values, [](int v) { return v < 5; });
+  EXPECT_NE(e, values.end());
+  EXPECT_EQ(*e, 4);
+}
+
+TEST(Miscellaneous, arraySize)
+{
+  constexpr std::size_t size = 56ULL;
+  double                arr[size];
+  constexpr auto        arrSize = cpptools::arraySize(arr);
+  EXPECT_EQ(arrSize, size);
+}
 
 TEST(Miscellaneous, minCheckValue)
 {
@@ -56,24 +78,6 @@ TEST(Miscellaneous, maxCheckType)
   constexpr int   i = 12;
   constexpr auto m = cpptools::max(s, 7LL, i);
   EXPECT_TRUE((std::is_same_v<std::remove_const_t<decltype(m)>, long long>));
-}
-
-TEST(Miscellaneous, compareArrayExpectTrue)
-{
-  constexpr int a1[]{1, 3, 5, 7, 9};
-  constexpr int a2[]{1, 3, 5, 7, 9};
-  constexpr bool equal = cpptools::compareArray(a1, a2);
-
-  EXPECT_TRUE(equal);
-}
-
-TEST(Miscellaneous, compareArrayExpectFalse)
-{
-  constexpr int a1[]{1, 3, 5, 7, 9};
-  constexpr int a2[]{1, 3, 513, 7, 91};
-  constexpr bool equal = cpptools::compareArray(a1, a2);
-
-  EXPECT_FALSE(equal);
 }
 
 TEST(Miscellaneous, AlignUp)
@@ -163,42 +167,6 @@ TEST(Miscellaneous, numberOfDecimalPlacesInt)
   const int value = 31146;
   constexpr std::size_t expected = 0ULL;
   EXPECT_EQ(cpptools::numberOfDecimalPlaces(value), expected);
-}
-
-TEST(Miscellaneous, BinaryRepresentationShort8BitIntZero)
-{
-  constexpr std::uint8_t val = 0;
-  const std::string expected{"00000000"};
-  std::stringstream sstr;
-  cpptools::binaryRep(val, sstr);
-  EXPECT_EQ(sstr.str(), expected);
-}
-
-TEST(Miscellaneous, BinaryRepresentationShort8BitIntOne)
-{
-  constexpr std::uint8_t val = 1;
-  const std::string expected{"00000001"};
-  std::stringstream sstr;
-  cpptools::binaryRep(val, sstr);
-  EXPECT_EQ(sstr.str(), expected);
-}
-
-TEST(Miscellaneous, BinaryRepresentation16BitInt)
-{
-  constexpr std::uint16_t val = 4971;
-  const std::string expected{"00010011 01101011"};
-  std::stringstream sstr;
-  cpptools::binaryRep(val, sstr);
-  EXPECT_EQ(sstr.str(), expected);
-}
-
-TEST(Miscellaneous, BinaryRepresentation64BitInt)
-{
-  constexpr std::uint64_t val = 5'239'785'412;
-  const std::string expected{"00000000 00000000 00000000 00000001 00111000 01010000 11000111 11000100"};
-  std::stringstream sstr;
-  cpptools::binaryRep(val, sstr);
-  EXPECT_EQ(sstr.str(), expected);
 }
  
  

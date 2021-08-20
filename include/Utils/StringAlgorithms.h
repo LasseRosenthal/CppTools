@@ -51,6 +51,24 @@ inline auto lexicalCast(std::string const& s) -> T
 }
 
 /** 
+ * @brief casts a wstring to an unsigned integer
+ */
+template <typename T, std::enable_if_t<std::is_same_v<T, unsigned int>, void**> = nullptr>
+inline auto lexicalCast(std::wstring const& s) -> T
+{
+  return std::stoul(s);
+}
+
+/** 
+ * @brief casts a string to an unsigned integer
+ */
+template <typename T, std::enable_if_t<std::is_same_v<T, unsigned int>, void**> = nullptr>
+inline auto lexicalCast(std::string const& s) -> T
+{
+  return std::stoul(s);
+}
+
+/** 
  * @brief casts a wstring to a long integer
  */
 template <typename T, std::enable_if_t<std::is_same_v<T, long>, void**> = nullptr>
@@ -356,20 +374,23 @@ template <class StrT, typename Predicate>
 auto substringBetweenDelimiters(StrT const& s, Predicate&& pred) -> StrT
 {
   const auto end = s.end();
-  const auto pos1 = std::find_if_not(s.begin(), end, std::forward<Predicate>(pred));
-  if(pos1 == end)
-  {
-    return {};
-  }
 
-  const auto pos2 = std::find_if(pos1, end, std::forward<Predicate>(pred));
+  const auto leftDelimiter = std::find_if(s.begin(), end, std::forward<Predicate>(pred));
+  const auto pos2 = std::find_if_not(leftDelimiter, end, std::forward<Predicate>(pred));
   if(pos2 == end)
   {
     return {};
   }
 
-  return StrT{pos1, pos2};
+  const auto rightDelimiter = std::find_if(pos2, end, std::forward<Predicate>(pred));
+  if(rightDelimiter == end)
+  {
+    return {};
+  }
+
+  return StrT{pos2, rightDelimiter};
 }
+
 
 /** 
  * @brief splits a given string into tokens that are delimited by characters that fullfill a given predicate.
@@ -405,7 +426,7 @@ auto split(StrT const& s, Predicate&& pred) -> std::vector<StrT>
 }
 
 /**
- * @brief removes all characters from the left side of a given string that fullfill a certain predicat.
+ * @brief removes all characters that fullfill a certain predicate from the left side of a given string.
  */
 template <typename StrT, typename Predicate>
 auto cropLeft(StrT&& s, Predicate&& pred) -> StrT
@@ -422,7 +443,7 @@ auto cropLeft(StrT&& s, Predicate&& pred) -> StrT
 }
 
 template <typename StrT, typename Predicate>
-auto cropLeft(StrT const& s, Predicate&& pred) -> StrT
+inline auto cropLeft(StrT const& s, Predicate&& pred) -> StrT
 {
   StrT copy{s};
   return cropLeft(std::move(copy), std::forward<Predicate>(pred));
@@ -446,10 +467,34 @@ auto cropRight(StrT&& s, Predicate&& pred) -> StrT
 }
 
 template <typename StrT, typename Predicate>
-auto cropRight(StrT const& s, Predicate&& pred) -> StrT
+inline auto cropRight(StrT const& s, Predicate&& pred) -> StrT
 {
   StrT copy{s};
   return cropRight(std::move(copy), std::forward<Predicate>(pred));
+}
+
+/**
+ * @brief removes all characters that fullfill a certain predicate from the right and the left side of a given string.
+ */
+template <typename StrT, typename Predicate>
+inline auto cropBothSides(StrT&& s, Predicate&& pred) -> StrT
+{
+  if(!s.empty())
+  {
+    return cropRight(cropLeft(std::forward<StrT>(s), std::forward<Predicate>(pred)), std::forward<Predicate>(pred));
+  }
+
+  return std::forward<StrT>(s);
+}
+
+/**
+ * @brief removes all characters that fullfill a certain predicate from the right and the left side of a given string.
+ */
+template <typename StrT, typename Predicate>
+inline auto cropBothSides(StrT const& s, Predicate&& pred) -> StrT
+{
+  StrT copy{s};
+  return cropBothSides(std::move(copy), std::forward<Predicate>(pred));
 }
 
 /**

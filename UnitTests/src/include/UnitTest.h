@@ -173,7 +173,6 @@ TEST(Unit, DivisionByScalarFreeOperator)
 }
 
 
-
 TEST(Unit, DivisionByScalar)
 {
   auto s1 = 3.2_s;

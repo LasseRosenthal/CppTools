@@ -17,7 +17,7 @@
  
  
 // includes
-#include <Utils/BitField.h>
+#include <Bitwise/BitField.h>
 
 #include <algorithm>
 #include <string>
@@ -330,7 +330,7 @@ TEST(BitField, additionOperator)
 TEST(BitField, indexAccessIterator)
 {
   using bitField = BitField<7ULL, 0ULL>;
-  constexpr bitField b{0b0101'0011};
+  bitField b{0b0101'0011};
   
   auto it = b.begin();
 
