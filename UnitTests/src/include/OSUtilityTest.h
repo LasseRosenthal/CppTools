@@ -20,6 +20,7 @@
 #include <Utils/OSUtility.h>
  
 using namespace std::string_literals;
+using namespace std::string_view_literals;
 
 
 TEST(OSUtility, getExistingEnvironmentVariableStringParameter)
@@ -40,6 +41,42 @@ TEST(OSUtility, getNonExistingEnvironmentVariableExpectRuntimeError)
     auto env = osutility::getEnvironmentVariable(L"dummy"s),
     osutility::environmentvariableNotFound
   );
+}
+
+TEST(OSUtility, existsEnvironmentVariableExpectTrue)
+{
+  const auto exists = osutility::existsEnvironmentVariable(L"SystemRoot"s);
+  EXPECT_TRUE(exists);
+}
+
+TEST(OSUtility, existsEnvironmentVariableExpectFalse)
+{
+  const auto exists = osutility::existsEnvironmentVariable(L"dummy"s);
+  EXPECT_FALSE(exists);
+}
+
+TEST(OSUtility, setEnvironmentVariable)
+{
+  const auto envName = L"dummyTestvar"s;
+  const auto envContent = L"dummyContent"s;
+  const auto success = osutility::setEnvironmentVariable(envName, envContent);
+  EXPECT_TRUE(success);
+  EXPECT_TRUE(osutility::existsEnvironmentVariable(envName));
+
+  const auto envGetContent = osutility::getEnvironmentVariable(envName);
+  EXPECT_EQ(envGetContent, envContent);
+}
+
+TEST(OSUtility, getExistingEnvironmentVariableOnlyOneCall)
+{
+  const auto envName = L"dummy2"s;
+  const auto envContent = L"1"s;
+  const auto success = osutility::setEnvironmentVariable(envName, envContent);
+  EXPECT_TRUE(success);
+  EXPECT_TRUE(osutility::existsEnvironmentVariable(envName));
+
+  const auto envGetContent = osutility::getEnvironmentVariable(envName);
+  EXPECT_EQ(envGetContent, envContent);
 }
  
  

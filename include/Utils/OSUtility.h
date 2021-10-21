@@ -18,7 +18,7 @@
  
 // includes
 #include <stdexcept>
-#include <string_view>
+#include <string>
 
 
 namespace osutility {
@@ -38,7 +38,17 @@ public:
  *        of type std::runtime_error is thrown.
  * @throw environmentvariableNotFound, std::runtime_error
  */
-auto getEnvironmentVariable(std::wstring_view name) -> std::wstring;
+auto getEnvironmentVariable(std::wstring const& name) -> std::wstring;
+
+/** 
+ * @brief Sets the contents of the specified environment variable for the current process.
+ */
+auto setEnvironmentVariable(std::wstring const& name, std::wstring const& value) -> bool;
+
+/** 
+ * @brief Checks if an environment variable with the given name exists.
+ */
+auto existsEnvironmentVariable(std::wstring const& name) -> bool;
 
 
 }   // namespace osutility

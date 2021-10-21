@@ -67,7 +67,7 @@ auto findLastIf(Cont& cont, Predicate&& pred) -> typename Cont::iterator
  * @brief Returns the size of an array of type T via template type deduction.
  */
 template <typename T, std::size_t N>
-[[nodiscard]] constexpr auto arraySize(const T(&)[N]) noexcept -> std::size_t
+[[nodiscard]] constexpr auto arraySize(T const(&)[N]) noexcept -> std::size_t
 {
   return N;
 }
@@ -131,7 +131,7 @@ constexpr auto alignUp(std::size_t n) noexcept -> std::enable_if_t<!meta::IsPowe
  * @returns the aligned version of n
  */
 template <typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
-inline auto alignUp(const T n, const T alignment) -> T
+constexpr auto alignUp(const T n, const T alignment) -> T
 {
   return ((n + alignment - 1) / alignment) * alignment;
 }
@@ -178,6 +178,64 @@ auto numberOfDecimalPlaces(T value) -> std::size_t
   {
     return 0ULL;
   }
+}
+
+/**
+ * @brief  computes the smallest integral value that is not less than x / y.
+ * @remark version only enabled if x and y are an integral type.
+ */
+template <typename T1, typename T2, typename OptionalRetType = void>
+inline auto ceilDiv(T1 x, T2 y)
+-> std::enable_if_t<std::is_integral_v<T1> && std::is_integral_v<T2>,
+                    std::conditional_t<std::is_same_v<OptionalRetType, void>, std::common_type_t<T1, T2>, OptionalRetType>
+                   >
+{
+  using retType = std::conditional_t<std::is_same_v<OptionalRetType, void>, std::common_type_t<T1, T2>, OptionalRetType>;
+  // if x % y == 0, (x-1)/y equals x/y - 1 (since integer division is rounding down)
+  // if x % y != 0, (x-1)/y equals x/y
+  return static_cast<retType>(1 + ((x - 1) / y));
+}
+
+/**
+ * @brief  computes the smallest integral value that is not less than x / y.
+ * @remark version only enabled if x or y is a floating point.
+ */
+template <typename T1, typename T2, typename OptionalRetType = void>
+inline auto ceilDiv(T1 x, T2 y)
+-> std::enable_if_t<std::is_floating_point_v<T1> || std::is_floating_point_v<T2>,
+                    std::conditional_t<std::is_same_v<OptionalRetType, void>, std::common_type_t<T1, T2>, OptionalRetType>  
+                   >
+{
+  using retType = std::conditional_t<std::is_same_v<OptionalRetType, void>, std::common_type_t<T1, T2>, OptionalRetType>;
+  return static_cast<retType>(std::ceil(x / y));
+}
+
+/**
+ * @brief  computes the greatest integral value that is not greater than x / y.
+ * @remark version only enabled if x and y are an integral type.
+ */
+template <typename T1, typename T2, typename OptionalRetType = void>
+inline auto floorDiv(T1 x, T2 y)
+-> std::enable_if_t<std::is_integral_v<T1> && std::is_integral_v<T2>,
+                    std::conditional_t<std::is_same_v<OptionalRetType, void>, std::common_type_t<T1, T2>, OptionalRetType>
+                   >
+{
+  using retType = std::conditional_t<std::is_same_v<OptionalRetType, void>, std::common_type_t<T1, T2>, OptionalRetType>;
+  return static_cast<retType>(x / y);
+}
+
+/**
+ * @brief  computes the greatest integral value that is not greater than x / y.
+ * @remark version only enabled if x or y is a floating point.
+ */
+template <typename T1, typename T2, typename OptionalRetType = void>
+inline auto floorDiv(T1 x, T2 y)
+-> std::enable_if_t<std::is_floating_point_v<T1> || std::is_floating_point_v<T2>,
+                    std::conditional_t<std::is_same_v<OptionalRetType, void>, std::common_type_t<T1, T2>, OptionalRetType>  
+                   >
+{
+  using retType = std::conditional_t<std::is_same_v<OptionalRetType, void>, std::common_type_t<T1, T2>, OptionalRetType>;
+  return static_cast<retType>(std::floor(x / y));
 }
 
 

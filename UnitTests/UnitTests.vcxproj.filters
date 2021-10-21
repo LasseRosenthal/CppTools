@@ -141,6 +141,42 @@
     <ClInclude Include="src\include\BitVectorTest.h">
       <Filter>Header Files\Bitwise</Filter>
     </ClInclude>
+    <ClInclude Include="src\include\FileWatcherTest.h">
+      <Filter>Header Files\OSUtility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\MultiIndexBitArrayAccessorTest.h">
+      <Filter>Header Files\Bitwise</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\HashMapTest.h">
+      <Filter>Header Files\ConcurrencyTools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\OneShotEventTest.h">
+      <Filter>Header Files\ConcurrencyTools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\ThreadPoolTest.h">
+      <Filter>Header Files\ConcurrencyTools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\ThreadsafePriorityQueueTest.h">
+      <Filter>Header Files\ConcurrencyTools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\ThreadsafeQueueTest.h">
+      <Filter>Header Files\ConcurrencyTools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\WatchdogTest.h">
+      <Filter>Header Files\ConcurrencyTools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\Person.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\StringJoinerTest.h">
+      <Filter>Header Files\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\SingletonBaseTest.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\TestFrameworks.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -175,6 +211,12 @@
     </Filter>
     <Filter Include="Header Files\Bitwise">
       <UniqueIdentifier>{2bf08f07-e90f-4fdf-9545-c0b8defb7612}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\OSUtility">
+      <UniqueIdentifier>{fe701dfd-e419-4949-860b-38cf6e360263}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ConcurrencyTools">
+      <UniqueIdentifier>{a9f740ef-daea-4745-98bd-805a005f2028}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

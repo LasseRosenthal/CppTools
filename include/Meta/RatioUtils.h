@@ -18,6 +18,7 @@
  
 // includes
 #include <Meta/CompileTimeArithmetic.h>
+#include <Meta/Utility.h>
 
 #include <ratio>
 #include <type_traits>
@@ -37,6 +38,22 @@ struct AsDecimalT {
 
 template <typename Ratio, typename T = double>
 constexpr auto AsDecimal = AsDecimalT<Ratio, T>::value;
+
+/** 
+ * @struct NegativeT
+ * @brief  NegativeT computes the negative value of a given ratio.
+ */
+template <typename Ratio, typename = void>
+struct NegativeT;
+
+template <typename Ratio>
+struct NegativeT<Ratio, std::enable_if_t<Ratio::num == 0>> : meta::IdentityT<Ratio> {};
+
+template <typename Ratio>
+struct NegativeT<Ratio, std::enable_if_t<Ratio::num != 0>> : meta::IdentityT<std::ratio<-Ratio::num, Ratio::den>> {};
+
+template <typename Ratio>
+using Negative = typename NegativeT<Ratio>::type;
 
 /** 
  * @struct IsIntegralRatio
@@ -94,22 +111,6 @@ struct InvertT : RatioPowT<Ratio, -1> {};
 
 template <typename Ratio>
 using Invert = typename InvertT<Ratio>::type;
-
-/** 
- * @struct NegativeT
- * @brief  NegativeT computes the negative value of a given ratio.
- */
-template <typename Ratio, typename = void>
-struct NegativeT;
-
-template <typename Ratio>
-struct NegativeT<Ratio, std::enable_if_t<Ratio::num == 0>> : IdentityT<Ratio> {};
-
-template <typename Ratio>
-struct NegativeT<Ratio, std::enable_if_t<Ratio::num != 0>> : IdentityT<std::ratio<-Ratio::num, Ratio::den>> {};
-
-template <typename Ratio>
-using Negative = typename NegativeT<Ratio>::type;
 
 /** 
  * @struct RatioPowerT

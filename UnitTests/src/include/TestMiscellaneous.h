@@ -83,8 +83,12 @@ TEST(Miscellaneous, maxCheckType)
 TEST(Miscellaneous, AlignUp)
 {
   constexpr std::size_t alignment = 7ULL;
+  constexpr auto alignedZero = cpptools::alignUp(0ULL, alignment);
+  EXPECT_EQ(alignedZero, 0ULL);
 
-  EXPECT_EQ(cpptools::alignUp(0ULL, alignment), 0ULL);
+  constexpr auto aligned59 = cpptools::alignUp(59ULL, alignment);
+  EXPECT_EQ(aligned59, 63ULL);
+
 
   for(std::size_t n = 0ULL; n < 1000; ++n)
   {
@@ -168,6 +172,99 @@ TEST(Miscellaneous, numberOfDecimalPlacesInt)
   constexpr std::size_t expected = 0ULL;
   EXPECT_EQ(cpptools::numberOfDecimalPlaces(value), expected);
 }
+
+TEST(Miscellaneous, CeilDivReturnValueDoubles)
+{
+  constexpr double dividend = 13.2;
+  constexpr double divisor = 2.1;
+  constexpr double expected = 7.0;
+  EXPECT_EQ(cpptools::ceilDiv(dividend, divisor), expected);
+}
+
+TEST(Miscellaneous, CeilDivReturnValueIntegersExact)
+{
+  constexpr int dividend = 14;
+  constexpr int divisor = 2;
+  constexpr int expected = 7;
+  EXPECT_EQ(cpptools::ceilDiv(dividend, divisor), expected);
+}
+
+TEST(Miscellaneous, CeilDivReturnValueIntegersLargerThanExact)
+{
+  constexpr int dividend = 15;
+  constexpr int divisor = 2;
+  constexpr int expected = 8;
+  EXPECT_EQ(cpptools::ceilDiv(dividend, divisor), expected);
+}
+
+TEST(Miscellaneous, CeilDivReturnValueExact)
+{
+  constexpr double dividend = 13.2;
+  constexpr double divisor = 6.6;
+  constexpr double expected = 2.0;
+  EXPECT_EQ(cpptools::ceilDiv(dividend, divisor), 2.0);
+}
+
+TEST(Miscellaneous, ceilDivReturnType)
+{
+  constexpr double dividend = 13.2;
+  constexpr float divisor = 2.1F;
+  auto result = cpptools::ceilDiv(13.2, 2.1);
+  using expectedType = double;
+  EXPECT_TRUE((std::is_same_v<decltype(result), expectedType>));
+}
+
+TEST(Miscellaneous, ceilDivReturnTypeExplicit)
+{
+  constexpr double dividend = 13.2;
+  constexpr float divisor = 2.1F;
+  using expectedType = int;
+  auto result = cpptools::ceilDiv<double, float, expectedType>(13.2, 2.1);
+  EXPECT_TRUE((std::is_same_v<decltype(result), expectedType>));
+}
+
+TEST(UtilityToolsTest, floorDivReturnValue)
+{
+  constexpr double dividend = 13.2;
+  constexpr double divisor = 2.1;
+  constexpr double expected = 6.0;
+  EXPECT_EQ(cpptools::floorDiv(dividend, divisor), expected);
+}
+
+TEST(UtilityToolsTest, floorDivReturnValueIntegersExact)
+{
+  constexpr int dividend = 14;
+  constexpr int divisor = 2;
+  constexpr int expected = 7;
+  EXPECT_EQ(cpptools::floorDiv(dividend, divisor), expected);
+}
+
+TEST(UtilityToolsTest, floorDivReturnValueIntegersSmallerThanExact)
+{
+  constexpr int dividend = 15;
+  constexpr int divisor = 2;
+  constexpr int expected = 7;
+  EXPECT_EQ(cpptools::floorDiv(dividend, divisor), expected);
+}
+
+TEST(UtilityToolsTest, floorDivReturnType)
+{
+  constexpr double dividend = 13.2;
+  constexpr float divisor = 2.1F;
+  using expectedType = double;
+  auto result = cpptools::floorDiv(13.2, 2.1);
+  EXPECT_TRUE((std::is_same_v<decltype(result), expectedType>));
+}
+
+TEST(UtilityToolsTest, floorDivReturnTypeExplicit)
+{
+  constexpr double dividend = 13.2;
+  constexpr float divisor = 2.1F;
+  using expectedType = int;
+  auto result = cpptools::floorDiv<double, float, expectedType>(13.2, 2.1);
+  EXPECT_TRUE((std::is_same_v<decltype(result), expectedType>));
+}
+
  
  
 // *************************************************************************** // 

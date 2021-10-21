@@ -138,6 +138,26 @@ TEST_F(MultiTypeMapTest, FindNoSuccess)
   EXPECT_EQ(multiMap.end(), m);
 }
 
+TEST_F(MultiTypeMapTest, ContainsExpectTrue)
+{
+  EXPECT_TRUE(multiMap.contains("monday"s));
+}
+
+TEST_F(MultiTypeMapTest, ContainsExpectFalse)
+{
+  EXPECT_FALSE(multiMap.contains("sunday"s));
+}
+
+TEST_F(MultiTypeHashMapTest, ContainsExpectTrue)
+{
+  EXPECT_TRUE(multiMap.contains("monday"s));
+}
+
+TEST_F(MultiTypeHashMapTest, ContainsExpectFalse)
+{
+  EXPECT_FALSE(multiMap.contains("sunday"s));
+}
+
 /**
  * @brief  tests if the get method returns the correct value.
  */

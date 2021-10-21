@@ -17,6 +17,8 @@
  
  
 // includes
+#include <Bitwise/Bitwise.h>
+#include <Meta/Utility.h>
 #include <Utils/miscellaneous.h>
 
 #include <cmath>
@@ -34,13 +36,6 @@ namespace cpptools {
 template <std::size_t Size, std::size_t StartBit = 0Ull>
 class BitField {
 
-  template <std::size_t Size>
-  using MinimumType = std::conditional_t<Size == 0ULL, void,
-                      std::conditional_t<Size <= 8ULL, std::uint8_t,
-                      std::conditional_t<Size <= 16ULL, std::uint16_t,
-                      std::conditional_t<Size <= 32ULL, std::uint32_t,
-                      std::conditional_t<Size <= 64ULL, std::uint64_t, void>>>>>;
-
   template <bool IsConst>
   class BitProxy;
 
@@ -51,18 +46,17 @@ public:
 
   // ---------------------------------------------------
   // public types
-  using value_type      = MinimumType<StartBit + Size>;
+  using value_type      = meta::MinIntegralType<StartBit + Size>;
   using size_type       = std::size_t;
   using reference       = BitProxy<false>;
   using const_reference = BitProxy<true>;
   using iterator        = BitFieldIterator<false>;
   using const_iterator  = BitFieldIterator<true>;
 
-
   // ---------------------------------------------------
   // public constants
-  static constexpr value_type mask    = (static_cast<value_type>(1) << Size) - 1;   // BitField<3, 2> --> 0000 0111
-  static constexpr value_type cutter  = mask << StartBit;                           // BitField<3, 2> --> 0001 1100
+  static constexpr value_type mask    = bws::punchMask<value_type>(Size);           // BitField<3, 2> --> 0000 0111
+  static constexpr value_type cutter  = bws::punchMask<value_type>(Size, StartBit); // BitField<3, 2> --> 0001 1100
   static constexpr size_type firstBit = StartBit;
 
   // ---------------------------------------------------

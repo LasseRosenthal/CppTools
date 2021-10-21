@@ -25,8 +25,12 @@
  */
 struct Person {
 
-  auto getAge  () const noexcept { return age;}
-  auto getSize () const noexcept { return size;}
+  constexpr Person() noexcept = default;
+  constexpr Person(int a, int s) noexcept :
+    age{ a }, size{ s }{}
+
+  constexpr auto getAge  () const noexcept { return age;}
+  constexpr auto getSize () const noexcept { return size;}
   void setAge  (int a) noexcept { age = a;}
   void setSize (int s) noexcept { size = s;}
 

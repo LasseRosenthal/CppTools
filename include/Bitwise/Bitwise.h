@@ -19,6 +19,7 @@
 // includes
 #include <cstdint>
 #include <ostream>
+#include <type_traits>
  
 
 namespace bws {
@@ -83,6 +84,80 @@ template <typename T>
   {
     return ((static_cast<T>(1) << size) - 1) << startBit;
   }
+}
+
+/**
+ * @brief  Counts the number of bits set in a give value v.
+ * @tparam T the type of the value.
+ */
+template <typename T>
+[[nodiscard]] constexpr auto countBits(T v) noexcept -> std::enable_if_t<!std::is_signed_v<T>, std::size_t>
+{
+  v = v - ((v >> 1) & (T) ~(T)0 / 3);
+  v = (v & (T) ~(T)0 / 15 * 3) + ((v >> 2) & (T) ~(T)0 / 15 * 3);
+  //v = (v + (v >> 4)) & (T) ~(T)0 / 255 * 15;
+  //return (T)(v * ((T) ~(T)0 / 255)) >> ((sizeof(T) - 1) * CHAR_BIT);
+
+  return (T)(((v + (v >> 4)) & (T) ~(T)0 / 255 * 15) * ((T) ~(T)0 / 255)) >> ((sizeof(T) - 1ULL) * CHAR_BIT);
+}
+
+template <typename T>
+[[nodiscard]] constexpr auto countBits(T v) noexcept -> std::enable_if_t<std::is_signed_v<T>, std::size_t>
+{
+  std::size_t c{};
+  for(; v; v >>= 1)
+  {
+    c += v & 1;
+  }
+
+  return c;
+}
+
+template <typename T>
+[[nodiscard]] auto firstBitSet(T v) noexcept -> std::size_t
+{
+  std::size_t c{};
+  if(v & 0x1)
+  {
+    // special case for odd v (assumed to happen half of the time)
+    c = 0;
+  }
+  else
+  {
+    c = 1;
+    if((v & 0xffff) == 0)
+    {
+      v >>= 16;
+      c += 16;
+    }
+    if((v & 0xff) == 0)
+    {
+      v >>= 8;
+      c += 8;
+    }
+    if((v & 0xf) == 0)
+    {
+      v >>= 4;
+      c += 4;
+    }
+    if((v & 0x3) == 0)
+    {
+      v >>= 2;
+      c += 2;
+    }
+    c -= v & 0x1;
+  }
+
+  return c;
+
+  //std::size_t c{};
+  //while(!(v & T{1}))
+  //{
+  //  ++c;
+  //  v >>= 1;
+  //}
+
+  //return c;
 }
 
 

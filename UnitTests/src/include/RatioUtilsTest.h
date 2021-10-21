@@ -29,6 +29,11 @@ TEST(RatioUtils, AsDecimalT)
   EXPECT_EQ(dec, expected);
 }
 
+TEST(RatioUtils, Negative)
+{
+  EXPECT_TRUE((std::ratio_equal_v<Negative<std::ratio<4143, 30003>>, std::ratio<-4143, 30003>>));
+}
+
 TEST(RatioUtils, IsIntegralRatioExpectTrue)
 {
   EXPECT_TRUE((IsIntegralRatio<std::ratio<14, 7>>));
@@ -69,19 +74,11 @@ TEST(RatioUtils, Invert)
   EXPECT_TRUE((std::ratio_equal_v<Invert<std::ratio<4143, 30003>>, std::ratio<30003, 4143>>));
 }
 
-TEST(RatioUtils, Negative)
-{
-  EXPECT_TRUE((std::ratio_equal_v<Negative<std::ratio<4143, 30003>>, std::ratio<-4143, 30003>>));
-}
-
 TEST(RatioUtils, RatioPower)
 {
   constexpr auto val = RatioPower<std::ratio<12, 5>, std::ratio<5, 3>>;
   EXPECT_EQ(val, 4.302148556694878120397582733477);
 }
-
-
-
  
  
 // *************************************************************************** // 

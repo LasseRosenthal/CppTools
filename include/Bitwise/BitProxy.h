@@ -173,13 +173,6 @@ auto operator<<(std::basic_ostream<CharT, ChartTraits>& ostr, BitProxy<T, IsCons
   return ostr << (static_cast<bool>(bitProxy) ? ostr.widen('1') : ostr.widen('0'));
 }
 
-//template <typename T, bool IsConst, std::size_t Size, std::size_t StartBit>
-//template <typename>
-//auto BitProxy<T, IsConst, Size, StartBit>::operator= (bool const b) noexcept -> BitProxy&
-//{
-//
-//}
-
 
 }   // namespace bws
 

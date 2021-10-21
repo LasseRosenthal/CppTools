@@ -139,6 +139,11 @@ using PixelsUnitGenerator =
   UnitSystemGenerator<meta::Typelist<UnitSystemBaseTag<dimension::PixelTag<std::ratio<1>>, Period>>,
                       ScalingFactor>;
 
+template <typename Period, typename ScalingFactor = std::ratio<1>>
+using AngleUnitGenerator =
+  UnitSystemGenerator<meta::Typelist<UnitSystemBaseTag<dimension::AngleTag<std::ratio<1>>, Period>>,
+                      ScalingFactor>;
+
 template <typename PixelPeriod, typename LengthPeriod, typename ScalingFactor = std::ratio<1>>
 using ResolutionUnitGenerator = UnitSystemGenerator<
   meta::Typelist<UnitSystemBaseTag<dimension::PixelTag<std::ratio<1>>, PixelPeriod>,

@@ -81,6 +81,9 @@ TEST(BitProxy, testSingleBitNonConst)
 
   bool isBitSet = proxy.isSet();
   EXPECT_TRUE(isBitSet);
+
+  proxy = false;
+  EXPECT_FALSE(proxy);
 }
 
 TEST(BitProxy, setBit)

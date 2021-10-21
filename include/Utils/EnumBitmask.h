@@ -31,10 +31,14 @@ namespace cpptools {
  *         of EnableBitmaskOperationsT has to be provided for the enumeration type.
  * @see    https://en.cppreference.com/w/cpp/named_req/BitmaskType
  */
-template <typename Enum, typename = std::enable_if_t<std::is_enum_v<Enum>>>
-struct EnableBitmaskOperationsT : std::false_type {};
+template <typename Enum, typename = void>
+struct EnableBitmaskOperationsT;
 
 template <typename Enum>
+struct EnableBitmaskOperationsT<Enum, std::enable_if_t<std::is_enum_v<Enum>>>
+ : std::false_type {};
+
+template <typename Enum, typename = std::enable_if_t<std::is_enum_v<Enum>>>
 constexpr bool EnableBitmaskOperations = EnableBitmaskOperationsT<Enum>::value;
 
 
@@ -45,7 +49,7 @@ constexpr bool EnableBitmaskOperations = EnableBitmaskOperationsT<Enum>::value;
  * @brief bitwise and for enumeration types.
  */
 template <typename Enum, typename = std::enable_if_t<cpptools::EnableBitmaskOperations<Enum>>>
-inline constexpr auto operator&(Enum const e1, Enum const e2) noexcept -> Enum
+[[nodiscard]] constexpr auto operator&(Enum const e1, Enum const e2) noexcept -> Enum
 {
   return static_cast<Enum>(static_cast<std::underlying_type_t<Enum>>(e1) & static_cast<std::underlying_type_t<Enum>>(e2));
 }
@@ -54,7 +58,7 @@ inline constexpr auto operator&(Enum const e1, Enum const e2) noexcept -> Enum
  * @brief bitwise or for enumeration types.
  */
 template <typename Enum, typename = std::enable_if_t<cpptools::EnableBitmaskOperations<Enum>>>
-inline constexpr auto operator|(Enum const e1, Enum const e2) noexcept -> Enum
+[[nodiscard]] constexpr auto operator|(Enum const e1, Enum const e2) noexcept -> Enum
 {
   return static_cast<Enum>(static_cast<std::underlying_type_t<Enum>>(e1) | static_cast<std::underlying_type_t<Enum>>(e2));
 }
@@ -63,7 +67,7 @@ inline constexpr auto operator|(Enum const e1, Enum const e2) noexcept -> Enum
  * @brief bitwise xor for enumeration types.
  */
 template <typename Enum, typename = std::enable_if_t<cpptools::EnableBitmaskOperations<Enum>>>
-inline constexpr auto operator^(Enum const e1, Enum const e2) noexcept -> Enum
+[[nodiscard]] constexpr auto operator^(Enum const e1, Enum const e2) noexcept -> Enum
 {
   return static_cast<Enum>(static_cast<std::underlying_type_t<Enum>>(e1) ^ static_cast<std::underlying_type_t<Enum>>(e2));
 }
@@ -72,7 +76,7 @@ inline constexpr auto operator^(Enum const e1, Enum const e2) noexcept -> Enum
  * @brief bitwise negation for enumeration types.
  */
 template <typename Enum, typename = std::enable_if_t<cpptools::EnableBitmaskOperations<Enum>>>
-inline constexpr auto operator~(Enum const e) noexcept -> Enum
+[[nodiscard]] constexpr auto operator~(Enum const e) noexcept -> Enum
 {
   return static_cast<Enum>(~static_cast<std::underlying_type_t<Enum>>(e));
 }
@@ -81,7 +85,7 @@ inline constexpr auto operator~(Enum const e) noexcept -> Enum
  * @brief bitwise and for enumeration types.
  */
 template <typename Enum, typename = std::enable_if_t<cpptools::EnableBitmaskOperations<Enum>>>
-inline constexpr auto operator&=(Enum& e1, Enum const e2) noexcept -> Enum
+constexpr auto operator&=(Enum& e1, Enum const e2) noexcept -> Enum
 {
   e1 = e1 & e2;
   return e1;
@@ -91,7 +95,7 @@ inline constexpr auto operator&=(Enum& e1, Enum const e2) noexcept -> Enum
  * @brief bitwise or for enumeration types.
  */
 template <typename Enum, typename = std::enable_if_t<cpptools::EnableBitmaskOperations<Enum>>>
-inline constexpr auto operator|=(Enum& e1, Enum const e2) noexcept -> Enum
+constexpr auto operator|=(Enum& e1, Enum const e2) noexcept -> Enum
 {
   e1 = e1 | e2;
   return e1;
@@ -101,7 +105,7 @@ inline constexpr auto operator|=(Enum& e1, Enum const e2) noexcept -> Enum
  * @brief bitwise xor for enumeration types.
  */
 template <typename Enum, typename = std::enable_if_t<cpptools::EnableBitmaskOperations<Enum>>>
-inline constexpr auto operator^=(Enum& e1, Enum const e2) noexcept -> Enum
+constexpr auto operator^=(Enum& e1, Enum const e2) noexcept -> Enum
 {
   e1 = e1 ^ e2;
   return e1;

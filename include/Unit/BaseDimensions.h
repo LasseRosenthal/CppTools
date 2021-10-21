@@ -28,40 +28,43 @@ namespace dimension {
 // tags for the seven SI-base Units
 // see https://en.wikipedia.org/wiki/International_System_of_Units
 template <typename Exponent = std::ratio<0>>
-struct TimeTag : BaseDimensionTag<0, Exponent> {};
+struct TimeTag : BaseDimensionTag<0ULL, Exponent> {};
 
 template <typename Exponent = std::ratio<0>>
-struct LengthTag : BaseDimensionTag<1, Exponent> {};
+struct LengthTag : BaseDimensionTag<1ULL, Exponent> {};
 
 template <typename Exponent = std::ratio<0>>
-struct MassTag : BaseDimensionTag<2, Exponent> {};
+struct MassTag : BaseDimensionTag<2ULL, Exponent> {};
 
 template <typename Exponent = std::ratio<0>>
-struct CurrentTag : BaseDimensionTag<3, Exponent> {};
+struct CurrentTag : BaseDimensionTag<3ULL, Exponent> {};
 
 template <typename Exponent = std::ratio<0>>
-struct TemperatureTag : BaseDimensionTag<4, Exponent> {};
+struct TemperatureTag : BaseDimensionTag<4ULL, Exponent> {};
 
 template <typename Exponent = std::ratio<0>>
-struct SubstanceTag : BaseDimensionTag<5, Exponent> {};
+struct SubstanceTag : BaseDimensionTag<5ULL, Exponent> {};
 
 template <typename Exponent = std::ratio<0>>
-struct LuminosityTag : BaseDimensionTag<6, Exponent> {};
+struct LuminosityTag : BaseDimensionTag<6ULL, Exponent> {};
 
 // ---------------------------------------------------
 // tags for other quantities
 template <typename Exponent = std::ratio<0>>
-struct StorageAmountTag : BaseDimensionTag<7, Exponent> {};
+struct StorageAmountTag : BaseDimensionTag<7ULL, Exponent> {};
 
 template <typename Exponent = std::ratio<0>>
-struct PixelTag : BaseDimensionTag<8, Exponent> {};
+struct PixelTag : BaseDimensionTag<8ULL, Exponent> {};
+
+template <typename Exponent = std::ratio<0>>
+struct AngleTag : BaseDimensionTag<9ULL, Exponent> {};
 
 
 /** 
  * @brief  numBaseDimensions defines the number of base dimensions.
  * @remark this constant has to be adjusted if new Base Tags are added.
  */
-inline constexpr std::size_t numBaseDimensions = 9ULL;
+constexpr std::size_t numBaseDimensions = 10ULL;
 
 /** 
  * @brief BaseDimensionIndices is an index_sequence ranging from 0 to numBaseDimensions-1.
@@ -84,31 +87,34 @@ template <int Index, typename Exponent = std::ratio<0>>
 using DimensionTagGenerator = typename DimensionTagGeneratorT<Index, Exponent>::type;
 
 template <typename Exponent>
-struct DimensionTagGeneratorT<0, Exponent> : meta::IdentityT<TimeTag<Exponent>> {};
+struct DimensionTagGeneratorT<0ULL, Exponent> : meta::IdentityT<TimeTag<Exponent>> {};
 
 template <typename Exponent>
-struct DimensionTagGeneratorT<1, Exponent> : meta::IdentityT<LengthTag<Exponent>> {};
+struct DimensionTagGeneratorT<1ULL, Exponent> : meta::IdentityT<LengthTag<Exponent>> {};
 
 template <typename Exponent>
-struct DimensionTagGeneratorT<2, Exponent> : meta::IdentityT<MassTag<Exponent>> {};
+struct DimensionTagGeneratorT<2ULL, Exponent> : meta::IdentityT<MassTag<Exponent>> {};
 
 template <typename Exponent>
-struct DimensionTagGeneratorT<3, Exponent> : meta::IdentityT<CurrentTag<Exponent>> {};
+struct DimensionTagGeneratorT<3ULL, Exponent> : meta::IdentityT<CurrentTag<Exponent>> {};
 
 template <typename Exponent>
-struct DimensionTagGeneratorT<4, Exponent> : meta::IdentityT<TemperatureTag<Exponent>> {};
+struct DimensionTagGeneratorT<4ULL, Exponent> : meta::IdentityT<TemperatureTag<Exponent>> {};
 
 template <typename Exponent>
-struct DimensionTagGeneratorT<5, Exponent> : meta::IdentityT<SubstanceTag<Exponent>> {};
+struct DimensionTagGeneratorT<5ULL, Exponent> : meta::IdentityT<SubstanceTag<Exponent>> {};
 
 template <typename Exponent>
-struct DimensionTagGeneratorT<6, Exponent> : meta::IdentityT<LuminosityTag<Exponent>> {};
+struct DimensionTagGeneratorT<6ULL, Exponent> : meta::IdentityT<LuminosityTag<Exponent>> {};
 
 template <typename Exponent>
-struct DimensionTagGeneratorT<7, Exponent> : meta::IdentityT<StorageAmountTag<Exponent>> {};
+struct DimensionTagGeneratorT<7ULL, Exponent> : meta::IdentityT<StorageAmountTag<Exponent>> {};
 
 template <typename Exponent>
-struct DimensionTagGeneratorT<8, Exponent> : meta::IdentityT<PixelTag<Exponent>> {};
+struct DimensionTagGeneratorT<8ULL, Exponent> : meta::IdentityT<PixelTag<Exponent>> {};
+
+template <typename Exponent>
+struct DimensionTagGeneratorT<9ULL, Exponent> : meta::IdentityT<AngleTag<Exponent>> {};
 
 
 /**

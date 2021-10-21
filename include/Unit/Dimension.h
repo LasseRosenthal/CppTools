@@ -75,7 +75,7 @@ constexpr bool HasOnlyZeroExponents = HasOnlyZeroExponentsT<DimensionT>::value;
 template <std::size_t Index, typename BaseDimTagList>
 using DimensionAt = std::conditional_t<
     meta::valuelist::HasValue<meta::valuelist::TypeToValuelist<BaseDimTagList, IndexOfT>, Index>,
-    meta::typelist::NthElement<BaseDimTagList, meta::typelist::FindIf<BaseDimTagList, HasIndex<Index>>>,
+    meta::typelist::NthElement<BaseDimTagList, meta::typelist::FindIf<BaseDimTagList, dimension::HasIndex<Index>>>,
     DimensionTagGenerator<Index, std::ratio<0>>
   >;
 
@@ -169,6 +169,7 @@ using SubstanceAmount = DimensionGenerator<SubstanceTag<std::ratio<1>>>;
 using Luminousity     = DimensionGenerator<LuminosityTag<std::ratio<1>>>;
 using StorageAmount   = DimensionGenerator<StorageAmountTag<std::ratio<1>>>;
 using Pixel           = DimensionGenerator<PixelTag<std::ratio<1>>>;
+using Angle           = DimensionGenerator<AngleTag<std::ratio<1>>>;
 using Velocity        = DimensionGenerator<TimeTag<std::ratio<-1>>, LengthTag<std::ratio<1>>>;
 using Acceleration    = DimensionGenerator<TimeTag<std::ratio<-2>>, LengthTag<std::ratio<1>>>;
 using Force           = DimensionGenerator<TimeTag<std::ratio<-2>>, LengthTag<std::ratio<1>>, MassTag<std::ratio<1>>>;

@@ -100,7 +100,7 @@ private:
 };
 
 
-/**
+/**
  * @brief Constructor.
  * @param dims a parameter pack that determines the dimensions of the array.
  */
@@ -122,7 +122,7 @@ inline MultiIndexVector<T, Dimension, Ordering>::MultiIndexVector(std::initializ
   , totalSize     {(... * dims)}
 {}
 
-/**
+/**
  * @brief Default constructor. Construct an empty array.
  */
 template <typename T, std::size_t Dimension, storageOrdering Ordering>
@@ -130,7 +130,7 @@ inline MultiIndexVector<T, Dimension, Ordering>::MultiIndexVector()
   : dimensions {zeroArray(std::make_index_sequence<rank>{})}
 {}
 
-/**
+/**
  * @brief Returns the total size of the array.
  */
 template <typename T, std::size_t Dimension, storageOrdering Ordering>
@@ -139,7 +139,7 @@ inline auto MultiIndexVector<T, Dimension, Ordering>::size() const noexcept -> s
   return totalSize;
 }
 
-/**
+/**
  * @brief Returns the size of the i-th dimension of the array.
  * @param i the zero based index of the dimension.
  */
@@ -149,7 +149,7 @@ inline auto MultiIndexVector<T, Dimension, Ordering>::size(size_type i) const ->
   return dimensions[i];
 }
 
-/**
+/**
  * @brief Checks if the array is empty, i.e if its size equals zero.
  */
 template <typename T, std::size_t Dimension, storageOrdering Ordering>
@@ -158,7 +158,7 @@ inline auto MultiIndexVector<T, Dimension, Ordering>::empty() const noexcept -> 
   return totalSize == 0ULL;
 }
 
-/**
+/**
  * @brief Index operator. Returns a reference to the element spcified by the given indices.
  */
 template <typename T, std::size_t Dimension, storageOrdering Ordering>
@@ -168,7 +168,7 @@ inline auto MultiIndexVector<T, Dimension, Ordering>::operator()(Is... is) -> re
   return arrayAccessor(is...);
 }
 
-/**
+/**
  * @brief Index operator. Returns a const reference to the element spcified by the given indices.
  */
 template <typename T, std::size_t Dimension, storageOrdering Ordering>
@@ -178,7 +178,7 @@ inline auto MultiIndexVector<T, Dimension, Ordering>::operator()(Is... is) const
   return arrayAccessor(is...);
 }
 
-/**
+/**
  * @brief Returns a raw pointer to the underlying array.
  */
 template <typename T, std::size_t Dimension, storageOrdering Ordering>
@@ -187,7 +187,7 @@ inline auto MultiIndexVector<T, Dimension, Ordering>::data() -> pointer
   return values.data();
 }
 
-/**
+/**
  * @brief Returns a const raw pointer to the underlying array.
  */
 template <typename T, std::size_t Dimension, storageOrdering Ordering>
@@ -204,7 +204,7 @@ constexpr void MultiIndexVector<T, Dimension, Ordering>::setDimensions(Tuple&& d
   (..., [this, &dimVals](std::size_t index, std::size_t val) { dimensions[index] = val;}(Is, std::get<Is>(dimVals)));
 }
 
-/**
+/**
  * @brief Resizes the array.
  * @param dims a parameter pack that determines the dimensions of the array.
  */

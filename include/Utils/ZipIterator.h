@@ -132,17 +132,17 @@ private:
 };
 
 
-/**
+/**
  * @brief Constructor. Creates a tuple that stores the provided iterators
- */
+ */
 template <typename... Iters>
 inline ZipIterator<Iters...>::ZipIterator(Iters... iters)
   : iterators{iters...}
 {}
 
-/**
+/**
  * @brief Copy assignment.
- */
+ */
 template <typename... Iters>
 inline auto ZipIterator<Iters...>::operator=(ZipIterator const& src) -> ZipIterator&
 {
@@ -151,9 +151,9 @@ inline auto ZipIterator<Iters...>::operator=(ZipIterator const& src) -> ZipItera
   return *this;
 }
 
-/**
+/**
  * @brief Move assignment.
- */
+ */
 template <typename... Iters>
 inline auto ZipIterator<Iters...>::operator=(ZipIterator&& src) -> ZipIterator&
 {
@@ -161,19 +161,19 @@ inline auto ZipIterator<Iters...>::operator=(ZipIterator&& src) -> ZipIterator&
   return *this;
 }
 
-/**
+/**
  * @brief Swap method. Exchanges the iterator tuple of the ZipIterator with the iterator
  *        tuple of a given ZipIterator.             
- */
+ */
 template <typename... Iters>
 inline void ZipIterator<Iters...>::swap(ZipIterator& other) noexcept
 {
   iterators.swap(other.iterators);
 }
 
-/**
+/**
  * @brief increment operator (prefix version).
- */
+ */
 template <typename... Iters>
 inline auto ZipIterator<Iters...>::operator++() -> ZipIterator&
 {
@@ -181,9 +181,9 @@ inline auto ZipIterator<Iters...>::operator++() -> ZipIterator&
   return *this;
 }
 
-/**
+/**
  * @brief increment operator (postfix version).
- */
+ */
 template <typename... Iters>
 inline auto ZipIterator<Iters...>::operator++(int) -> ZipIterator&
 {
@@ -192,9 +192,9 @@ inline auto ZipIterator<Iters...>::operator++(int) -> ZipIterator&
   return tmp;
 }
 
-/**
+/**
  * @brief Auxiliary method that increments all stored iterators.
- */
+ */
 template <typename... Iters>
 template <std::size_t... Is>
 inline void ZipIterator<Iters...>::increment(std::index_sequence<Is...>)
@@ -202,21 +202,21 @@ inline void ZipIterator<Iters...>::increment(std::index_sequence<Is...>)
   (..., ++std::get<Is>(iterators));
 }
 
-/**
+/**
  * @brief  returns the current value which is a tuple of lvalue-references
  *         to the values the stored iterators are pointing to.
  * @remark since the return type is a tuple, it can be decomposed via structered bindings.
- */
+ */
 template <typename... Iters>
 inline auto ZipIterator<Iters...>::operator*() -> value_type
 {
   return getValue(extentIndexSequence());
 }
 
-/**
+/**
  * @brief Auxiliary method that creates a tuple of lvalue-references
  *        to the values the stored iterators are pointing to.  
- */
+ */
 template <typename... Iters>
 template <std::size_t... Is>
 inline auto ZipIterator<Iters...>::getValue(std::index_sequence<Is...>) -> value_type
@@ -224,13 +224,13 @@ inline auto ZipIterator<Iters...>::getValue(std::index_sequence<Is...>) -> value
   return value_type((*std::get<Is>(iterators))...);
 }
 
-/**
+/**
  * @brief   Auxiliary method that checks the inequality of two given ZipIterators.
  * @remarks since we want to loop over ranges that may have different lengths,
  *          it is generally not possible to match both end iterators at the same
  *          time. Thus iterating has to be aborted when the first end iterator
  *          of either range is reached.
- */
+ */
 template <typename... Iters>
 template <std::size_t... Is1, std::size_t... Is2>
 inline auto ZipIterator<Iters...>::notEqual(ZipIterator const& other, 
@@ -240,18 +240,18 @@ inline auto ZipIterator<Iters...>::notEqual(ZipIterator const& other,
   return (... && (std::get<Is1>(iterators) != std::get<Is2>(other.iterators)));
 }
 
-/**
+/**
  * @brief Test for inequality
- */
+ */
 template <typename... Iters>
 bool operator!= (ZipIterator<Iters...> const& lhs, ZipIterator<Iters...> const& rhs)
 {
   return lhs.notEqual(rhs, std::index_sequence_for<Iters...>{}, std::index_sequence_for<Iters...>{});
 }
 
-/**
+/**
  * @brief Test for equality
- */
+ */
 template <typename... Iters>
 inline auto operator== (ZipIterator<Iters...> const& lhs, ZipIterator<Iters...> const& rhs) -> bool
 {
@@ -342,45 +342,45 @@ private:
 };
 
 
-/**
+/**
  * @brief Constructor. Creates a tuple holding references to the given containers.
- */
+ */
 template <typename... Ts>
 inline Zipper<Ts...>::Zipper(Ts&... conts)
   : m_conts{conts...}
 {}
 
-/**
+/**
  * @brief Begin method. returns a ZipIterator aggregating non-const begin iterators.
- */
+ */
 template <typename... Ts>
 inline auto Zipper<Ts...>::begin() -> iterator
 {
   return begin(std::index_sequence_for<Ts...>{});
 }
 
-/**
+/**
  * @brief  Begin method. returns a ZipIterator aggregating const begin iterators.
  * @see    https://en.cppreference.com/w/cpp/named_req/Container
- */
+ */
 template <typename... Ts>
 inline auto Zipper<Ts...>::begin() const -> const_iterator
 {
   return cbegin(std::index_sequence_for<Ts...>{});
 }
 
-/**
+/**
  * @brief Begin method. returns a ZipIterator aggregating const begin iterators.
- */
+ */
 template <typename... Ts>
 inline auto Zipper<Ts...>::cbegin() const -> const_iterator
 {
   return cbegin(std::index_sequence_for<Ts...>{});
 }
 
-/**
+/**
  * @brief Auxiliary method that creates a ZipIterator aggregating non-const begin iterators.
- */
+ */
 template <typename... Ts>
 template <std::size_t... Is>
 inline auto Zipper<Ts...>::begin(std::index_sequence<Is...>) -> iterator
@@ -388,9 +388,9 @@ inline auto Zipper<Ts...>::begin(std::index_sequence<Is...>) -> iterator
   return iterator(std::get<Is>(m_conts).begin()...);
 }
 
-/**
+/**
  * @brief Auxiliary method that creates a ZipIterator aggregating const begin iterators.
- */
+ */
 template <typename... Ts>
 template <std::size_t... Is>
 inline auto Zipper<Ts...>::cbegin(std::index_sequence<Is...>) const -> const_iterator
@@ -398,37 +398,37 @@ inline auto Zipper<Ts...>::cbegin(std::index_sequence<Is...>) const -> const_ite
   return const_iterator(std::get<Is>(m_conts).cbegin()...);
 }
 
-/**
+/**
  * @brief Returns a a ZipIterator aggregating non-const end iterators.
- */
+ */
 template <typename... Ts>
 inline auto Zipper<Ts...>::end() -> iterator
 {
   return end(std::index_sequence_for<Ts...>{});
 }
 
-/**
+/**
  * @brief Returns a a ZipIterator aggregating const end iterators.
  * @see   https://en.cppreference.com/w/cpp/named_req/Container
- */
+ */
 template <typename... Ts>
 inline auto Zipper<Ts...>::end() const -> const_iterator
 {
   return cend(std::index_sequence_for<Ts...>{});
 }
 
-/**
+/**
  * @brief Returns a a ZipIterator aggregating const end iterators.
- */
+ */
 template <typename... Ts>
 inline auto Zipper<Ts...>::cend() const -> const_iterator
 {
   return cend(std::index_sequence_for<Ts...>{});
 }
 
-/**
+/**
  * @brief Auxiliary end method that creates a ZipIterator aggregating non-const end iterators.
- */
+ */
 template <typename... Ts>
 template <std::size_t... Is>
 inline auto Zipper<Ts...>::end(std::index_sequence<Is...>) -> iterator
@@ -436,9 +436,9 @@ inline auto Zipper<Ts...>::end(std::index_sequence<Is...>) -> iterator
   return iterator(std::get<Is>(m_conts).end()...);
 }
 
-/**
+/**
  * @brief Auxiliary end method that creates a ZipIterator aggregating const end iterators.
- */
+ */
 template <typename... Ts>
 template <std::size_t... Is>
 inline auto Zipper<Ts...>::cend(std::index_sequence<Is...>) const -> const_iterator

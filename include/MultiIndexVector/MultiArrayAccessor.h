@@ -28,7 +28,7 @@ namespace multiindex {
  
 /** 
  * @class  MultiArrayAccessor 
- * @brief  MultiArrayAccessor multidimensional access to linear storage.
+ * @brief  MultiArrayAccessor provides multidimensional access to linear storage.
  * @tparam storageOrdering a value of type /link #storageOrdering /endlink that specifies the method of calculation.
  * @see    see https://en.wikipedia.org/wiki/Row-_and_column-major_order
  */
@@ -65,7 +65,7 @@ public:
 
   // ---------------------------------------------------
   // private types
-  using addresCalculator = AdressCalculator<Dimension, ordering>;
+  using addressCalculator = AdressCalculator<Dimension, ordering>;
 
   // ---------------------------------------------------
   // private data
@@ -78,14 +78,14 @@ template <typename T, std::size_t Dimension, storageOrdering Ordering>
 template<typename... Is, typename>
 inline auto MultiArrayAccessor<T, Dimension, Ordering>::operator()(Is... is) -> reference
 {
-  return data[addresCalculator::transform(dimensions, is...)];
+  return data[addressCalculator::transform(dimensions, is...)];
 }
 
 template <typename T, std::size_t Dimension, storageOrdering Ordering>
 template<typename... Is, typename>
 inline auto MultiArrayAccessor<T, Dimension, Ordering>::operator()(Is... is) const -> const_reference
 {
-  return data[addresCalculator::transform(dimensions, is...)];
+  return data[addressCalculator::transform(dimensions, is...)];
 }
 
 
@@ -129,7 +129,7 @@ struct MultiArrayAccessor<T[N], Dimension, Ordering> {
 
    // ---------------------------------------------------
    // private types
-   using addresCalculator = AdressCalculator<Dimension, ordering>;
+   using addressCalculator = AdressCalculator<Dimension, ordering>;
 
    // ---------------------------------------------------
    // private data
@@ -142,26 +142,26 @@ template <typename T, std::size_t N, std::size_t Dimension, storageOrdering Orde
 template <typename... Is, typename>
 constexpr auto MultiArrayAccessor<T[N], Dimension, Ordering>::operator()(Is... is) -> reference
 {
-  return data[addresCalculator::transform(dimensions, is...)];
+  return data[addressCalculator::transform(dimensions, is...)];
 }
 
 template <typename T, std::size_t N, std::size_t Dimension, storageOrdering Ordering>
 template <typename... Is, typename>
 constexpr auto MultiArrayAccessor<T[N], Dimension, Ordering>::operator()(Is... is) const -> const_reference
 {
-  return data[addresCalculator::transform(dimensions, is...)];
+  return data[addressCalculator::transform(dimensions, is...)];
 }
 
 template <typename T, std::size_t N, std::size_t Dimension, storageOrdering Ordering>
 constexpr auto MultiArrayAccessor<T[N], Dimension, Ordering>::operator[](size_type i) -> iterator_range
 {
-  return iterator_range{data + addresCalculator::subDivision(dimensions, i), data + addresCalculator::subDivision(dimensions, i+1ULL)};
+  return iterator_range{data + addressCalculator::subDivision(dimensions, i), data + addressCalculator::subDivision(dimensions, i+1ULL)};
 }
 
 template <typename T, std::size_t N, std::size_t Dimension, storageOrdering Ordering>
 constexpr auto MultiArrayAccessor<T[N], Dimension, Ordering>::operator[](size_type i) const -> const_iterator_range
 {
-  return const_iterator_range{data + addresCalculator::subDivision(dimensions, i), data + addresCalculator::subDivision(dimensions, i+1ULL)};
+  return const_iterator_range{data + addressCalculator::subDivision(dimensions, i), data + addressCalculator::subDivision(dimensions, i+1ULL)};
 }
 
 

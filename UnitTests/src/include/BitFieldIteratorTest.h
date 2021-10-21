@@ -104,6 +104,22 @@ TEST(BitFieldIterator, iteratorDifference)
   EXPECT_EQ(diff1, 9LL);
   EXPECT_EQ(diff2, -8LL);
 }
+
+TEST(BitFieldIterator, iteratorDifferenceWIthStd)
+{
+  constexpr std::array<std::uint8_t, 2ULL> data{ 0b11010101, 0b11000011 };
+  constexpr auto begin = bws::cbegin(data);
+  constexpr auto end = bws::cend(data);
+
+  EXPECT_EQ(std::distance(begin, end), 16LL);
+  EXPECT_EQ(std::distance(end, begin), -16LL);
+
+  constexpr auto diff1 = (begin + 13LL) - (begin + 4LL);
+  constexpr auto diff2 = (begin + 4LL) - (begin + 12LL);
+
+  EXPECT_EQ(diff1, 9LL);
+  EXPECT_EQ(diff2, -8LL);
+}
  
 TEST(BitFieldIterator, iterationOverArray)
 {

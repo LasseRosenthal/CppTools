@@ -17,9 +17,10 @@
  
  
 // includes
-#include <Bitwise/BitProxy.h>
+#include <Bitwise/BitFieldIterator.h>
 #include <Utils/miscellaneous.h>
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -50,9 +51,6 @@ class BitVectorT {
   static constexpr std::size_t byteSize   = sizeof(byte);
   static constexpr std::size_t regionSize = 8ULL * byteSize;
 
-  template <bool IsConst>
-  class BitIterator;
-
 public:
 
   // ---------------------------------------------------
@@ -61,21 +59,30 @@ public:
   using value_type      = bool;
   using reference       = BitProxy<byte, false>;
   using const_reference = BitProxy<byte, true>;
-  using iterator        = BitIterator<false>;
-  using const_iterator  = BitIterator<true>;
+  using iterator        = BitFieldIterator<byte, false>;
+  using const_iterator  = BitFieldIterator<byte, true>;
   
   // ---------------------------------------------------
   // ctor & dtor
-  BitVectorT () = default;
-  BitVectorT (size_type s);
-  BitVectorT (std::initializer_list<int> l);
+  BitVectorT     () = default;
+  BitVectorT     (size_type s, value_type val = value_type{});
+  BitVectorT     (std::initializer_list<int> l);
+  template <typename T, std::size_t N>
+  BitVectorT     (T const (&src)[N]);
+  BitVectorT     (BitVectorT const& src);
+  BitVectorT     (BitVectorT&& src) noexcept;
+  auto operator= (BitVectorT src) noexcept -> BitVectorT&;
 
   // ---------------------------------------------------
   // public api
   [[nodiscard]] auto size     () const noexcept -> size_type;
   [[nodiscard]] auto empty    () const noexcept -> bool;
   [[nodiscard]] auto capacity () const noexcept -> size_type;
+  void swap                   (BitVectorT&) noexcept;
   void reserve                (size_type c);
+  void shrink_to_fit          ();
+  void resize                 (size_type size, value_type val = value_type{});
+  void assign                 (size_type size, value_type val);
   auto operator[]             (size_type index) const -> const_reference;
   auto operator[]             (size_type index) -> reference;
   auto at                     (size_type index) const -> const_reference;
@@ -104,291 +111,11 @@ private:
   // ---------------------------------------------------
   // private methods
   auto numberOfRegions    () const noexcept -> size_type;
-  auto allocateMemory     () const -> dataPtr;
+  auto allocateMemory     (size_type numRegions) const -> dataPtr;
   void performBoundsCheck (size_type);
+  auto minCapacity        (size_type size) const -> size_type;
+  auto realloc            (size_type const c) -> bool;
 };
-
-
-/**
- * @class BitIterator
- * @brief
- */
-template <typename IntType>
-template <bool IsConst>
-class BitVectorT<IntType>::BitIterator {
-
-  // ---------------------------------------------------
-  // private constants and types
-  static constexpr bool        isConst    = IsConst;
-  static constexpr std::size_t byteSize   = sizeof(IntType);
-  static constexpr std::size_t regionSize = 8ULL * byteSize;
-
-  using rawPtr = IntType*;
-
-  // convenience alias for SFINAE
-  template <bool B>
-  using RequiresNonConst = std::enable_if_t<!B>;
-
-public:
-
-  // ---------------------------------------------------
-  // iterator properties
-  using value_type        = BitProxy<IntType, isConst>;
-  using size_type         = typename value_type::size_type;
-  using difference_type   = std::ptrdiff_t;
-  using pointer           = std::conditional_t<isConst, value_type const*, value_type*>;
-  using reference         = std::conditional_t<isConst, value_type const&, value_type&>;
-  using const_reference   = value_type const&;
-
-  // ---------------------------------------------------
-  // construction
-  BitIterator           () = delete;
-  constexpr BitIterator (rawPtr data, size_type index, size_type bitFieldSize);
-  BitIterator           (BitIterator const&) noexcept = default;
-  auto operator=        (BitIterator const&) noexcept -> BitIterator& = default;
-
-  // ---------------------------------------------------
-  // incrementing and decrementing methods
-  auto operator+= (difference_type n) noexcept -> BitIterator&;
-  auto operator-= (difference_type n) noexcept -> BitIterator&;
-  auto operator++ () noexcept -> BitIterator&;
-  auto operator++ (int) noexcept -> BitIterator;
-  auto operator-- () noexcept -> BitIterator&;
-  auto operator-- (int) noexcept -> BitIterator;
-
-  // ---------------------------------------------------
-  // api
-  template <typename = RequiresNonConst<isConst>>
-  constexpr auto operator* () const noexcept -> const_reference { return bitProxy; }
-  auto operator*           () -> reference { return bitProxy; }
-
-  // ---------------------------------------------------
-  // comparison
-  friend auto operator< (BitIterator const& it1, BitIterator const& it2) noexcept -> bool
-  {
-    return it1.bitIndex() < it2.bitIndex();
-  }
-  friend auto operator> (BitIterator const& it1, BitIterator const& it2) noexcept -> bool
-  {
-    return it2 < it1;
-  }
-  friend auto operator<= (BitIterator const& it1, BitIterator const& it2) noexcept -> bool
-  {
-    return !(it2 < it1);
-  }
-  friend auto operator>= (BitIterator const& it1, BitIterator const& it2) noexcept -> bool
-  {
-    return !(it1 < it2);
-  }
-  friend auto operator== (BitIterator const& it1, BitIterator const& it2) noexcept -> bool
-  {
-    return it1.bitIndex() == it2.bitIndex();
-  }
-  friend auto operator!= (BitIterator const& it1, BitIterator const& it2) noexcept -> bool
-  {
-    return !(it1 == it2);
-  }
-
-//private:
-
-  // ---------------------------------------------------
-  // private data
-  rawPtr     data;
-  size_type  regionIndex;
-  size_type  indexInRegion;
-  size_type  bitFieldSize;
-  value_type bitProxy;
-
-  // ---------------------------------------------------
-  // private methods
-  void advance                             (difference_type n) noexcept;
-  void advanceNoBoundsChecks               (difference_type n) noexcept;
-  [[nodiscard]] constexpr auto createProxy () const noexcept -> value_type;
-  [[nodiscard]] constexpr auto bitIndex    () const noexcept -> size_type;
-  [[nodiscard]] constexpr auto isAtEnd     () const noexcept -> bool;
-  void moveToEnd                           () noexcept;
-  void moveToBegin                         () noexcept;
-};
-
-
-template <typename IntType>
-template <bool IsConst>
-constexpr BitVectorT<IntType>::BitIterator<IsConst>::BitIterator(rawPtr data, size_type index, size_type bitFieldSize)
-  : data          {data}
-  , regionIndex   {index / regionSize}
-  , indexInRegion {index % regionSize}
-  , bitFieldSize  {bitFieldSize}
-  , bitProxy      {createProxy()}
-{}
-
-/**
- * @brief increments the iterator by n elements.
- */
-template <typename IntType>
-template <bool IsConst>
-auto BitVectorT<IntType>::BitIterator<IsConst>::operator+=(difference_type n) noexcept -> BitIterator&
-{
-  advance(n);
-  return *this;
-}
-
-/**
- * @brief decrements the iterator by n elements.
- */
-template <typename IntType>
-template <bool IsConst>
-auto BitVectorT<IntType>::BitIterator<IsConst>::operator-=(difference_type n) noexcept -> BitIterator&
-{
-  advance(-n);
-  return *this;
-}
-
-/**
- * @brief  increments the iterator by one element (postfix version).
- * @return a reference to the incremented iterator.
- */
-template <typename IntType>
-template <bool IsConst>
-auto BitVectorT<IntType>::BitIterator<IsConst>::operator++() noexcept -> BitIterator&
-{
-  return *this += 1LL;
-}
-
-/**
- * @brief  decrements the iterator by one element (präfix version).
- * @return a reference to the decremented iterator.
- */
-template <typename IntType>
-template <bool IsConst>
-auto BitVectorT<IntType>::BitIterator<IsConst>::operator++(int) noexcept -> BitIterator
-{
-  BitIterator tmp{*this};
-  ++(*this);
-  return tmp;
-}
-
-/**
- * @brief  decrements the iterator by one element (postfix version).
- * @return a reference to the decremented iterator.
- */
-template <typename IntType>
-template <bool IsConst>
-auto BitVectorT<IntType>::BitIterator<IsConst>::operator--() noexcept -> BitIterator&
-{
-  return *this -= 1LL;
-}
-
-/**
- * @brief  decrements the iterator by one element (präfix version).
- * @return a copy of the iterator before it was decremented.
- */
-template <typename IntType>
-template <bool IsConst>
-auto BitVectorT<IntType>::BitIterator<IsConst>::operator--(int) noexcept -> BitIterator
-{
-  BitIterator tmp{*this};
-  --(*this);
-  return tmp;
-}
-
-/**
- * @brief Advances the iterator by n bits.
- */
-template <typename IntType>
-template <bool IsConst>
-void BitVectorT<IntType>::BitIterator<IsConst>::advance(difference_type n) noexcept
-{
-  if(n >= 0LL)
-  {
-    if(bitIndex() + n >= bitFieldSize)
-    {
-      moveToEnd();
-      return;
-    }
-  }
-  else if(static_cast<size_type>(-n) >= bitIndex())
-  {
-    moveToBegin();
-    return;
-  }
-
-  advanceNoBoundsChecks(n);
-}
-
-/**
- * @brief  Advances the iterator by n bits.
- * @remark This method does not perform any bounds checking.
- */
-template <typename IntType>
-template <bool IsConst>
-void BitVectorT<IntType>::BitIterator<IsConst>::advanceNoBoundsChecks(difference_type n) noexcept
-{
-  const size_type newBitIndex = bitIndex() + n;
-  indexInRegion = newBitIndex % regionSize;
-  if(const auto newRegionIndex = newBitIndex / regionSize; newRegionIndex != regionIndex)
-  {
-    regionIndex = newRegionIndex;
-    bitProxy    = createProxy();
-  }
-  else
-  {
-    bitProxy.advance(n);
-  }
-}
-
-/**
- * @brief creates a /link #BitProxy /endlink object for the current position of the iterator.
- */
-template <typename IntType>
-template <bool IsConst>
-constexpr [[nodiscard]] auto BitVectorT<IntType>::BitIterator<IsConst>::createProxy() const noexcept -> value_type
-{
-  return value_type{data + regionIndex, indexInRegion};
-}
-
-/**
- * @brief calculates the index of the bit the iterator is pointing to.
- */
-template <typename IntType>
-template <bool IsConst>
-constexpr [[nodiscard]] auto BitVectorT<IntType>::BitIterator<IsConst>::bitIndex() const noexcept -> size_type
-{
-  return regionSize * regionIndex + indexInRegion;
-}
-
-/**
- * @brief Checks if the iterator is pointing behind the last bit.
- */
-template <typename IntType>
-template <bool IsConst>
-constexpr [[nodiscard]] auto BitVectorT<IntType>::BitIterator<IsConst>::isAtEnd() const noexcept -> bool
-{
-  return bitIndex() >= bitFieldSize;
-}
-
-/**
- * @brief Sets the iterator to one past the last bit.
- */
-template <typename IntType>
-template <bool IsConst>
-inline void BitVectorT<IntType>::BitIterator<IsConst>::moveToEnd() noexcept
-{
-  regionIndex   = bitFieldSize / regionSize;
-  indexInRegion = bitFieldSize % regionSize;
-}
-
-/**
- * @brief Sets the iterator to the first bit.
- */
-template <typename IntType>
-template <bool IsConst>
-inline void BitVectorT<IntType>::BitIterator<IsConst>::moveToBegin() noexcept
-{
-  regionIndex   = 0ULL;
-  indexInRegion = 0ULL;
-  bitProxy      = createProxy();
-}
-
 
 
 /**
@@ -396,11 +123,13 @@ inline void BitVectorT<IntType>::BitIterator<IsConst>::moveToBegin() noexcept
  *        And allocates memory.
  */
 template <typename IntType>
-inline BitVectorT<IntType>::BitVectorT(size_type s)
+inline BitVectorT<IntType>::BitVectorT(size_type s, value_type val)
   : currentSize     {s}
-  , currentCapacity {cpptools::alignUp(currentSize, regionSize)}
-  , data            {allocateMemory()}
-{}
+  , currentCapacity {minCapacity(currentSize)}
+  , data            {allocateMemory(currentCapacity / regionSize)}
+{
+  assign(s, val);
+}
 
 /**
  * @brief Constructor. Sets the initial size of the vector, calculates its capacity
@@ -408,13 +137,58 @@ inline BitVectorT<IntType>::BitVectorT(size_type s)
  */
 template <typename IntType>
 inline BitVectorT<IntType>::BitVectorT(std::initializer_list<int> l)
-  : BitVectorT ()
+  : BitVectorT()
 {
   reserve(l.size());
   for(const auto b : l)
   {
     push_back(b);
   }
+}
+
+/**
+ * @brief Constructor. Sets the initial size of the vector, calculates its capacity,
+ *        allocates memory and copies the content of the given array
+ */
+template <typename IntType>
+template <typename T, std::size_t N>
+inline BitVectorT<IntType>::BitVectorT(T const (&src)[N])
+  : BitVectorT(N * sizeof(T) * 8ULL)
+{
+  std::memcpy(data.get(), src, N * sizeof(T));
+}
+
+/**
+ * @brief copy constructor.
+ */
+template <typename IntType>
+inline BitVectorT<IntType>::BitVectorT(BitVectorT const& src)
+  : BitVectorT(src.size())
+{
+  std::memcpy(data.get(), src.data.get(), currentCapacity / 8ULL);
+}
+
+/**
+ * @brief move constructor.
+ */
+template <typename IntType>
+inline BitVectorT<IntType>::BitVectorT(BitVectorT&& src) noexcept
+  : currentSize     {std::move(src.currentSize)}
+  , currentCapacity {std::move(src.currentCapacity)}
+  , data            {std::move(src.data)}
+{
+  src.currentSize     = 0ULL;
+  src.currentCapacity = 0ULL;
+}
+
+/**
+ * @brief assignment operator.
+ */
+template <typename IntType>
+inline auto BitVectorT<IntType>::operator=(BitVectorT src) noexcept -> BitVectorT&
+{
+  this->swap(src);
+  return *this;
 }
 
 /**
@@ -445,29 +219,149 @@ inline [[nodiscard]] auto BitVectorT<IntType>::capacity() const noexcept -> size
 }
 
 /**
+ * @brief Swaps the content of the bit vector with the content of src.
+ */
+template <typename IntType>
+void BitVectorT<IntType>::swap(BitVectorT& src) noexcept
+{
+  using std::swap;
+  swap(currentSize, src.currentSize);
+  swap(currentCapacity, src.currentCapacity);
+  data.swap(src.data);
+}
+
+/**
  * @brief  Increase the capacity of the vector to a value that's greater or equal to newCapacity.
  *         If newCapacity is greater than the current capacity(), new storage is allocated, otherwise the method does nothing.
  * @remark If newCapacity is greater than capacity(), all iterators, including the past-the-end iterator,
  *         and all references to the elements are invalidated. Otherwise, no iterators or references are invalidated. 
  */
 template <typename IntType>
-void BitVectorT<IntType>::reserve(size_type newCapacity)
+inline void BitVectorT<IntType>::reserve(size_type newCapacity)
 {
   if(newCapacity > currentCapacity)
   {
-    newCapacity = cpptools::alignUp(newCapacity, regionSize);
-    auto* newStorage = new(std::nothrow) IntType[newCapacity / regionSize];
+    realloc(cpptools::alignUp(newCapacity, regionSize));
+  }
+}
 
-    if(newStorage != nullptr)
+/**
+ * @brief  Requests the removal of unused capacity.
+ * @remark If reallocation occurs, all iterators, including the past the end iterator,
+ *         and all references to the elements are invalidated. If no reallocation takes place,
+ *         no iterators or references are invalidated. 
+ */
+template <typename IntType>
+inline void BitVectorT<IntType>::shrink_to_fit()
+{
+  if(const auto newCapacity = minCapacity(currentSize); newCapacity < currentCapacity)
+  {
+    realloc(newCapacity);
+  }
+}
+
+/**
+ * @brief  Resizes the container to contain size elements.
+ * @remark If the current size is greater than size, the container is reduced to its first size elements.
+ *         If the current size is less than size, additional copies of val are appended.
+ */
+template <typename IntType>
+void BitVectorT<IntType>::resize(size_type size, value_type val)
+{
+  if(size < currentSize)
+  {
+    currentSize = size;
+    shrink_to_fit();
+  }
+  else if(size > currentSize)
+  {
+    if(const auto requiredCapacity = minCapacity(size); requiredCapacity > currentCapacity)
     {
-      if(data)
+      realloc(requiredCapacity);
+    }
+
+    const auto currentMinCapacity = minCapacity(currentSize);
+    if(size >= currentMinCapacity)
+    {
+      auto numNewElements = size - currentSize;
+
+      while(currentSize < currentMinCapacity)
       {
-        std::memcpy(newStorage, data.get(), currentCapacity / 8ULL);
+        (*this)[currentSize] = val;
+        ++currentSize;
+        --numNewElements;
       }
-      data.reset(newStorage);
-      currentCapacity = newCapacity;
+
+      if(const auto numCompleteRegions = numNewElements / regionSize; numCompleteRegions > 0)
+      {
+        std::memset(data.get() + (currentSize / regionSize), val ? static_cast<int>(~0) : 0, numCompleteRegions * byteSize);
+        currentSize += numCompleteRegions * regionSize;
+      }
+
+      if(const auto numRemainingElements = numNewElements % regionSize; numRemainingElements > 0ULL)
+      {
+        data[currentSize / regionSize] = val ? punchMask<byte>(numRemainingElements) : byte{};
+      }
+
+      currentSize = size;
+    }
+    else
+    {
+      for(const auto s = currentSize; size > s; --size)
+      {
+        push_back(val);
+      }
     }
   }
+}
+
+/**
+ * @brief Replaces the content with size copies of val.
+ */
+template <typename IntType>
+void BitVectorT<IntType>::assign(size_type size, value_type val)
+{
+  if(size < regionSize)
+  {
+    data[0ULL] = punchMask<byte>(size);
+  }
+  else
+  {
+    if(const auto requiredCapacity = minCapacity(size); requiredCapacity > currentCapacity)
+    {
+      data            = allocateMemory(requiredCapacity / regionSize);
+      currentCapacity = requiredCapacity;
+    }
+
+    const auto numCompleteRegions = size / regionSize;
+    std::memset(data.get(), val ? static_cast<int>(~0) : 0, numCompleteRegions * byteSize);
+    data[numCompleteRegions] = val ? punchMask<byte>(size % regionSize) : byte{};
+  }
+
+  currentSize = size;
+}
+
+/**
+ * @brief  Reallocates the memory area holding the bits.
+ * @remark the new capacity has to be aligned to the regionSize.
+ */
+template <typename IntType>
+auto BitVectorT<IntType>::realloc(size_type const newCapacity) -> bool
+{
+  auto* const newStorage = new(std::nothrow) IntType[newCapacity / regionSize];
+  if(newStorage != nullptr)
+  {
+    if(data)
+    {
+      std::memcpy(newStorage, data.get(), newCapacity / 8ULL);
+    }
+    data.reset(newStorage);
+    currentCapacity = newCapacity;
+
+    return true;
+  }
+
+  return false;
 }
 
 /**
@@ -533,6 +427,15 @@ void BitVectorT<IntType>::performBoundsCheck(size_type index)
     errMsg << "Error : index [which is " << index << "] >= size [which is " << currentSize << "]";
     throw std::out_of_range(errMsg.str());
   }
+}
+
+/**
+ * @brief Computes the minimum capacity that is required to hold the stored bits.
+ */
+template <typename IntType>
+auto BitVectorT<IntType>::minCapacity(size_type size) const -> size_type
+{
+  return cpptools::alignUp(size, regionSize);
 }
 
 /**
@@ -678,9 +581,38 @@ auto BitVectorT<IntType>::numberOfRegions() const noexcept -> size_type
  *        referring to the newly allocated memory chunk.
  */
 template <typename IntType>
-auto BitVectorT<IntType>::allocateMemory() const -> dataPtr
+auto BitVectorT<IntType>::allocateMemory(size_type numRegions) const -> dataPtr
 {
-  return std::make_unique<byte[]>(numberOfRegions());
+  return std::make_unique<byte[]>(numRegions);
+}
+
+/**
+ * @brief Checks if the content of lhs and rhs are equal, that is they have the same size
+ *        and all bits are equal.
+ */
+template <typename IntType1, typename IntType2>
+auto operator==(BitVectorT<IntType1> const& lhs, BitVectorT<IntType2> const& rhs)
+{
+  if(const auto s = lhs.size(); s == rhs.size())
+  {
+    for(std::size_t i = 0ULL; i < s; ++i)
+    {
+      if(lhs[i] != rhs[i])
+      {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  return false;
+}
+
+template <typename IntType1, typename IntType2>
+auto operator!=(BitVectorT<IntType1> const& lhs, BitVectorT<IntType2> const& rhs)
+{
+  return !(lhs == rhs);
 }
 
 

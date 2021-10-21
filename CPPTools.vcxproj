@@ -178,15 +178,29 @@
     <ClInclude Include="include\Benchmark\StopWatch.h" />
     <ClInclude Include="include\Benchmark\Utility.h" />
     <ClInclude Include="include\Benchmark\WinHighResClock.h" />
+    <ClInclude Include="include\Bitwise\BitArray.h" />
     <ClInclude Include="include\Bitwise\BitField.h" />
     <ClInclude Include="include\Bitwise\BitFieldIterator.h" />
     <ClInclude Include="include\Bitwise\BitProxy.h" />
     <ClInclude Include="include\Bitwise\BitVector.h" />
     <ClInclude Include="include\Bitwise\Bitwise.h" />
     <ClInclude Include="include\Bitwise\details\MultiIndexBitArrayAccessor.h" />
+    <ClInclude Include="include\ConcurrencyTools\ConcurrencyToolsConfig.h" />
+    <ClInclude Include="include\ConcurrencyTools\detail\FunctionTraits.h" />
+    <ClInclude Include="include\ConcurrencyTools\FunctionWrapper.h" />
+    <ClInclude Include="include\ConcurrencyTools\HashMap.h" />
+    <ClInclude Include="include\ConcurrencyTools\List.h" />
+    <ClInclude Include="include\ConcurrencyTools\OneShotEvent.h" />
+    <ClInclude Include="include\ConcurrencyTools\RAIIThread.h" />
+    <ClInclude Include="include\ConcurrencyTools\ThreadingModel.h" />
+    <ClInclude Include="include\ConcurrencyTools\ThreadPool.h" />
+    <ClInclude Include="include\ConcurrencyTools\ThreadsafeQueue.h" />
+    <ClInclude Include="include\ConcurrencyTools\TMPUtils.h" />
+    <ClInclude Include="include\ConcurrencyTools\Watchdog.h" />
     <ClInclude Include="include\Meta\Algorithms.h" />
     <ClInclude Include="include\Meta\CompileTimeArithmetic.h" />
     <ClInclude Include="include\Meta\RatioUtils.h" />
+    <ClInclude Include="include\Meta\StringJoiner.h" />
     <ClInclude Include="include\Meta\Traits.h" />
     <ClInclude Include="include\Meta\TupleUtils.h" />
     <ClInclude Include="include\Meta\Typelist.h" />
@@ -203,6 +217,7 @@
     <ClInclude Include="include\MultiIndexVector\StorageOrdering.h" />
     <ClInclude Include="include\MultiIndexVector\VectorMatrixAlgebra.h" />
     <ClInclude Include="include\Numerics\linalg.h" />
+    <ClInclude Include="include\OSUtility\FileWatcher.h" />
     <ClInclude Include="include\TransformationMatrix\CTM.h" />
     <ClInclude Include="include\Unit\BaseDimensions.h" />
     <ClInclude Include="include\Unit\BaseDimensionTag.h" />
@@ -210,6 +225,7 @@
     <ClInclude Include="include\Unit\detail\UnitSystemConversion.h" />
     <ClInclude Include="include\Unit\Dimension.h" />
     <ClInclude Include="include\Unit\Unit.h" />
+    <ClInclude Include="include\Unit\Units.h" />
     <ClInclude Include="include\Unit\UnitSystem.h" />
     <ClInclude Include="include\Unit\UnitSystemGenerator.h" />
     <ClInclude Include="include\Utils\CountedObject.h" />
@@ -235,6 +251,7 @@
   <ItemGroup>
     <ClCompile Include="src\CPUTimer.cpp" />
     <ClCompile Include="src\FilesystemUtils.cpp" />
+    <ClCompile Include="src\FileWatcher.cpp" />
     <ClCompile Include="src\StringAlgorithms.cpp" />
     <ClCompile Include="src\WinHighResClock.cpp" />
     <ClCompile Include="src\XercesString.cpp" />

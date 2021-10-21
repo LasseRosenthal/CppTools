@@ -1,6 +1,10 @@
 
 #include "pch.h"
 
+
+#include "StringJoinerTest.h"
+#if 1
+
 // Utils
 #include "UtilityTest.h"
 #include "CountedObjectTest.h"
@@ -13,6 +17,7 @@
 #include "IntegerRangeTest.h"
 //#include "OSUtilityTest.h"
 #include "FrameworkTest.h"
+#include "SingletonBaseTest.h"
 
 // Bitwise
 #include "BitwiseTest.h"
@@ -53,6 +58,17 @@
 #include "AlgorithmsTest.h"
 #include "UnitTest.h"
 
+// OSUtility
+#include "FileWatcherTest.h"
+
+// ConcurrencyTools
+#include "ThreadsafeQueueTest.h"
+#include "ThreadsafePriorityQueueTest.h"
+#include "HashMapTest.h"
+#include "ThreadPoolTest.h"
+#include "OneShotEventTest.h"
+#include "ListTest.h"
+#endif
 // XercesUtils
 //#include "XercesUtilsTest.h"
 //#include "linalgTest.h"

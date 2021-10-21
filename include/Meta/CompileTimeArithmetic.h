@@ -54,7 +54,7 @@ auto constexpr Power(T const x) noexcept -> std::enable_if_t<(N == 0), T>
 
 /** 
  * @struct  NthRoot
- * @brief   NthRoot is a compile implmentation to compute the nth root
+ * @brief   NthRoot is a compile implementation to compute the nth root
  *          of a given number.
  * @remarks the computation is based on the Newton method.
  * @see     https://en.wikipedia.org/wiki/Newton%27s_method

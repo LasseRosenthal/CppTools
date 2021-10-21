@@ -64,29 +64,41 @@
     <ClInclude Include="src\include\EnumBitmaskTest.h" />
     <ClInclude Include="src\include\EnumRangeTest.h" />
     <ClInclude Include="src\include\FilesystemUtilsTest.h" />
+    <ClInclude Include="src\include\FileWatcherTest.h" />
     <ClInclude Include="src\include\FloatingPointTest.h" />
     <ClInclude Include="src\include\FrameworkTest.h" />
+    <ClInclude Include="src\include\HashMapTest.h" />
     <ClInclude Include="src\include\IntegerRangeTest.h" />
     <ClInclude Include="src\include\linalgTest.h" />
+    <ClInclude Include="src\include\MultiIndexBitArrayAccessorTest.h" />
     <ClInclude Include="src\include\MultiTypeMapTest.h" />
+    <ClInclude Include="src\include\OneShotEventTest.h" />
+    <ClInclude Include="src\include\Person.h" />
     <ClInclude Include="src\include\RatioUtilsTest.h" />
+    <ClInclude Include="src\include\SingletonBaseTest.h" />
     <ClInclude Include="src\include\StackMatrixTest.h" />
     <ClInclude Include="src\include\StackVectorTest.h" />
     <ClInclude Include="src\include\StringAlgorithmsTest.h" />
+    <ClInclude Include="src\include\StringJoinerTest.h" />
     <ClInclude Include="src\include\StringUtilsTest.h" />
     <ClInclude Include="src\include\TestAdressCalculator.h" />
     <ClInclude Include="src\include\TestCTM.h" />
+    <ClInclude Include="src\include\TestFrameworks.h" />
     <ClInclude Include="src\include\TestMiscellaneous.h" />
     <ClInclude Include="src\include\TestMultiArrayAccessor.h" />
     <ClInclude Include="src\include\TestMultiIndexArray.h" />
     <ClInclude Include="src\include\TestMultiIndexVector.h" />
     <ClInclude Include="src\include\TestVectorMatrixAlgebra.h" />
+    <ClInclude Include="src\include\ThreadPoolTest.h" />
+    <ClInclude Include="src\include\ThreadsafePriorityQueueTest.h" />
+    <ClInclude Include="src\include\ThreadsafeQueueTest.h" />
     <ClInclude Include="src\include\TupleUtilsTest.h" />
     <ClInclude Include="src\include\TypelistTest.h" />
     <ClInclude Include="src\include\UnitSystemTest.h" />
     <ClInclude Include="src\include\UnitTest.h" />
     <ClInclude Include="src\include\UtilityTest.h" />
     <ClInclude Include="src\include\ValuelistTest.h" />
+    <ClInclude Include="src\include\WatchdogTest.h" />
     <ClInclude Include="src\include\XercesUtilsTest.h" />
     <ClInclude Include="src\include\ZipIteratorTest.h" />
   </ItemGroup>
@@ -125,6 +137,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -145,6 +158,7 @@ xcopy "D:\Programs\icu\icu4c\bin64\icuuc66d.dll" "$(TargetDir)" /y</Command>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -164,6 +178,7 @@ xcopy "D:\Programs\icu\icu4c\bin64\icuuc66d.dll" "$(TargetDir)" /y</Command>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -186,6 +201,7 @@ xcopy "D:\Programs\icu\icu4c\bin64\icudt66.dll" "$(TargetDir)" /y</Command>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

@@ -22,10 +22,12 @@
 
 #include <functional>
 #include <iomanip>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 
@@ -299,23 +301,25 @@ inline auto cstrLength(CharT const* const c) -> std::size_t
 
 /**
  * @brief     converts the given string s to multibyte c-string
- * @param[in] const std::(w)string& s
- * @returns   char* pointer containing the characters of s
+ * @param[in] const std::(w)string_view& s
+ * @returns   char* pointer containing the characters of s including a terminating null character.
+ * @remark    The client is responsible for deleting the returnded memory pointed by invoking delete[].
  */
 auto toMBstring(std::string_view s) -> char*;
 auto toMBstring(std::wstring_view s) -> char*;
 
 /**
- * @brief     converts the given string s to wide character c-string dest
- * @param[in] const std::(w)string& s
- * @returns   a wide character c-string containing the characters of s
+ * @brief     converts the given string_view s to wide character c-string dest
+ * @param[in] std::(w)string_view s
+ * @returns   a wide character c-string containing the characters of s including a terminating null character.
+ * @remark    The client is responsible for deleting the returnded memory pointed by invoking delete[].
  */
 wchar_t* toWCstring(std::string_view s);
 wchar_t* toWCstring(std::wstring_view s);
 
 /**
  * converts the given std::wstring s to a std::string
- * @param   std::wstring const& s
+ * @param   std::wstring_view s
  * @returns a std::string containing the characters of s
  */
 inline auto wstringToString(std::wstring_view s) -> std::string
@@ -326,7 +330,7 @@ inline auto wstringToString(std::wstring_view s) -> std::string
 
 /**
  * @brief   converts the given std::string s to std::wstring dest
- * @param   std::string const& s
+ * @param   std::string_view s
  * @returns a std::wstring containing the characters of s
  */
 inline auto stringToWstring(std::string_view s) -> std::wstring
@@ -336,67 +340,122 @@ inline auto stringToWstring(std::string_view s) -> std::wstring
 }
 
 /**
- * @brief   checks if if a given string s1 begins with another string s2
+ * @brief   checks if if a given string_view s1 begins with the contents 
+            of another string_view s2.
  * @returns true, if s1 begins with s2. False otherwise.
  */
-template <typename StrT>
-auto beginsWith(StrT const& s1, StrT const& s2) -> bool
-{
-  const auto length1 = s1.length();
-  const auto length2 = s2.length();
-  if(length2 > length1)
-  {
-    return false;
-  }
-  return s1.compare(0ULL, length2, s2) == 0;
-}
+auto beginsWith(std::string_view s1, std::string_view s2) -> bool;
+auto beginsWith(std::wstring_view s1, std::wstring_view s2) -> bool;
 
 /**
- * @brief   checks if if a given string s1 ends with another string s2
- * @returns true, if s1 ends with s2. False otherwise.
+ * @brief   checks if if a given string_view s1 ends with the contents 
+            of another string_view s2.
+ * @returns true, if s1 begins with s2. False otherwise.
  */
-template <typename StrT>
-auto endsWith(StrT const& s1, StrT const& s2) -> bool
-{
-  const auto length1 = s1.length();
-  const auto length2 = s2.length();
-  if(length2 > length1)
-  {
-    return false;
-  }
-  return s1.compare(length1 - length2, length2, s2) == 0;
-}
+auto endsWith(std::string_view s1, std::string_view s2) -> bool;
+auto endsWith(std::wstring_view s1, std::wstring_view s2) -> bool;
 
 /**
- * @brief returns the substring between two delimiters
+ * @brief returns a std::string_view offering a view to the substring between two delimiters
+ *        obeying a given predicate.
  */
-template <class StrT, typename Predicate>
-auto substringBetweenDelimiters(StrT const& s, Predicate&& pred) -> StrT
+template <typename Predicate>
+auto enclosedStringView(std::string_view s, Predicate&& pred) -> std::string_view
 {
-  const auto end = s.end();
-
-  const auto leftDelimiter = std::find_if(s.begin(), end, std::forward<Predicate>(pred));
-  const auto pos2 = std::find_if_not(leftDelimiter, end, std::forward<Predicate>(pred));
-  if(pos2 == end)
+  const auto end       = s.end();
+  const auto leftDelim = std::find_if(s.begin(), end, std::forward<Predicate>(pred));
+  const auto firstChar = std::find_if_not(leftDelim, end, std::forward<Predicate>(pred));
+  if(firstChar == end)
   {
     return {};
   }
 
-  const auto rightDelimiter = std::find_if(pos2, end, std::forward<Predicate>(pred));
-  if(rightDelimiter == end)
+  const auto rightDelim = std::find_if(firstChar, end, std::forward<Predicate>(pred));
+  if(rightDelim == end)
   {
     return {};
   }
 
-  return StrT{pos2, rightDelimiter};
+  return std::string_view(std::addressof(*firstChar), std::distance(firstChar, rightDelim));
 }
 
+/**
+ * @brief returns a std::wstring_view offering a view to the substring between two delimiters
+ *        obeying a given predicate.
+ */
+template <typename Predicate>
+auto enclosedStringView(std::wstring_view s, Predicate&& pred) -> std::wstring_view
+{
+  const auto end       = s.end();
+  const auto leftDelim = std::find_if(s.begin(), end, std::forward<Predicate>(pred));
+  const auto firstChar = std::find_if_not(leftDelim, end, std::forward<Predicate>(pred));
+  if(firstChar == end)
+  {
+    return {};
+  }
+
+  const auto rightDelim = std::find_if(firstChar, end, std::forward<Predicate>(pred));
+  if(rightDelim == end)
+  {
+    return {};
+  }
+
+  return std::wstring_view(std::addressof(*firstChar), std::distance(firstChar, rightDelim));
+}
+
+/**
+ * @brief returns a std::string storing a copy of the substring between two delimiters
+ *        obeying a given predicate.
+ */
+template <typename Predicate>
+auto enclosedString(std::string_view const& s, Predicate&& pred) -> std::string
+{
+  const auto end       = s.end();
+  const auto leftDelim = std::find_if(s.begin(), end, std::forward<Predicate>(pred));
+  const auto firstChar = std::find_if_not(leftDelim, end, std::forward<Predicate>(pred));
+  if(firstChar == end)
+  {
+    return {};
+  }
+
+  const auto rightDelim = std::find_if(firstChar, end, std::forward<Predicate>(pred));
+  if(rightDelim == end)
+  {
+    return {};
+  }
+
+  return std::string{firstChar, rightDelim};
+}
+
+/**
+ * @brief returns a std::wstring storing a copy of the substring between two delimiters
+ *        obeying a given predicate.
+ */
+template <typename Predicate>
+auto enclosedString(std::wstring_view const& s, Predicate&& pred) -> std::wstring
+{
+  const auto end       = s.end();
+  const auto leftDelim = std::find_if(s.begin(), end, std::forward<Predicate>(pred));
+  const auto firstChar = std::find_if_not(leftDelim, end, std::forward<Predicate>(pred));
+  if(firstChar == end)
+  {
+    return {};
+  }
+
+  const auto rightDelim = std::find_if(firstChar, end, std::forward<Predicate>(pred));
+  if(rightDelim == end)
+  {
+    return {};
+  }
+
+  return std::wstring{firstChar, rightDelim};
+}
 
 /** 
- * @brief splits a given string into tokens that are delimited by characters that fullfill a given predicate.
+ * @brief splits a given string_view into std::sting tokens that are delimited by characters that fullfill a given predicate.
  */
-template <typename StrT, typename Predicate>
-auto split(StrT const& s, Predicate&& pred) -> std::vector<StrT>
+template <typename Predicate>
+auto split(std::string_view s, Predicate&& pred) -> std::vector<std::string>
 {
   if(s.empty())
   {
@@ -404,7 +463,7 @@ auto split(StrT const& s, Predicate&& pred) -> std::vector<StrT>
   }
 
   const auto numDelim = std::count_if(s.begin(), s.end(), std::forward<Predicate>(pred));
-  std::vector<StrT> tokens;
+  std::vector<std::string> tokens;
   tokens.reserve(numDelim + 1);
 
   const auto end = s.end();
@@ -420,6 +479,99 @@ auto split(StrT const& s, Predicate&& pred) -> std::vector<StrT>
   if(pos1 != end)
   {
     tokens.emplace_back(pos1, pos2);
+  }
+
+  return tokens;
+}
+
+template <typename Predicate>
+auto splitView(std::string_view s, Predicate&& pred) -> std::vector<std::string_view>
+{
+  if(s.empty())
+  {
+    return {};
+  }
+
+  const auto numDelim = std::count_if(s.begin(), s.end(), std::forward<Predicate>(pred));
+  std::vector<std::string_view> tokens;
+  tokens.reserve(numDelim + 1);
+
+  const auto end = s.end();
+  auto pos1 = std::find_if_not(s.begin(), end, std::forward<Predicate>(pred));
+  auto pos2 = std::find_if(pos1, end, std::forward<Predicate>(pred));
+  while(pos2 != end)
+  {
+    tokens.emplace_back(std::addressof(*pos1), std::distance(pos1, pos2));
+    pos1 = std::find_if_not(pos2, end, std::forward<Predicate>(pred));
+    pos2 = std::find_if(pos1, end, std::forward<Predicate>(pred));
+  }
+
+  if(pos1 != end)
+  {
+    tokens.emplace_back(std::addressof(*pos1), std::distance(pos1, pos2));
+  }
+
+  return tokens;
+}
+
+/** 
+ * @brief splits a given wstring_view into tokens that are delimited by characters that fullfill a given predicate.
+ */
+template <typename Predicate>
+auto split(std::wstring_view s, Predicate&& pred) -> std::vector<std::wstring>
+{
+  if(s.empty())
+  {
+    return {};
+  }
+
+  const auto numDelim = std::count_if(s.begin(), s.end(), std::forward<Predicate>(pred));
+  std::vector<std::wstring> tokens;
+  tokens.reserve(numDelim + 1);
+
+  const auto end = s.end();
+  auto pos1 = std::find_if_not(s.begin(), end, std::forward<Predicate>(pred));
+  auto pos2 = std::find_if(pos1, end, std::forward<Predicate>(pred));
+  while(pos2 != end)
+  {
+    tokens.emplace_back(pos1, pos2);
+    pos1 = std::find_if_not(pos2, end, std::forward<Predicate>(pred));
+    pos2 = std::find_if(pos1, end, std::forward<Predicate>(pred));
+  }
+
+  if(pos1 != end)
+  {
+    tokens.emplace_back(pos1, pos2);
+  }
+
+  return tokens;
+}
+
+template <typename Predicate>
+auto splitView(std::wstring_view s, Predicate&& pred) -> std::vector<std::wstring_view>
+{
+  if(s.empty())
+  {
+    return {};
+  }
+
+  const auto numDelim = std::count_if(s.begin(), s.end(), std::forward<Predicate>(pred));
+  std::vector<std::wstring_view> tokens;
+  tokens.reserve(numDelim + 1);
+
+  const auto end = s.end();
+  auto pos1 = std::find_if_not(s.begin(), end, std::forward<Predicate>(pred));
+  auto pos2 = std::find_if(pos1, end, std::forward<Predicate>(pred));
+  while(pos2 != end)
+  {
+    tokens.emplace_back(std::addressof(*pos1), std::distance(pos1, pos2));
+    pos1 = std::find_if_not(pos2, end, std::forward<Predicate>(pred));
+    pos2 = std::find_if(pos1, end, std::forward<Predicate>(pred));
+  }
+
+  if(pos1 != end)
+  {
+    tokens.emplace_back(std::addressof(*pos1), std::distance(pos1, pos2));
   }
 
   return tokens;

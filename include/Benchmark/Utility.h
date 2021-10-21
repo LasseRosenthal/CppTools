@@ -84,7 +84,6 @@ auto convertToTimeString(std::tm const& time) -> std::basic_string<CharT>
   return timeStrm.str();
 }
 
-#if 0
 /** 
  * @brief
  */
@@ -111,6 +110,7 @@ auto sliceDuration(SrcDuration& srcDur) -> std::enable_if_t<std::is_integral_v<t
 /** 
  * @brief 
  */
+#if 0
 template <typename... SliceDurations, typename SrcDuration>
 void decomposeDuration(SrcDuration& d, SliceDurations& ... sliceDurations)
 {
@@ -144,9 +144,10 @@ struct decomposeDurationImpl<maxIndex, maxIndex, SrcDuration, SliceDurations...>
   static void slice(SrcDuration& d, std::tuple<SliceDurations...>& t) {}
 };
 
-
 }   // namespace detail
 #endif
+
+
 }   // namespace benchmark
 
 

@@ -32,6 +32,7 @@ TEST(Dimension, ExponentsPredefinedDimensionTime)
     std::ratio<0>,
     std::ratio<0>,
     std::ratio<0>,
+    std::ratio<0>,
     std::ratio<0>
   >;
 
@@ -56,6 +57,7 @@ TEST(Dimension, ExponentsPredefinedDimensionPower)
     std::ratio<0>,
     std::ratio<0>,
     std::ratio<0>,
+    std::ratio<0>,
     std::ratio<0>
   >;
 
@@ -74,6 +76,7 @@ TEST(Dimension, ExponentsNonRationalDimension)
     std::ratio<0>,
     std::ratio<0>,
     std::ratio<3,7>,
+    std::ratio<0>,
     std::ratio<0>
   >;
 

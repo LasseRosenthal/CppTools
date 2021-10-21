@@ -19,7 +19,8 @@
 // includes
 #include <Benchmark/Utility.h>
 
-
+#include <DebugTraceFramework/DebugStream.h>
+ 
 using namespace std::chrono_literals;
 using namespace std::string_literals;
  
@@ -88,6 +89,8 @@ TEST(BenchmarksUtility, convertToTimeString)
   using namespace benchmark::literals;
   using clock = std::chrono::system_clock;
 
+  dbgf::WDebugStream s{__FUNCTION__, __FILE__};
+
   const auto timePoint = clock::now();
   std::time_t ttCreation = 1'623'068'375LL; // clock::to_time_t(timePoint);
   std::tm          timeStruc;
@@ -97,6 +100,8 @@ TEST(BenchmarksUtility, convertToTimeString)
   const auto timeString = benchmark::convertToTimeString<wchar_t>(timeStruc);
 
   EXPECT_EQ(timeString, L"14:19:35"s);
+
+  s << timeString << std::endl;
 }
  
  

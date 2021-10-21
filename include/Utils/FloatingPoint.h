@@ -6,7 +6,10 @@
  
 /** 
  * @file    FloatingPoint.h 
- * @brief 
+ * @brief   FloatingPoint is a class that allows for the exploration of the
+ *          different components of floating point numbers according to the
+ *          IEEE specifications for single (float) and double precision (double).
+ * @see     https://en.wikipedia.org/wiki/IEEE_754 
  * 
  * @author  Lasse Rosenthal 
  * @date    23.12.2020 
@@ -492,8 +495,8 @@ constexpr auto FloatingPoint<FloatT>::distanceToZeroToIntRep(intType i) noexcept
 }
 
 /**
- * @brief Comparison for almost equality. Returns true if the distance of the floating point numbers is less than
- *        a maximum which is given by a template parameter.
+ * @brief Comparison for almost equality. Returns true if the distance in ULP (units in the last place)
+ *        of the floating point numbers is less than a maximum which is given by a template parameter.
  */
 template <typename FloatT>
 template <std::size_t MaxULPDist>

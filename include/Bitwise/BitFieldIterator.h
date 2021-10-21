@@ -281,9 +281,15 @@ template <typename T, bool B>
 [[nodiscard]] constexpr auto operator+(BitFieldIterator<T, B> const& it,
                                        typename BitFieldIterator<T, B>::difference_type n) noexcept -> BitFieldIterator<T, B>
 {
-  return n >= 0LL ?
-    BitFieldIterator<T, B>(it.data, it.bitIndex() + n > it.bitFieldSize ? it.bitFieldSize : it.bitIndex() + n, it.bitFieldSize) :
-    BitFieldIterator<T, B>(it.data, static_cast<typename BitFieldIterator<T, B>::size_type>(-n) >= it.bitIndex() ? 0ULL : it.bitIndex() + n, it.bitFieldSize);
+  using size_type = typename BitFieldIterator<T, B>::size_type;
+  if(n >= 0LL)
+  {
+    const auto newIndex = it.bitIndex() + static_cast<size_type>(n);
+    return BitFieldIterator<T, B>{it.data, newIndex > it.bitFieldSize ? it.bitFieldSize : newIndex, it.bitFieldSize};
+  }
+
+  const auto diff = static_cast<size_type>(-n);
+  return BitFieldIterator<T, B>{it.data, diff >= it.bitIndex() ? 0ULL : it.bitIndex() - diff, it.bitFieldSize};
 }
 
 template <typename T, bool B>

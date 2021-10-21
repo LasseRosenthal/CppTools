@@ -19,7 +19,11 @@
 // includes
 #include <Utils/StringAlgorithms.h>
 
+#include <cstring>
+#include <cwchar>
+
 using namespace std::string_literals;
+using namespace std::string_view_literals;
 
 
 TEST(StringAlgorithms, lexicalCastStringToInt)
@@ -141,11 +145,27 @@ TEST(StringAlgorithms, splitEmptyString)
   EXPECT_EQ(tokens, expected);
 }
 
+TEST(StringAlgorithms, splitViewEmptyString)
+{
+  std::wstring_view s;
+  const auto tokens = stringAlgorithms::splitView(s, [](auto c){ return L' ' == c;});
+  const std::vector<std::wstring_view> expected;
+  EXPECT_EQ(tokens, expected);
+}
+
 TEST(StringAlgorithms, splitNoDelimiter)
 {
   const auto s = L"StringWithoutDelimiter"s;
   const auto tokens = stringAlgorithms::split(s, [](auto c){ return L' ' == c;});
   const std::vector<std::wstring> expected{L"StringWithoutDelimiter"s};
+  EXPECT_EQ(tokens, expected);
+}
+
+TEST(StringAlgorithms, splitViewNoDelimiter)
+{
+  const auto s = L"StringWithoutDelimiter"sv;
+  const auto tokens = stringAlgorithms::splitView(s, [](auto c){ return L' ' == c;});
+  const std::vector expected{L"StringWithoutDelimiter"sv};
   EXPECT_EQ(tokens, expected);
 }
 
@@ -157,11 +177,27 @@ TEST(StringAlgorithms, splitOnlyDelimiter)
   EXPECT_EQ(tokens, expected);
 }
 
+TEST(StringAlgorithms, splitViewOnlyDelimiter)
+{
+  const auto s = L"++++++"sv;
+  const auto tokens = stringAlgorithms::splitView(s, [](auto c){ return L'+' == c;});
+  const std::vector<std::wstring_view> expected;
+  EXPECT_EQ(tokens, expected);
+}
+
 TEST(StringAlgorithms, splitDelimiterAtBegin)
 {
   const auto s = L" StringWithoutDelimiter"s;
   const auto tokens = stringAlgorithms::split(s, [](auto c){ return L' ' == c;});
   const std::vector<std::wstring> expected{L"StringWithoutDelimiter"s};
+  EXPECT_EQ(tokens, expected);
+}
+
+TEST(StringAlgorithms, splitViewDelimiterAtBegin)
+{
+  const auto s = " StringWithoutDelimiter"sv;
+  const auto tokens = stringAlgorithms::splitView(s, [](auto c){ return ' ' == c;});
+  const std::vector expected{"StringWithoutDelimiter"sv};
   EXPECT_EQ(tokens, expected);
 }
 
@@ -173,11 +209,27 @@ TEST(StringAlgorithms, splitDelimiterAtEnd)
   EXPECT_EQ(tokens, expected);
 }
 
+TEST(StringAlgorithms, splitViewDelimiterAtEnd)
+{
+  const auto s = L"StringWithoutDelimiter "sv;
+  const auto tokens = stringAlgorithms::splitView(s, [](auto c){ return L' ' == c;});
+  const std::vector expected{L"StringWithoutDelimiter"sv};
+  EXPECT_EQ(tokens, expected);
+}
+
 TEST(StringAlgorithms, splitDelimiterAtBeginAndEnd)
 {
   const auto s = L"     StringWithManyDelimiters   "s;
   const auto tokens = stringAlgorithms::split(s, [](auto c){ return L' ' == c;});
   const std::vector<std::wstring> expected{L"StringWithManyDelimiters"s};
+  EXPECT_EQ(tokens, expected);
+}
+
+TEST(StringAlgorithms, splitViewDelimiterAtBeginAndEnd)
+{
+  const auto s = L"     StringWithManyDelimiters   "sv;
+  const auto tokens = stringAlgorithms::splitView(s, [](auto c){ return L' ' == c;});
+  const std::vector expected{L"StringWithManyDelimiters"sv};
   EXPECT_EQ(tokens, expected);
 }
 
@@ -189,6 +241,14 @@ TEST(StringAlgorithms, splitAdjacentDelimiter)
   EXPECT_EQ(tokens, expected);
 }
 
+TEST(StringAlgorithms, splitViewAdjacentDelimiter)
+{
+  const auto s = L"StringWith  TwoDelimiters"sv;
+  const auto tokens = stringAlgorithms::splitView(s, [](auto c){ return L' ' == c;});
+  const std::vector expected{L"StringWith"sv, L"TwoDelimiters"sv};
+  EXPECT_EQ(tokens, expected);
+}
+
 TEST(StringAlgorithms, split)
 {
   const auto s = L"   split;this  string with lots     of;;;;text  into substrings   "s;
@@ -197,11 +257,35 @@ TEST(StringAlgorithms, split)
   EXPECT_EQ(tokens, expected);
 }
 
+TEST(StringAlgorithms, splitView)
+{
+  const auto s = L"   split;this  string with lots     of;;;;text  into substrings   "sv;
+  const auto tokens = stringAlgorithms::splitView(s, [](auto c){ return L' ' == c || L';' == c;});
+  const std::vector expected{L"split"sv, L"this"sv, L"string"sv, L"with"sv, L"lots"sv, L"of"sv, L"text"sv, L"into"sv, L"substrings"sv};
+  EXPECT_EQ(tokens, expected);
+}
+
 TEST(StringAlgorithms, splitCommaSeparatedList)
 {
   const auto s = "B,C,M,Y,X,Z"s;
-  const auto tokens = stringAlgorithms::split(s, [](auto c){ return L',' == c;});
+  const auto tokens = stringAlgorithms::split(s, [](auto c){ return ',' == c;});
   const std::vector<std::string> expected{"B"s, "C"s, "M"s, "Y"s, "X"s, "Z"s};
+  EXPECT_EQ(tokens, expected);
+}
+
+TEST(StringAlgorithms, splitCommaSeparatedListTakingCharPointer)
+{
+  const char* s = "B,C,M,Y,X,Z";
+  const auto tokens = stringAlgorithms::split(s, [](auto c){ return ',' == c;});
+  const std::vector expected{"B"s, "C"s, "M"s, "Y"s, "X"s, "Z"s};
+  EXPECT_EQ(tokens, expected);
+}
+
+TEST(StringAlgorithms, splitViewCommaSeparatedList)
+{
+  const auto s = L"B,C,M,Y,X,Z"sv;
+  const auto tokens = stringAlgorithms::splitView(s, [](auto c){ return L',' == c;});
+  const std::vector expected{L"B"sv, L"C"sv, L"M"sv, L"Y"sv, L"X"sv, L"Z"sv};
   EXPECT_EQ(tokens, expected);
 }
 
@@ -229,11 +313,180 @@ TEST(StringAlgorithms, cstrLengthWstring)
   EXPECT_EQ(stringAlgorithms::cstrLength(s), 5ULL);
 }
 
-TEST(StringAlgorithms, toMBstringString)
+TEST(StringAlgorithms, stringToMBstring)
 {
   const auto s = "Hallo"s;
+  const std::size_t expectedStrSize = 5ULL;
   std::unique_ptr<char[]> mbstr(stringAlgorithms::toMBstring(s));
   EXPECT_STREQ(mbstr.get(), s.c_str());
+
+  const auto len = std::strlen(mbstr.get());
+  EXPECT_EQ(len, expectedStrSize);
+}
+
+TEST(StringAlgorithms, emptyStringToMBstring)
+{
+  const auto s = ""s;
+  const std::size_t expectedStrSize = 0ULL;
+  std::unique_ptr<char[]> mbstr(stringAlgorithms::toMBstring(s));
+  EXPECT_STREQ(mbstr.get(), s.c_str());
+
+  const auto len = std::strlen(mbstr.get());
+  EXPECT_EQ(len, expectedStrSize);
+}
+
+TEST(StringAlgorithms, stringViewToMBstring)
+{
+  const auto s = "Hallo"sv;
+  const std::size_t expectedStrSize = 5ULL;
+  std::unique_ptr<char[]> mbstr(stringAlgorithms::toMBstring(s));
+  EXPECT_STREQ(mbstr.get(), "Hallo");
+
+  const auto len = std::strlen(mbstr.get());
+  EXPECT_EQ(len, expectedStrSize);
+}
+
+TEST(StringAlgorithms, emptyStringViewToMBstring)
+{
+  const auto s = ""sv;
+  const std::size_t expectedStrSize = 0ULL;
+  std::unique_ptr<char[]> mbstr(stringAlgorithms::toMBstring(s));
+  EXPECT_STREQ(mbstr.get(), "");
+
+  const auto len = std::strlen(mbstr.get());
+  EXPECT_EQ(len, expectedStrSize);
+}
+
+TEST(StringAlgorithms, wstringToMBstring)
+{
+  const auto s = L"Hallo"s;
+  const std::size_t expectedStrSize = 5ULL;
+  std::unique_ptr<char[]> mbstr(stringAlgorithms::toMBstring(s));
+  EXPECT_STREQ(mbstr.get(), "Hallo");
+
+  const auto len = std::strlen(mbstr.get());
+  EXPECT_EQ(len, expectedStrSize);
+}
+
+TEST(StringAlgorithms, emptyWStringToMBstring)
+{
+  const auto s = L""s;
+  const std::size_t expectedStrSize = 0ULL;
+  std::unique_ptr<char[]> mbstr(stringAlgorithms::toMBstring(s));
+  EXPECT_STREQ(mbstr.get(), "");
+
+  const auto len = std::strlen(mbstr.get());
+  EXPECT_EQ(len, expectedStrSize);
+}
+
+TEST(StringAlgorithms, wstringViewToMBstring)
+{
+  const auto s = L"Hallo"sv;
+  const std::size_t expectedStrSize = 5ULL;
+  std::unique_ptr<char[]> mbstr(stringAlgorithms::toMBstring(s));
+  EXPECT_STREQ(mbstr.get(), "Hallo");
+
+  const auto len = std::strlen(mbstr.get());
+  EXPECT_EQ(len, expectedStrSize);
+}
+
+TEST(StringAlgorithms, emptyWStringViewToMBstring)
+{
+  const auto s = L""sv;
+  const std::size_t expectedStrSize = 0ULL;
+  std::unique_ptr<char[]> mbstr(stringAlgorithms::toMBstring(s));
+  EXPECT_STREQ(mbstr.get(), "");
+
+  const auto len = std::strlen(mbstr.get());
+  EXPECT_EQ(len, expectedStrSize);
+}
+
+TEST(StringAlgorithms, stringToWCstring)
+{
+  const auto s = "Hallo"s;
+  const std::size_t expectedStrSize = 5ULL;
+  std::unique_ptr<wchar_t[]> mbstr(stringAlgorithms::toWCstring(s));
+  EXPECT_STREQ(mbstr.get(), L"Hallo");
+
+  const auto len = std::wcslen(mbstr.get());
+  EXPECT_EQ(len, expectedStrSize);
+}
+
+TEST(StringAlgorithms, emptyStringToWCstring)
+{
+  const auto s = ""s;
+  const std::size_t expectedStrSize = 0ULL;
+  std::unique_ptr<wchar_t[]> mbstr(stringAlgorithms::toWCstring(s));
+  EXPECT_STREQ(mbstr.get(), L"");
+
+  const auto len = std::wcslen(mbstr.get());
+  EXPECT_EQ(len, expectedStrSize);
+}
+
+TEST(StringAlgorithms, stringViewToWCstring)
+{
+  const auto s = "Hallo"sv;
+  const std::size_t expectedStrSize = 5ULL;
+  std::unique_ptr<wchar_t[]> mbstr(stringAlgorithms::toWCstring(s));
+  EXPECT_STREQ(mbstr.get(), L"Hallo");
+
+  const auto len = std::wcslen(mbstr.get());
+  EXPECT_EQ(len, expectedStrSize);
+}
+
+TEST(StringAlgorithms, emptyStringViewToWCstring)
+{
+  const auto s = ""sv;
+  const std::size_t expectedStrSize = 0ULL;
+  std::unique_ptr<wchar_t[]> mbstr(stringAlgorithms::toWCstring(s));
+  EXPECT_STREQ(mbstr.get(), L"");
+
+  const auto len = std::wcslen(mbstr.get());
+  EXPECT_EQ(len, expectedStrSize);
+}
+
+TEST(StringAlgorithms, wstringToWCstring)
+{
+  const auto s = L"Hallo"s;
+  const std::size_t expectedStrSize = 5ULL;
+  std::unique_ptr<wchar_t[]> mbstr(stringAlgorithms::toWCstring(s));
+  EXPECT_STREQ(mbstr.get(), L"Hallo");
+
+  const auto len = std::wcslen(mbstr.get());
+  EXPECT_EQ(len, expectedStrSize);
+}
+
+TEST(StringAlgorithms, emptyWStringToWCstring)
+{
+  const auto s = L""s;
+  const std::size_t expectedStrSize = 0ULL;
+  std::unique_ptr<wchar_t[]> mbstr(stringAlgorithms::toWCstring(s));
+  EXPECT_STREQ(mbstr.get(), L"");
+
+  const auto len = std::wcslen(mbstr.get());
+  EXPECT_EQ(len, expectedStrSize);
+}
+
+TEST(StringAlgorithms, wstringViewToWCstring)
+{
+  const auto s = L"Hallo"sv;
+  const std::size_t expectedStrSize = 5ULL;
+  std::unique_ptr<wchar_t[]> mbstr(stringAlgorithms::toWCstring(s));
+  EXPECT_STREQ(mbstr.get(), L"Hallo");
+
+  const auto len = std::wcslen(mbstr.get());
+  EXPECT_EQ(len, expectedStrSize);
+}
+
+TEST(StringAlgorithms, emptyWStringViewToWCstring)
+{
+  const auto s = L""sv;
+  const std::size_t expectedStrSize = 0ULL;
+  std::unique_ptr<wchar_t[]> mbstr(stringAlgorithms::toWCstring(s));
+  EXPECT_STREQ(mbstr.get(), L"");
+
+  const auto len = std::wcslen(mbstr.get());
+  EXPECT_EQ(len, expectedStrSize);
 }
 
 TEST(StringAlgorithms, toMBstringWString)
@@ -329,19 +582,35 @@ TEST(StringAlgorithms, endsWithExpectTrueIdenticalStrings)
   EXPECT_TRUE(stringAlgorithms::endsWith(s1, s2));
 }
 
-TEST(StringAlgorithms, substringBetweenDelimitersOneDelimiter)
+TEST(StringAlgorithms, enclosedStringOneDelimiter)
 {
   const auto s1 = "%NumWorkers%"s;
   const auto expected = "NumWorkers"s;
-  const auto subStr = stringAlgorithms::substringBetweenDelimiters(s1, [](const char c){ return c == '%';});
+  const auto subStr = stringAlgorithms::enclosedString(s1, [](const char c){ return c == '%';});
   EXPECT_EQ(subStr, expected);
 }
 
-TEST(StringAlgorithms, substringBetweenDelimitersTwoDelimiters)
+TEST(StringAlgorithms, enclosedStringViewOneDelimiter)
+{
+  const auto s1 = "%NumWorkers%"sv;
+  const auto expected = "NumWorkers"sv;
+  const auto subStr = stringAlgorithms::enclosedStringView(s1, [](const char c){ return c == '%';});
+  EXPECT_EQ(subStr, expected);
+}
+
+TEST(StringAlgorithms, enclosedStringTwoDelimiters)
 {
   const auto s1 = "XpathComponent[46]"s;
   const auto expected = "46"s;
-  const auto subStr = stringAlgorithms::substringBetweenDelimiters(s1, [](const char c){ return c == '[' || c == ']';});
+  const auto subStr = stringAlgorithms::enclosedString(s1, [](const char c){ return c == '[' || c == ']';});
+  EXPECT_EQ(subStr, expected);
+}
+
+TEST(StringAlgorithms, enclosedStringViewTwoDelimiters)
+{
+  const auto s1 = L"XpathComponent[46]"sv;
+  const auto expected = L"46"sv;
+  const auto subStr = stringAlgorithms::enclosedString(s1, [](const wchar_t c){ return c == L'[' || c == L']';});
   EXPECT_EQ(subStr, expected);
 }
 

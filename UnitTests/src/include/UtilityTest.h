@@ -26,9 +26,17 @@
 using namespace meta;
 
 
-/**
- * @brief  tests of IsPowerOfTwo.
- */
+TEST(Utility, MinIntegralType)
+{
+  EXPECT_TRUE((std::is_same_v<meta::MinIntegralType<7ULL>, std::uint8_t>));
+  EXPECT_TRUE((std::is_same_v<meta::MinIntegralType<14ULL>, std::uint16_t>));
+  EXPECT_TRUE((std::is_same_v<meta::MinIntegralType<32ULL>, std::uint32_t>));
+  EXPECT_TRUE((std::is_same_v<meta::MinIntegralType<31ULL>, std::uint32_t>));
+  EXPECT_TRUE((std::is_same_v<meta::MinIntegralType<33ULL>, std::uint64_t>));
+  EXPECT_TRUE((std::is_same_v<meta::MinIntegralType<64ULL>, std::uint64_t>));
+  EXPECT_TRUE((std::is_same_v<meta::MinIntegralType<65ULL>, void>));
+}
+
 TEST(Utility, IsPowerOfTwo)
 {
   EXPECT_TRUE((meta::IsPowerOfTwo<1ULL>));

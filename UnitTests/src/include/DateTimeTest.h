@@ -20,22 +20,10 @@
 #include <Benchmark/DateTime.h>
 #include <Benchmark/WinHighResClock.h>
 
-#include <iostream>
 
 using namespace std::chrono_literals;
 using namespace std::string_literals;
  
- 
-
-TEST(DateTime, getCurrentDateTime)
-{
-  const auto dateTime = date::getCurrentDateTime();
-
-  std::cout << dateTime.date << std::endl;
-  std::cout << dateTime.time << std::endl;
-
-  EXPECT_TRUE(true);
-}
 
 TEST(DateTime, timePointTo)
 {

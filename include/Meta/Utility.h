@@ -17,6 +17,7 @@
  
  
 // includes
+#include <cstdint>
 #include <tuple>
 #include <type_traits>
  
@@ -36,6 +37,18 @@ struct IdentityT {
 
 template <typename T>
 using Identity = typename IdentityT<T>::type;
+
+/** 
+ * @brief  Alias template providing the smallest integral type whose size
+ *         in bits is equal or greater the a given number of bits.
+ * @remark If no such integral type exists, the returned type is void.
+ */
+template <std::size_t Bits>
+using MinIntegralType = std::conditional_t<Bits == 0ULL, void,
+                        std::conditional_t<Bits <= 8ULL, std::uint8_t,
+                        std::conditional_t<Bits <= 16ULL, std::uint16_t,
+                        std::conditional_t<Bits <= 32ULL, std::uint32_t,
+                        std::conditional_t<Bits <= 64ULL, std::uint64_t, void>>>>>;
 
 /** 
  * @struct FunctionTraits 
@@ -85,15 +98,6 @@ using TypeOf = std::tuple_element_t<Index, std::tuple<Ts...>>;
  */
 template <typename... Ts>
 using FirstTypeOf = TypeOf<0ULL, Ts...>;
-
-//template <typename... Ts>
-//struct FirstTypeOfT;
-//
-//template <typename T, typename... Ts>
-//struct FirstTypeOfT<T, Ts...> : meta::IdentityT<T> {};
-//
-//template <typename... Ts>
-//using FirstTypeOf = typename FirstTypeOfT<Ts...>::type;
 
 /** 
  * @struct InvalidType 

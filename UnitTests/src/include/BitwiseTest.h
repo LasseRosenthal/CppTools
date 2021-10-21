@@ -138,6 +138,88 @@ TEST(Bitwise, punchMaskSizeExceedingTypeSize)
   bws::binaryRep(myMask, sstr);
   EXPECT_EQ(sstr.str(), expected);
 }
+
+TEST(Bitwise, countBitsUInt8ExpectZero)
+{
+  constexpr std::uint8_t v = 0b00000000;
+  constexpr std::size_t expected = 0ULL;
+  constexpr auto c = bws::countBits(v);
+  EXPECT_EQ(c, expected);
+}
+
+TEST(Bitwise, countBitsUInt16ExpectOne)
+{
+  constexpr std::uint16_t v = 0b00000000'10000000;
+  constexpr std::size_t expected = 1ULL;
+  const auto c = bws::countBits(v);
+  EXPECT_EQ(c, expected);
+}
+
+TEST(Bitwise, countBitsIntExpectTwo)
+{
+  constexpr std::uint32_t v = 0b00001010'00000000'00000000'00000000;
+  constexpr std::size_t expected = 2ULL;
+  const auto c = bws::countBits(v);
+  EXPECT_EQ(c, expected);
+}
+
+TEST(Bitwise, countBitsIntExpectFive)
+{
+  constexpr std::uint32_t v = 0b00001010'00000000'00000000'00001101;
+  constexpr std::size_t expected = 5ULL;
+  const auto c = bws::countBits(v);
+  EXPECT_EQ(c, expected);
+}
+
+TEST(Bitwise, countBitsSignedIntExpectFive)
+{
+  constexpr std::int32_t v = 0b00001010'00000000'00000000'00001101;
+  constexpr std::size_t expected = 5ULL;
+  const auto c = bws::countBits(v);
+  EXPECT_EQ(c, expected);
+}
+
+TEST(Bitwise, countBitsUInt64ExpectAll)
+{
+  constexpr std::uint64_t v = 0b11111111'11111111'11111111'11111111'11111111'11111111'11111111'11111111;
+  constexpr std::size_t expected = 64ULL;
+  const auto c = bws::countBits(v);
+  EXPECT_EQ(c, expected);
+}
+
+TEST(Bitwise, firstBitSetExpectZero)
+{
+  constexpr std::uint64_t v = 0b11111111'11111111'11111111'11111111'11111111'11111111'11111111'11111111;
+  constexpr std::size_t expected = 0ULL;
+  const auto c = bws::firstBitSet(v);
+  EXPECT_EQ(c, expected);
+}
+#if 0
+
+TEST(Bitwise, firstBitSetExpect63)
+{
+  constexpr std::uint64_t v = 0b10000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000;
+  constexpr std::size_t expected = 63ULL;
+  const auto c = bws::firstBitSet(v);
+  EXPECT_EQ(c, expected);
+}
+
+TEST(Bitwise, firstBitSet)
+{
+  constexpr std::int32_t v = 0b00001010'00000000'00000000'00001100;
+  constexpr std::size_t expected = 2ULL;
+  const auto c = bws::firstBitSet(v);
+  EXPECT_EQ(c, expected);
+}
+
+TEST(Bitwise, firstBitSetNonOneIsSet)
+{
+  constexpr std::int32_t v = 0b00000000'00000000'00000000'00000000;
+  constexpr std::size_t expected = 64ULL;
+  const auto c = bws::firstBitSet(v);
+  EXPECT_EQ(c, expected);
+}
+#endif
  
  
 // *************************************************************************** // 

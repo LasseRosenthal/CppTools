@@ -43,6 +43,7 @@ public:
 
   // ---------------------------------------------------
   // public api
+  virtual void terminate           () = 0;
   [[nodiscard]] auto isInitialized () const noexcept -> bool;
   [[nodiscard]] auto errorMsg      () const -> std::string const&;
 
@@ -63,7 +64,7 @@ protected:
 
   // ---------------------------------------------------
   // data
-  bool        success{true};
+  bool        initialized{false};
   std::string errMsg;
 };
 
@@ -73,7 +74,7 @@ protected:
  */
 inline [[nodiscard]] auto Framework::isInitialized() const noexcept -> bool
 { 
-  return success;
+  return initialized;
 }
 
 /**

@@ -27,9 +27,9 @@ namespace osutility {
 
 
 // getEnvironmentVariable
-auto getEnvironmentVariable(std::wstring_view name) -> std::wstring
+auto getEnvironmentVariable(std::wstring const& name) -> std::wstring
 {
-  const unsigned long minBufSize{2};
+  constexpr unsigned long minBufSize{2UL};
   auto buffer = std::make_unique<wchar_t[]>(minBufSize);
 
   // first call to obtain the number of characters required to hold the environment variable
@@ -45,12 +45,9 @@ auto getEnvironmentVariable(std::wstring_view name) -> std::wstring
       throw std::runtime_error("Unknown error during call of getEnvironmentVariable");
     }
   }
-  else
+  else if(requiredSize > minBufSize)
   {
-    if(requiredSize > minBufSize || !buffer)
-    {
-      buffer = std::make_unique<wchar_t[]>(requiredSize);
-    }
+    buffer = std::make_unique<wchar_t[]>(requiredSize);
 
     // second call to read the environment variable
     if(GetEnvironmentVariable(name.data(), buffer.get(), requiredSize) == 0)
@@ -60,6 +57,27 @@ auto getEnvironmentVariable(std::wstring_view name) -> std::wstring
   }
 
   return std::wstring{buffer.get()};
+}
+
+auto setEnvironmentVariable(std::wstring const& name, std::wstring const& value) -> bool
+{
+  return SetEnvironmentVariable(name.c_str(), value.c_str());
+}
+
+// existsEnvironmentVariable
+auto existsEnvironmentVariable(std::wstring const& name) -> bool
+{
+  constexpr unsigned long minBufSize{2UL};
+  const auto buffer = std::make_unique<wchar_t[]>(minBufSize);
+
+  // first call to obtain the number of characters required to hold the environment variable
+  const auto requiredSize = GetEnvironmentVariable(name.data(), buffer.get(), minBufSize);
+  if(requiredSize == 0U)
+  {
+    return false;
+  }
+
+  return true;
 }
 
 

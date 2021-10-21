@@ -12,90 +12,45 @@
  * @date    10.02.2021 
  */ 
  
-#ifndef FRAMEWORKTEST_H_2977982424799892077621258419590505129538 
-#define FRAMEWORKTEST_H_2977982424799892077621258419590505129538 
+#ifndef FRAMEWORKTEST_H_325684923109141345318162367523415282947428 
+#define FRAMEWORKTEST_H_325684923109141345318162367523415282947428 
  
  
 // includes
-#include <Utils/Framework.h>
-
-#include <iostream>
-#include <string>
-
-using namespace std::string_literals;
- 
-
-namespace cpptools {
+#include "TestFrameworks.h"
 
 
-/** 
- * @class DebugTraceFramework
- * @brief DebugTraceFramework encapsulates the initialization and termination process
- *        for the DebugTrace framework.
- */
-class DebugTraceFramework final : Framework {
-
-  // the Framework interface shall have access to the constructor
-  friend Framework;
-
-public:
-  /**
-   * DbgTraceParams stores the configuration parameters for DebugTrace
-   */
-  struct Params {
-    int p{-1};
-  };
-
-
-private:
-
-  DebugTraceFramework(std::string const& componentName, const Params& params = {});
-  ~DebugTraceFramework();
-};
-
-
-/**
- * @brief Constructor. Initializes the DebugTrace framework. If the initialization fails,
- *        an error message is provided.
- */
-inline DebugTraceFramework::DebugTraceFramework(const std::string&                 componentName,
-                                                const DebugTraceFramework::Params& params)
+TEST(Framework, isInitalized)
 {
-  try
+  bool b = false;
+  std::vector<std::string> msgs;
+
+  const auto testFramework = cpptools::Framework::create<cpptools::TestFramework>(b, msgs);
+  EXPECT_TRUE(testFramework->isInitialized());
+}
+
+
+TEST(Framework, destructorIsCalled)
+{
+  bool b = false;
+  std::vector<std::string> msgs;
   {
-    std::cout << "DebugTraceFramework initialize ...\n"
-              << "params.p = " << params.p << '\n';
+    const auto testFramework = cpptools::Framework::create<cpptools::TestFramework>(b, msgs);
   }
-  catch(...)
-  {
-    success = false;
-    errMsg  = "Error during initialization of Debug Trace";
-  }
+  EXPECT_TRUE(b);
 }
 
-/**
- * @brief Destructor. Terminates the DebugTrace framework.
- */
-inline DebugTraceFramework::~DebugTraceFramework()
+TEST(Framework, failingConstructor)
 {
-  std::cout << "Terminate DebugTrace now ...\n";
+  bool b = false;
+  std::vector<std::string> msgs;
+  const auto testFramework = cpptools::Framework::create<cpptools::TestFramework>(b, msgs, true);
+  EXPECT_FALSE(testFramework->isInitialized());
 }
 
-}   // namespace cpptools
 
-
-TEST(Framework, constructor)
-{
-  cpptools::DebugTraceFramework::Params par;
-  par.p          = 1345;
-  const auto framework = cpptools::Framework::create<cpptools::DebugTraceFramework>("Test"s, par);
-
-  EXPECT_TRUE(framework->isInitialized());
-}
-
- 
 // *************************************************************************** // 
 // ******************************* END OF FILE ******************************* // 
 // *************************************************************************** // 
  
-#endif // FRAMEWORKTEST_H_2977982424799892077621258419590505129538 
+#endif // FRAMEWORKTEST_H_325684923109141345318162367523415282947428 
