@@ -144,6 +144,30 @@ TEST(Dimension, InversionType)
   EXPECT_TRUE((std::is_same_v<generatedType, expectedType>));
 }
 
+TEST(Dimension, NthRootTypeCOmplexType)
+{
+  constexpr std::size_t N = 2ULL;
+  using D = DimensionGenerator<TimeTag<std::ratio<3, 7>>, LengthTag<std::ratio<2>>,
+                               MassTag<std::ratio<1, 3>>, StorageAmountTag<std::ratio<3, 7>>>;
+
+  using generatedType = unit::dimension::NthRoot<D, N>;
+  using expectedType =
+    DimensionGenerator<TimeTag<std::ratio<3, N*7>>, LengthTag<std::ratio<1>>,
+                       MassTag<std::ratio<1, N*3>>, StorageAmountTag<std::ratio<3, N*7>>>;
+  EXPECT_TRUE((std::is_same_v<generatedType, expectedType>));
+}
+
+TEST(Dimension, NthRootTypeOfSquaredTime)
+{
+  constexpr std::size_t N = 2ULL;
+  using D = DimensionGenerator<TimeTag<std::ratio<2>>>;
+
+  using generatedType = unit::dimension::NthRoot<D, N>;
+  using expectedType = unit::dimension::Time;
+  EXPECT_TRUE((std::is_same_v<generatedType, expectedType>));
+}
+
+
 TEST(Dimension, HasOnlyZeroExponentsExpectTrue)
 {
   using D = DimensionGenerator<TimeTag<std::ratio<0, 3>>, LengthTag<std::ratio<0, 2>>>;

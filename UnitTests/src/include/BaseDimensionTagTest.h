@@ -23,14 +23,27 @@ using namespace unit::dimension;
  
 TEST(BaseDimensions, TagGeneratorExpectRationalExponent)
 {
-  using myDim = DimensionTagGenerator<0>;
+  using myDim = BaseDimensionTag<0>;
   EXPECT_TRUE(myDim::hasRationalExponent);
 }
 
 TEST(BaseDimensions, TagGeneratorExpectNonRationalExponent)
 {
-  using myDim = DimensionTagGenerator<6, std::ratio<3,2>>;
+  using myDim = BaseDimensionTag<6, std::ratio<3,2>>;
   EXPECT_FALSE(myDim::hasRationalExponent);
+}
+
+TEST(BaseDimensions, NthRoot)
+{
+  constexpr std::size_t N = 2ULL;
+  constexpr long long num = 2LL;
+  constexpr long long den = 3LL;
+
+  using myDim = BaseDimensionTag<6, std::ratio<num, den>>;
+
+  using generatedType = unit::dimension::NthRootOfBaseTag<myDim, N>;
+  using expectedType = BaseDimensionTag<6, std::ratio<1, 3>>;
+  EXPECT_TRUE((std::is_same_v<generatedType, expectedType>));
 }
  
  

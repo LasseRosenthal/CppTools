@@ -86,7 +86,7 @@ struct HasZeroExponentT
 template <std::size_t Index>
 struct HasIndexT {
   template <typename BaseDimTag>
-  struct nestedTemplate : std::conditional_t<BaseDimTag::index == Index, std::true_type, std::false_type> {};
+  using nestedTemplate = std::conditional_t<BaseDimTag::index == Index, std::true_type, std::false_type>;
 };
 
 template <std::size_t Index>

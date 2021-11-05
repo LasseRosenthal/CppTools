@@ -28,36 +28,36 @@ namespace dimension {
 // tags for the seven SI-base Units
 // see https://en.wikipedia.org/wiki/International_System_of_Units
 template <typename Exponent = std::ratio<0>>
-struct TimeTag : BaseDimensionTag<0ULL, Exponent> {};
+using TimeTag = BaseDimensionTag<0ULL, Exponent>;
 
 template <typename Exponent = std::ratio<0>>
-struct LengthTag : BaseDimensionTag<1ULL, Exponent> {};
+using LengthTag = BaseDimensionTag<1ULL, Exponent>;
 
 template <typename Exponent = std::ratio<0>>
-struct MassTag : BaseDimensionTag<2ULL, Exponent> {};
+using MassTag = BaseDimensionTag<2ULL, Exponent>;
 
 template <typename Exponent = std::ratio<0>>
-struct CurrentTag : BaseDimensionTag<3ULL, Exponent> {};
+using CurrentTag = BaseDimensionTag<3ULL, Exponent>;
 
 template <typename Exponent = std::ratio<0>>
-struct TemperatureTag : BaseDimensionTag<4ULL, Exponent> {};
+using TemperatureTag = BaseDimensionTag<4ULL, Exponent>;
 
 template <typename Exponent = std::ratio<0>>
-struct SubstanceTag : BaseDimensionTag<5ULL, Exponent> {};
+using SubstanceTag = BaseDimensionTag<5ULL, Exponent>;
 
 template <typename Exponent = std::ratio<0>>
-struct LuminosityTag : BaseDimensionTag<6ULL, Exponent> {};
+using LuminosityTag = BaseDimensionTag<6ULL, Exponent>;
 
 // ---------------------------------------------------
 // tags for other quantities
 template <typename Exponent = std::ratio<0>>
-struct StorageAmountTag : BaseDimensionTag<7ULL, Exponent> {};
+using StorageAmountTag = BaseDimensionTag<7ULL, Exponent>;
 
 template <typename Exponent = std::ratio<0>>
-struct PixelTag : BaseDimensionTag<8ULL, Exponent> {};
+using PixelTag = BaseDimensionTag<8ULL, Exponent>;
 
 template <typename Exponent = std::ratio<0>>
-struct AngleTag : BaseDimensionTag<9ULL, Exponent> {};
+using AngleTag = BaseDimensionTag<9ULL, Exponent>;
 
 
 /** 
@@ -72,61 +72,68 @@ constexpr std::size_t numBaseDimensions = 10ULL;
 using BaseDimensionIndices = std::make_index_sequence<numBaseDimensions>;
 
 
-/** 
- * @struct DimensionTagGeneratorT
- * @brief  DimensionTagGeneratorT is a metafunction that is used 
- *         to generate base dimension tags for a given index and
- *         a rational exponent.
- * @remark If new base tags are added, corresponding specializations for
- *         DimensionTagGeneratorT have to be provided.
- */
-template <std::size_t Index, typename Exponent>
-struct DimensionTagGeneratorT;
-
-template <int Index, typename Exponent = std::ratio<0>>
-using DimensionTagGenerator = typename DimensionTagGeneratorT<Index, Exponent>::type;
-
-template <typename Exponent>
-struct DimensionTagGeneratorT<0ULL, Exponent> : meta::IdentityT<TimeTag<Exponent>> {};
-
-template <typename Exponent>
-struct DimensionTagGeneratorT<1ULL, Exponent> : meta::IdentityT<LengthTag<Exponent>> {};
-
-template <typename Exponent>
-struct DimensionTagGeneratorT<2ULL, Exponent> : meta::IdentityT<MassTag<Exponent>> {};
-
-template <typename Exponent>
-struct DimensionTagGeneratorT<3ULL, Exponent> : meta::IdentityT<CurrentTag<Exponent>> {};
-
-template <typename Exponent>
-struct DimensionTagGeneratorT<4ULL, Exponent> : meta::IdentityT<TemperatureTag<Exponent>> {};
-
-template <typename Exponent>
-struct DimensionTagGeneratorT<5ULL, Exponent> : meta::IdentityT<SubstanceTag<Exponent>> {};
-
-template <typename Exponent>
-struct DimensionTagGeneratorT<6ULL, Exponent> : meta::IdentityT<LuminosityTag<Exponent>> {};
-
-template <typename Exponent>
-struct DimensionTagGeneratorT<7ULL, Exponent> : meta::IdentityT<StorageAmountTag<Exponent>> {};
-
-template <typename Exponent>
-struct DimensionTagGeneratorT<8ULL, Exponent> : meta::IdentityT<PixelTag<Exponent>> {};
-
-template <typename Exponent>
-struct DimensionTagGeneratorT<9ULL, Exponent> : meta::IdentityT<AngleTag<Exponent>> {};
-
-
 /**
  * @struct InvertBaseTagT
  * @brief  provides a type alias for a BaseDimensionTag that arises through multiplication
  *         of the exponent of a given BaseDimensionTag with minus one.
  */
 template <typename BaseDimTag>
-struct InvertBaseTagT : meta::IdentityT<DimensionTagGenerator<BaseDimTag::index, meta::Negative<ExponentOf<BaseDimTag>>>>{};
+struct InvertBaseTagT : meta::IdentityT<BaseDimensionTag<BaseDimTag::index, meta::Negative<ExponentOf<BaseDimTag>>>>{};
 
 template <typename BaseDimTag>
 using InvertBaseTag = typename InvertBaseTagT<BaseDimTag>::type;
+
+
+
+/**
+ * @struct NthPowerOfBaseTagT
+ * @brief  provides a type alias for a BaseDimensionTag that arises through taking
+ *         the nthpower of the exponent of a given BaseDimensionTag.
+ */
+template <typename BaseDimTag, std::size_t N>
+struct NthPowerOfBaseTagT : meta::IdentityT<BaseDimensionTag<BaseDimTag::index, std::ratio_multiply<ExponentOf<BaseDimTag>, std::ratio<N>>>>{};
+
+template <typename BaseDimTag, std::size_t N>
+using NthPowerOfBaseTag = typename NthPowerOfBaseTagT<BaseDimTag, N>::type;
+
+/**
+ * @struct NthPowerGeneratorT
+ * @brief  NthPowerGeneratorT defines a nested template metafunction
+ *         that computes the nth power of a given dimension
+ */
+template <std::size_t N>
+struct NthPowerGeneratorT {
+  template <typename BaseDimTag>
+  using nestedTemplate = NthPowerOfBaseTagT<BaseDimTag, N>;
+};
+
+template <std::size_t N>
+using NthPowerGenerator = NthPowerGeneratorT<N>::template nestedTemplate;
+
+/**
+ * @struct NthRootOfBaseTagT
+ * @brief  provides a type alias for a BaseDimensionTag that arises through taking
+ *         the nth-root of the exponent of a given BaseDimensionTag.
+ */
+template <typename BaseDimTag, std::size_t N>
+struct NthRootOfBaseTagT : meta::IdentityT<BaseDimensionTag<BaseDimTag::index, std::ratio_multiply<ExponentOf<BaseDimTag>, std::ratio<1, N>>>>{};
+
+template <typename BaseDimTag, std::size_t N>
+using NthRootOfBaseTag = typename NthRootOfBaseTagT<BaseDimTag, N>::type;
+
+/**
+ * @struct NthRootGeneratorT
+ * @brief  NthRootGeneratorT defines a nested template metafunction
+ *         that computes the N-th root of a given dimension
+ */
+template <std::size_t N>
+struct NthRootGeneratorT {
+  template <typename BaseDimTag>
+  using nestedTemplate = NthRootOfBaseTagT<BaseDimTag, N>;
+};
+
+template <std::size_t N>
+using NthRootGenerator = NthRootGeneratorT<N>::template nestedTemplate;
 
 
 }   // namespace dimension

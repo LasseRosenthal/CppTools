@@ -18,15 +18,31 @@
  
 // includes
 #include <Unit/Unit.h>
-
-#include <string_view>
  
 
 namespace unit {
 
 
+/**
+ * @brief returns a prefix string for a given unit.
+ */
+template <typename U, typename CharT>
+constexpr auto prefix() -> const CharT* const;
+
+/**
+ * @brief Stream operator. Prints the actual value and a unit prefix if the prefix variable
+ *        template has been specialized for the given unit.
+ */
+template <typename CharT, typename U, typename CharTraits = std::char_traits<CharT>,
+          typename = std::void_t<typename U::value_type, typename U::unitSystem>>
+inline auto operator<<(std::basic_ostream<CharT, CharTraits>& ostr, U const u) -> std::basic_ostream<CharT, CharTraits>&
+{
+  return ostr << u.value() << ostr.widen(' ') << prefix<U, CharT>();
+}
+
 // ---------------------------------------------------
 // convenient alias templates for time units
+// ---------------------------------------------------
 template <typename Rep, typename Period = std::ratio<1>, typename Scaling = std::ratio<1>>
 using Time = Unit<double, unit::TimeUnitGenerator<Period, Scaling>>;
 
@@ -45,53 +61,53 @@ using years        = Time<double, std::ratio<31556952>>;
 
 // unit prefixes
 template <>
-constexpr std::string_view prefix<femtoseconds, char> = "fs";
+auto prefix<femtoseconds, char>() -> const char* const { return "fs";}
 template <>
-constexpr std::wstring_view prefix<femtoseconds, wchar_t> = L"fs";
+auto prefix<femtoseconds, wchar_t>() -> const wchar_t* const { return L"fs";}
 template <>
-constexpr std::string_view prefix<picoseconds, char> = "ps";
+auto prefix<picoseconds, char>() -> const char* const { return "ps";}
 template <>
-constexpr std::wstring_view prefix<picoseconds, wchar_t> = L"ps";
+auto prefix<picoseconds, wchar_t>() -> const wchar_t* const { return L"ps";}
 template <>
-constexpr std::string_view prefix<nanoseconds, char> = "ns";
+auto prefix<nanoseconds, char>() -> const char* const { return "ns";}
 template <>
-constexpr std::wstring_view prefix<nanoseconds, wchar_t> = L"ns";
+auto prefix<nanoseconds, wchar_t>() -> const wchar_t* const { return L"ns";}
 template <>
-constexpr std::string_view prefix<microseconds, char> = "mus";
+auto prefix<microseconds, char>() -> const char* const { return "mus";}
 template <>
-constexpr std::wstring_view prefix<microseconds, wchar_t> = L"mus";
+auto prefix<microseconds, wchar_t>() -> const wchar_t* const { return L"mus";}
 template <>
-constexpr std::string_view prefix<milliseconds, char> = "ms";
+auto prefix<milliseconds, char>() -> const char* const { return "ms";}
 template <>
-constexpr std::wstring_view prefix<milliseconds, wchar_t> = L"ms";
+auto prefix<milliseconds, wchar_t>() -> const wchar_t* const { return L"ms";}
 template <>
-constexpr std::string_view prefix<seconds, char> = "s";
+auto prefix<seconds, char>() -> const char* const { return "s";}
 template <>
-constexpr std::wstring_view prefix<seconds, wchar_t> = L"s";
+auto prefix<seconds, wchar_t>() -> const wchar_t* const { return L"s";}
 template <>
-constexpr std::string_view prefix<minutes, char> = "min";
+auto prefix<minutes, char>() -> const char* const { return "min";}
 template <>
-constexpr std::wstring_view prefix<minutes, wchar_t> = L"min";
+auto prefix<minutes, wchar_t>() -> const wchar_t* const { return L"min";}
 template <>
-constexpr std::string_view prefix<hours, char> = "h";
+auto prefix<hours, char>() -> const char* const { return "h";}
 template <>
-constexpr std::wstring_view prefix<hours, wchar_t> = L"h";
+auto prefix<hours, wchar_t>() -> const wchar_t* const { return L"h";}
 template <>
-constexpr std::string_view prefix<days, char> = "d";
+auto prefix<days, char>() -> const char* const { return "d";}
 template <>
-constexpr std::wstring_view prefix<days, wchar_t> = L"d";
+auto prefix<days, wchar_t>() -> const wchar_t* const { return L"d";}
 template <>
-constexpr std::string_view prefix<weeks, char> = "weeks";
+auto prefix<weeks, char>() -> const char* const { return "weeks";}
 template <>
-constexpr std::wstring_view prefix<weeks, wchar_t> = L"weeks";
+auto prefix<weeks, wchar_t>() -> const wchar_t* const { return L"weeks";}
 template <>
-constexpr std::string_view prefix<months, char> = "mon";
+auto prefix<months, char>() -> const char* const { return "mon";}
 template <>
-constexpr std::wstring_view prefix<months, wchar_t> = L"mon";
+auto prefix<months, wchar_t>() -> const wchar_t* const { return L"mon";}
 template <>
-constexpr std::string_view prefix<years, char> = "a";
+auto prefix<years, char>() -> const char* const { return "a";}
 template <>
-constexpr std::wstring_view prefix<years, wchar_t> = L"a";
+auto prefix<years, wchar_t>() -> const wchar_t* const { return L"a";}
 
 // literal operators
 namespace literals {
@@ -117,22 +133,288 @@ constexpr auto operator"" _d(long double d) noexcept { return days(d);}
 
 
 // ---------------------------------------------------
-// convenient alias templates for angle units
+// convenient alias templates for length units
+// ---------------------------------------------------
 template <typename Rep, typename Period = std::ratio<1>, typename Scaling = std::ratio<1>>
-using Angle = Unit<double, unit::AngleUnitGenerator<Period, Scaling>>;
+using Length = Unit<Rep, unit::LengthUnitGenerator<Period, Scaling>>;
 
-using radians = Angle<double>;
-using degrees = Angle<double, std::ratio<10000000000000000LL, 572957795130823208LL>>;
+using picometers  = Length<double, std::pico>;
+using nanometers  = Length<double, std::nano>;
+using micrometers = Length<double, std::micro>;
+using millimeters = Length<double, std::milli>;
+using centimeters = Length<double, std::centi>;
+using decimeters  = Length<double, std::deci>;
+using meters      = Length<double>;
+using kilometers  = Length<double, std::kilo>;
+using lightyears  = Length<double, std::ratio<9'460'730'472'580'800LL>>;
+using inch        = Length<double, std::ratio<254LL, 10'000LL>>;
+using points      = Length<double, std::ratio<127LL, 360'000LL>>;
+using pica        = Length<double, std::ratio<127LL, 30'000LL>>;
+using mile        = Length<double, std::ratio<1'609'344LL, 1'000LL>>;
+using yards       = Length<double, std::ratio<9'144LL, 10'000LL>>;
+using feets       = Length<double, std::ratio<3'048LL, 10'000LL>>;
 
 // unit prefixes
 template <>
-constexpr std::string_view prefix<radians, char> = "rad";
+auto prefix<picometers, char>() -> const char* const { return "pm";}
 template <>
-constexpr std::wstring_view prefix<radians, wchar_t> = L"rad";
+auto prefix<picometers, wchar_t>() -> const wchar_t* const { return L"pm";}
 template <>
-constexpr std::string_view prefix<degrees, char> = "deg";
+auto prefix<nanometers, char>() -> const char* const { return "nm";}
 template <>
-constexpr std::wstring_view prefix<degrees, wchar_t> = L"deg";
+auto prefix<nanometers, wchar_t>() -> const wchar_t* const { return L"nm";}
+template <>
+auto prefix<micrometers, char>() -> const char* const { return "mum";}
+template <>
+auto prefix<micrometers, wchar_t>() -> const wchar_t* const { return L"mum";}
+template <>
+auto prefix<millimeters, char>() -> const char* const { return "mm";}
+template <>
+auto prefix<millimeters, wchar_t>() -> const wchar_t* const { return L"mm";}
+template <>
+auto prefix<centimeters, char>() -> const char* const { return "cm";}
+template <>
+auto prefix<centimeters, wchar_t>() -> const wchar_t* const { return L"cm";}
+template <>
+auto prefix<decimeters, char>() -> const char* const { return "dm";}
+template <>
+auto prefix<decimeters, wchar_t>() -> const wchar_t* const { return L"dm";}
+template <>
+auto prefix<meters, char>() -> const char* const { return "m";}
+template <>
+auto prefix<meters, wchar_t>() -> const wchar_t* const { return L"m";}
+template <>
+auto prefix<kilometers, char>() -> const char* const { return "km";}
+template <>
+auto prefix<kilometers, wchar_t>() -> const wchar_t* const { return L"km";}
+template <>
+auto prefix<lightyears, char>() -> const char* const { return "ly";}
+template <>
+auto prefix<lightyears, wchar_t>() -> const wchar_t* const { return L"ly";}
+template <>
+auto prefix<inch, char>() -> const char* const { return "in";}
+template <>
+auto prefix<inch, wchar_t>() -> const wchar_t* const { return L"in";}
+template <>
+auto prefix<points, char>() -> const char* const { return "pt";}
+template <>
+auto prefix<points, wchar_t>() -> const wchar_t* const { return L"pt";}
+template <>
+auto prefix<pica, char>() -> const char* const { return "pica";}
+template <>
+auto prefix<pica, wchar_t>() -> const wchar_t* const { return L"pica";}
+template <>
+auto prefix<mile, char>() -> const char* const { return "mi";}
+template <>
+auto prefix<mile, wchar_t>() -> const wchar_t* const { return L"mi";}
+template <>
+auto prefix<yards, char>() -> const char* const { return "yd";}
+template <>
+auto prefix<yards, wchar_t>() -> const wchar_t* const { return L"yd";}
+template <>
+auto prefix<feets, char>() -> const char* const { return "ft";}
+template <>
+auto prefix<feets, wchar_t>() -> const wchar_t* const { return L"ft";}
+
+// literal operators
+namespace literals {
+/** @brief Literal operator for nanometers. */
+constexpr auto operator"" _nm(long double nm) noexcept { return nanometers(nm);}
+/** @brief Literal operator for millimeters. */
+constexpr auto operator"" _mm(long double mm) noexcept { return millimeters(mm);}
+/** @brief Literal operator for centimeters. */
+constexpr auto operator"" _cm(long double cm) noexcept { return centimeters(cm);}
+/** @brief Literal operator for meters. */
+constexpr auto operator"" _m (long double m)  noexcept { return meters(m);}
+/** @brief Literal operator for kilometers. */
+constexpr auto operator"" _km(long double km) noexcept { return kilometers(km);}
+/** @brief Literal operator for lightyears. */
+constexpr auto operator"" _ly(long double ly) noexcept { return lightyears(ly);}
+/** @brief Literal operator for inch. */
+constexpr auto operator"" _in(long double in) noexcept { return inch(in);}
+/** @brief Literal operator for points. */
+constexpr auto operator"" _pt(long double pt) noexcept { return points(pt);}
+/** @brief Literal operator for pica. */
+constexpr auto operator"" _pc(long double pc) noexcept { return pica(pc);  }
+/** @brief Literal operator for mile. */
+constexpr auto operator"" _mi(long double mi) noexcept { return mile(mi);  }
+/** @brief Literal operator for yards. */
+constexpr auto operator"" _yd(long double yd) noexcept { return yards(yd);  }
+/** @brief Literal operator for feets. */
+constexpr auto operator"" _ft(long double ft) noexcept { return feets(ft);  }
+}
+
+
+// ---------------------------------------------------
+// convenient alias templates for temperature units
+// ---------------------------------------------------
+template <typename Rep, typename Period = std::ratio<1>, typename Shift = std::ratio<0>>
+using Temperature = Unit<Rep, unit::TemperatureUnitGenerator<Period, Shift>>;
+
+using kelvin     = Temperature<double>;
+using celsius    = Temperature<double, std::ratio<1>, std::ratio<-27'315LL, 100LL>>;
+using fahrenheit = Temperature<double, std::ratio<5LL, 9LL>, std::ratio<-45'967LL, 100LL>>;
+using rankine    = Temperature<double, std::ratio<5LL, 9LL>>;
+
+// unit prefixes
+template <>
+auto prefix<kelvin, char>() -> const char* const { return "K";}
+template <>
+auto prefix<kelvin, wchar_t>() -> const wchar_t* const { return L"K";}
+template <>
+auto prefix<celsius, char>() -> const char* const { return "C";}
+template <>
+auto prefix<celsius, wchar_t>() -> const wchar_t* const { return L"C";}
+template <>
+auto prefix<fahrenheit, char>() -> const char* const { return "F";}
+template <>
+auto prefix<fahrenheit, wchar_t>() -> const wchar_t* const { return L"F";}
+template <>
+auto prefix<rankine, char>() -> const char* const { return "Ra";}
+template <>
+auto prefix<rankine, wchar_t>() -> const wchar_t* const { return L"Ra";}
+
+namespace literals {
+  /** @brief Literal operator for kelvin. */
+constexpr auto operator"" _K(long double k) noexcept { return kelvin(k);}
+  /** @brief Literal operator for celsius. */
+constexpr auto operator"" _C(long double c) noexcept { return celsius(c);}
+  /** @brief Literal operator for fahrenheit. */
+constexpr auto operator"" _F(long double f) noexcept { return fahrenheit(f);}
+  /** @brief Literal operator for rankine. */
+constexpr auto operator"" _Ra(long double ra) noexcept { return rankine(ra);}
+}
+
+
+// ---------------------------------------------------
+// convenient alias templates for storage amount units
+// ---------------------------------------------------
+template <typename Rep, typename Period = std::ratio<1>, typename Scaling = std::ratio<1>>
+using StorageAmount = Unit<Rep, unit::StorageAmountUnitGenerator<Period, Scaling>>;
+
+using bits      = StorageAmount<double>;
+using bytes     = StorageAmount<double, std::ratio<8ULL>>;
+using kilobytes = StorageAmount<double, std::ratio<8'000ULL>>;
+using megabytes = StorageAmount<double, std::ratio<8'000'000ULL>>;
+using gigabytes = StorageAmount<double, std::ratio<8'000'000'000ULL>>;
+using terabytes = StorageAmount<double, std::ratio<8'000'000'000'000ULL>>;
+using kibibytes = StorageAmount<double, std::ratio<8ULL * 1'024ULL>>;
+using mebibytes = StorageAmount<double, std::ratio<8ULL * 1'048'576ULL>>;
+using gibibytes = StorageAmount<double, std::ratio<8ULL * 1'073'741'824ULL>>;
+using tebibytes = StorageAmount<double, std::ratio<8ULL * 1'099'511'627'776ULL>>;
+
+// unit prefixes
+template <>
+auto prefix<bits, char>() -> const char* const { return "bit";}
+template <>
+auto prefix<bits, wchar_t>() -> const wchar_t* const { return L"bit";}
+template <>
+auto prefix<bytes, char>() -> const char* const { return "B";}
+template <>
+auto prefix<bytes, wchar_t>() -> const wchar_t* const { return L"B";}
+template <>
+auto prefix<kilobytes, char>() -> const char* const { return "kB";}
+template <>
+auto prefix<kilobytes, wchar_t>() -> const wchar_t* const { return L"kB";}
+template <>
+auto prefix<megabytes, char>() -> const char* const { return "MB";}
+template <>
+auto prefix<megabytes, wchar_t>() -> const wchar_t* const { return L"MB";}
+template <>
+auto prefix<gigabytes, char>() -> const char* const { return "GB";}
+template <>
+auto prefix<gigabytes, wchar_t>() -> const wchar_t* const { return L"GB";}
+template <>
+auto prefix<terabytes, char>() -> const char* const { return "TB";}
+template <>
+auto prefix<terabytes, wchar_t>() -> const wchar_t* const { return L"TB";}
+
+namespace literals {
+  /** @brief Literal operator for bits. */
+constexpr auto operator"" _b(long double b) noexcept { return bits(b);}
+/** @brief Literal operator for bytes. */
+constexpr auto operator"" _B(long double b) noexcept { return bytes(b);}
+/** @brief Literal operator for kilobytes. */
+constexpr auto operator"" _kB  (long double kb) noexcept { return kilobytes(kb); }
+/** @brief Literal operator for megabytes. */
+constexpr auto operator"" _MB  (long double mb) noexcept { return megabytes(mb); }
+/** @brief Literal operator for gigabytes. */
+constexpr auto operator"" _GB  (long double gb) noexcept { return gigabytes(gb); }
+/** @brief Literal operator for terabytes. */
+constexpr auto operator"" _TB  (long double tb) noexcept { return terabytes(tb); }
+/** @brief Literal operator for kibibytes. */
+constexpr auto operator"" _KiB (long double kib) noexcept { return kibibytes(kib); }
+/** @brief Literal operator for mebibytes. */
+constexpr auto operator"" _MiB (long double mib) noexcept { return mebibytes(mib); }
+/** @brief Literal operator for gibibytes. */
+constexpr auto operator"" _GiB (long double gib) noexcept { return gibibytes(gib); }
+/** @brief Literal operator for tebibytes. */
+constexpr auto operator"" _TiB (long double tib) noexcept { return tebibytes(tib); }
+}
+
+
+// ---------------------------------------------------
+// convenient alias templates for pixels units
+// ---------------------------------------------------
+template <typename Rep, typename Period = std::ratio<1>, typename Scaling = std::ratio<1>>
+using Pixels = Unit<Rep, unit::PixelsUnitGenerator<Period, Scaling>>;
+
+using pixels = Pixels<double>;
+
+// unit prefixes
+template <>
+constexpr auto prefix<pixels, char>() -> const char* const { return "pix";}
+template <>
+constexpr auto prefix<pixels, wchar_t>() -> const wchar_t* const { return L"pix";}
+template <>
+constexpr auto prefix<Pixels<std::int64_t>, char>() -> const char* const { return "pix";}
+template <>
+constexpr auto prefix<Pixels<std::int64_t>, wchar_t>() -> const wchar_t* const { return L"pix";}
+
+namespace literals {
+/** @brief Literal operator for pixels. */
+constexpr auto operator"" _pix(long double pix) noexcept { return pixels(pix);}
+}   // namespace literals
+
+
+// ---------------------------------------------------
+// convenient alias templates for PixelDensity units
+// ---------------------------------------------------
+template <typename Rep, typename PixelPeriod = std::ratio<1>, typename LengthPeriod = std::ratio<1>, typename Scaling = std::ratio<1>>
+using PixelDensity = Unit<Rep, unit::ResolutionUnitGenerator<PixelPeriod, LengthPeriod, Scaling>>;
+
+using pixelsPerInch = PixelDensity<double, std::ratio<1>, std::ratio<254LL, 10'000LL>>; 
+
+// unit prefixes
+template <>
+auto prefix<pixelsPerInch, char>() -> const char* const { return "dpi";}
+template <>
+auto prefix<pixelsPerInch, wchar_t>() -> const wchar_t* const { return L"dpi";}
+
+namespace literals {
+/** @brief Literal operator for pixelsPerInch. */
+constexpr auto operator"" _dpi(long double dpi) noexcept { return pixelsPerInch(dpi);}
+}   // namespace literals
+
+
+// ---------------------------------------------------
+// convenient alias templates for angle units
+// ---------------------------------------------------
+template <typename Rep, typename Period = std::ratio<1>, typename Scaling = std::ratio<1>>
+using Angle = Unit<Rep, unit::AngleUnitGenerator<Period, Scaling>>;
+
+using radians = Angle<double>;
+using degrees = Angle<double, std::ratio<10'000'000'000'000'000LL, 572'957'795'130'823'208LL>>;
+
+// unit prefixes
+template <>
+auto prefix<radians, char>() -> const char* const { return "rad";}
+template <>
+auto prefix<radians, wchar_t>() -> const wchar_t* const { return L"rad";}
+template <>
+auto prefix<degrees, char>() -> const char* const { return "deg";}
+template <>
+auto prefix<degrees, wchar_t>() -> const wchar_t* const { return L"deg";}
 
 // literal operators
 namespace literals {
@@ -144,46 +426,47 @@ constexpr auto operator"" _deg(long double deg) noexcept { return degrees(deg);}
 
 // ---------------------------------------------------
 // convenient alias templates for frequency units
+// ---------------------------------------------------
 template <typename Rep, typename Period = std::ratio<1>, typename Scaling = std::ratio<1>>
 using Frequency = Unit<double, unit::FrequencyUnitGenerator<Period, Scaling>>;
 
-using hertz      = Frequency<double>;
-using kilohertz  = Frequency<double, std::kilo>;
-using megahertz  = Frequency<double, std::mega>;
-using gigahertz  = Frequency<double, std::giga>;
-using terahertz  = Frequency<double, std::tera>;
-using petahertz  = Frequency<double, std::peta>;
-using exahertz   = Frequency<double, std::exa>;
+using hertz     = Frequency<double>;
+using kilohertz = Frequency<double, std::kilo>;
+using megahertz = Frequency<double, std::mega>;
+using gigahertz = Frequency<double, std::giga>;
+using terahertz = Frequency<double, std::tera>;
+using petahertz = Frequency<double, std::peta>;
+using exahertz  = Frequency<double, std::exa>;
 
 // unit prefixes
 template <>
-constexpr std::string_view prefix<hertz, char> = "Hz";
+auto prefix<hertz, char>() -> const char* const { return "Hz";}
 template <>
-constexpr std::wstring_view prefix<hertz, wchar_t> = L"Hz";
+auto prefix<hertz, wchar_t>() -> const wchar_t* const { return L"Hz";}
 template <>
-constexpr std::string_view prefix<kilohertz, char> = "kHz";
+auto prefix<kilohertz, char>() -> const char* const { return "kHz";}
 template <>
-constexpr std::wstring_view prefix<kilohertz, wchar_t> = L"kHz";
+auto prefix<kilohertz, wchar_t>() -> const wchar_t* const { return L"kHz";}
 template <>
-constexpr std::string_view prefix<megahertz, char> = "MHz";
+auto prefix<megahertz, char>() -> const char* const { return "MHz";}
 template <>
-constexpr std::wstring_view prefix<megahertz, wchar_t> = L"MHz";
+auto prefix<megahertz, wchar_t>() -> const wchar_t* const { return L"MHz";}
 template <>
-constexpr std::string_view prefix<gigahertz, char> = "GHz";
+auto prefix<gigahertz, char>() -> const char* const { return "GHz";}
 template <>
-constexpr std::wstring_view prefix<gigahertz, wchar_t> = L"GHz";
+auto prefix<gigahertz, wchar_t>() -> const wchar_t* const { return L"GHz";}
 template <>
-constexpr std::string_view prefix<terahertz, char> = "THz";
+auto prefix<terahertz, char>() -> const char* const { return "THz";}
 template <>
-constexpr std::wstring_view prefix<terahertz, wchar_t> = L"THz";
+auto prefix<terahertz, wchar_t>() -> const wchar_t* const { return L"THz";}
 template <>
-constexpr std::string_view prefix<petahertz, char> = "PHz";
+auto prefix<petahertz, char>() -> const char* const { return "PHz";}
 template <>
-constexpr std::wstring_view prefix<petahertz, wchar_t> = L"PHz";
+auto prefix<petahertz, wchar_t>() -> const wchar_t* const { return L"PHz";}
 template <>
-constexpr std::string_view prefix<exahertz, char> = "EHz";
+auto prefix<exahertz, char>() -> const char* const { return "EHz";}
 template <>
-constexpr std::wstring_view prefix<exahertz, wchar_t> = L"EHz";
+auto prefix<exahertz, wchar_t>() -> const wchar_t* const { return L"EHz";}
 
 // literal operators
 namespace literals {
@@ -206,6 +489,7 @@ constexpr auto operator"" _EHz(long double EHz) noexcept { return exahertz(EHz);
 
 // ---------------------------------------------------
 // convenient alias templates for area units
+// ---------------------------------------------------
 template <typename Rep, typename Period = std::ratio<1>, typename Scaling = std::ratio<1>>
 using Area = Unit<double, unit::AreaUnitGenerator<Period, Scaling>>;
 
@@ -218,9 +502,9 @@ using Acres             = Area<double, std::ratio<3'048LL, 10'000LL>, std::ratio
 
 // unit prefixes
 template <>
-constexpr std::string_view prefix<squaremeters, char> = "m²";
+auto prefix<squaremeters, char>() -> const char* const { return "m^2";}
 template <>
-constexpr std::wstring_view prefix<squaremeters, wchar_t> = L"m²";
+auto prefix<squaremeters, wchar_t>() -> const wchar_t* const { return L"m^2";}
 
 // literal operators
 namespace literals {
@@ -239,26 +523,64 @@ constexpr auto operator"" _ac (long double ac)  noexcept { return Acres(ac);}
 
 // ---------------------------------------------------
 // convenient alias templates for Velocity units
+// ---------------------------------------------------
 template <typename Rep, typename TimePeriod = std::ratio<1>, typename LengthPeriod = std::ratio<1>, typename Scaling = std::ratio<1>>
-using Velocity = Unit<double, unit::VelocityUnitGenerator<TimePeriod, LengthPeriod, Scaling>>;
+using Velocity = Unit<Rep, unit::VelocityUnitGenerator<TimePeriod, LengthPeriod, Scaling>>;
 
 using metersPerSecond   = Velocity<double>;
 using kilometersPerHour = Velocity<double, std::ratio<3'600LL>, std::kilo>;
 
 // unit prefixes
 template <>
-constexpr std::string_view prefix<metersPerSecond, char> = "m/s";
+auto prefix<metersPerSecond, char>() -> const char* const { return "m/s";}
 template <>
-constexpr std::wstring_view prefix<metersPerSecond, wchar_t> = L"m/s";
+auto prefix<metersPerSecond, wchar_t>() -> const wchar_t* const { return L"m/s";}
 template <>
-constexpr std::string_view prefix<kilometersPerHour, char> = "km/h";
+auto prefix<kilometersPerHour, char>() -> const char* const { return "km/h";}
 template <>
-constexpr std::wstring_view prefix<kilometersPerHour, wchar_t> = L"km/h";
+auto prefix<kilometersPerHour, wchar_t>() -> const wchar_t* const { return L"km/h";}
 
 // literal operators
 namespace literals {
 /** @brief Literal operator for kilometers per hour. */
 constexpr auto operator"" _kmh(long double kmh) noexcept { return kilometersPerHour(kmh);}
+}
+
+
+// ---------------------------------------------------
+// convenient alias templates for Energy units
+// ---------------------------------------------------
+template <typename Rep, typename TimePeriod = std::ratio<1>, typename LengthPeriod = std::ratio<1>,
+          typename MassPeriod = std::ratio<1>, typename Scaling = std::ratio<1>>
+using Energy = Unit<Rep, unit::EnergyUnitGenerator<TimePeriod, LengthPeriod, MassPeriod, Scaling>>;
+
+using joule       = Energy<double>;
+using calorie     = Energy<double, std::ratio<1>, std::ratio<1>, std::ratio<1>, std::ratio<41'868ULL, 10'000ULL>>;
+using kilocalorie = Energy<double, std::ratio<1>, std::ratio<1>, std::ratio<1>, std::ratio<41'868ULL, 10ULL>>;
+
+
+// literal operators
+namespace literals {
+/** @brief Literal operator for kilometers per hour. */
+constexpr auto operator"" _J(long double j) noexcept { return joule(j);}
+constexpr auto operator"" _cal(long double c) noexcept { return calorie(c);}
+constexpr auto operator"" _kcal(long double c) noexcept { return kilocalorie(c);}
+}
+
+
+// ---------------------------------------------------
+// convenient alias templates for Power units
+// ---------------------------------------------------
+template <typename Rep, typename TimePeriod = std::ratio<1>, typename LengthPeriod = std::ratio<1>,
+          typename MassPeriod = std::ratio<1>, typename Scaling = std::ratio<1>>
+using Power = Unit<Rep, unit::PowerUnitGenerator<TimePeriod, LengthPeriod, MassPeriod, Scaling>>;
+
+using watt = Power<double>;
+
+// literal operators
+namespace literals {
+/** @brief Literal operator for kilometers per hour. */
+constexpr auto operator"" _W(long double w) noexcept { return watt(w);}
 }
 
 

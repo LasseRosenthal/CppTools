@@ -63,25 +63,25 @@ public:
   constexpr auto operator= (Unit &&) noexcept -> Unit& = default;
   ~Unit() = default;
 
-  template <typename UnitFrom, typename = RequiresSameDimension<UnitFrom>>
-  constexpr Unit           (UnitFrom const& unitFrom) noexcept;
-  template <typename UnitFrom, typename = RequiresSameDimension<UnitFrom>>
-  constexpr auto operator= (UnitFrom const& unitFrom) noexcept -> Unit&;
+  template <typename U, typename = RequiresSameDimension<U>>
+  constexpr Unit           (U const u) noexcept;
+  template <typename U, typename = RequiresSameDimension<U>>
+  constexpr auto operator= (U const u) noexcept -> Unit&;
   auto operator=           (value_type v) noexcept -> Unit&;
 
   // ---------------------------------------------------
   // get and set methods
-  constexpr auto value    () const noexcept -> value_type;
-  void           setValue (value_type v) noexcept;
+  [[nodiscard]] constexpr auto value    () const noexcept -> value_type;
+  void                         setValue (value_type v) noexcept;
 
   // ---------------------------------------------------
   // arithmetic methods
-  template <typename UnitFrom, typename = RequiresSameDimension<UnitFrom>>
-  constexpr auto operator+= (UnitFrom const& unitFrom) noexcept -> Unit&;
-  template <typename UnitFrom, typename = RequiresSameDimension<UnitFrom>>
-  constexpr auto operator-= (UnitFrom const& unitFrom) noexcept -> Unit&;
-  auto operator*=           (value_type v) noexcept -> Unit&;
-  auto operator/=           (value_type v) -> Unit&;
+  template <typename U, typename = RequiresSameDimension<U>>
+  constexpr auto operator+= (U const u) noexcept -> Unit&;
+  template <typename U, typename = RequiresSameDimension<U>>
+  constexpr auto operator-= (U const u) noexcept -> Unit&;
+  constexpr auto operator*= (value_type v) noexcept -> Unit&;
+  constexpr auto operator/= (value_type v) -> Unit&;
 
 private:
 
@@ -94,45 +94,48 @@ private:
 /** 
  * @brief CommonType is alias for the common value_type of two Units.
  */
-template <typename U1, typename Unit2>
-using CommonType = std::common_type_t<typename U1::value_type, typename Unit2::value_type>;
+template <typename U1, typename U2>
+using CommonType = std::common_type_t<typename U1::value_type, typename U2::value_type>;
 
 /**
  * @struct IsUnitT
  * @brief  IsUnitT is a metafunction that detects if a given type T is a Unit,
  *         i.e. it checks whether T has member types unitSystem and value_type.
  */
-template <typename T, typename = std::void_t<>>
+template <typename U, typename = std::void_t<>>
 struct IsUnitT : std::false_type
 {};
 
-template <typename T>
-struct IsUnitT<T, std::void_t<typename T::value_type, typename T::unitSystem, typename T::dimension>>
+template <typename U>
+struct IsUnitT<U, std::void_t<typename U::value_type, typename U::unitSystem, typename U::dimension>>
   : std::true_type
 {};
 
-template <typename T>
-constexpr bool IsUnit = IsUnitT<T>::value;
+template <typename U>
+constexpr bool IsUnit = IsUnitT<U>::value;
 
+/**
+ * @brief EnableForUnit is a convenient alias template to simplify SFINAE expressions.
+ */
+template <typename U>
+using EnableForUnit = std::enable_if_t<IsUnit<U>>;
 
+/**
+ * @brief EnableForSameDimensions is a convenient alias template to simplify SFINAE expressions.
+ */
 template <typename U1, typename U2>
 using EnableForSameDimensions = RequiresSameDimension<typename U1::unitSystem, typename U2::unitSystem>;
-
 
 /** 
  * @brief UnitCast converts a Unit to a different Unit with same dimension.
  */
-template <typename UnitTo, typename UnitFrom>
-auto constexpr UnitCast(UnitFrom const& unitFrom) noexcept -> std::enable_if_t<UnitFrom::dimension::isRational, UnitTo>
+template <typename U1, typename U2>
+[[nodiscard]] auto constexpr UnitCast(U2 const u) noexcept -> U1
 {
-  using factor = typename ConversionFactorT<typename UnitTo::unitSystem, typename UnitFrom::unitSystem>::factor;
-  return UnitTo{unitFrom.value() * meta::AsDecimal<factor, CommonType<UnitTo, UnitFrom>>};
-}
-
-template <typename UnitTo, typename UnitFrom>
-auto constexpr UnitCast(UnitFrom const& unitFrom) noexcept -> std::enable_if_t<!UnitFrom::dimension::isRational, UnitTo>
-{
-  return UnitTo{unitFrom.value() * ConversionFactorT<UnitTo, UnitFrom>::value};
+  using commonValueType = std::common_type_t<CommonType<U1, U2>, double>; // use at least double as the conversion factor type
+  using S1 = typename U1::unitSystem;
+  using S2 = typename U2::unitSystem;
+  return U1{u.value() * ConversionFactor<S1, S2, commonValueType> + Shift<S1, S2, commonValueType>};
 }
 
 
@@ -141,7 +144,7 @@ auto constexpr UnitCast(UnitFrom const& unitFrom) noexcept -> std::enable_if_t<!
  */
 template <typename T, typename UnitSystemT>
 constexpr Unit<T, UnitSystemT>::Unit(value_type v) noexcept
-  : val{v}
+  : val {v}
 {}
 
 /** 
@@ -149,9 +152,9 @@ constexpr Unit<T, UnitSystemT>::Unit(value_type v) noexcept
  * @remarks Only enabled if source and dest unit have the same dimensions.
  */
 template <typename T, typename UnitSystemT>
-template <typename UnitFrom, typename>
-constexpr Unit<T, UnitSystemT>::Unit(UnitFrom const& unitFrom) noexcept
-  : val {UnitCast<Unit>(unitFrom).value()}
+template <typename U, typename>
+constexpr Unit<T, UnitSystemT>::Unit(U const u) noexcept
+  : val {UnitCast<Unit>(u).value()}
 {}
 
 /** 
@@ -159,10 +162,10 @@ constexpr Unit<T, UnitSystemT>::Unit(UnitFrom const& unitFrom) noexcept
  * @remarks Only enabled if source and dest unit have the same dimension.
  */
 template <typename T, typename UnitSystemT>
-template <typename UnitFrom, typename>
-constexpr auto Unit<T, UnitSystemT>::operator=(UnitFrom const& unitFrom) noexcept -> Unit&
+template <typename U, typename>
+constexpr auto Unit<T, UnitSystemT>::operator=(U const u) noexcept -> Unit&
 {
-  val = UnitCast<Unit>(unitFrom).value();
+  val = UnitCast<Unit>(u).value();
   return *this;
 }
 
@@ -182,7 +185,7 @@ inline auto Unit<T, UnitSystemT>::operator=(value_type v) noexcept -> Unit&
  * @brief Returns the current value.
  */
 template <typename T, typename UnitSystemT>
-constexpr auto Unit<T, UnitSystemT>::value() const noexcept -> value_type
+[[nodiscard]] constexpr auto Unit<T, UnitSystemT>::value() const noexcept -> value_type
 {
   return val;
 }
@@ -200,10 +203,10 @@ inline void Unit<T, UnitSystemT>::setValue(value_type v) noexcept
  * @brief Addition with a unit of same dimension.
  */
 template <typename T, typename UnitSystemT>
-template <typename UnitFrom, typename>
-constexpr auto Unit<T, UnitSystemT>::operator+=(UnitFrom const& unitFrom) noexcept -> Unit&
+template <typename U, typename>
+constexpr auto Unit<T, UnitSystemT>::operator+=(U const u) noexcept -> Unit&
 {
-  val += UnitCast<Unit>(unitFrom).value();
+  val += UnitCast<Unit>(u).value();
   return *this;
 }
 
@@ -211,10 +214,10 @@ constexpr auto Unit<T, UnitSystemT>::operator+=(UnitFrom const& unitFrom) noexce
  * @brief Subtraction with a unit of same dimension.
  */
 template <typename T, typename UnitSystemT>
-template <typename UnitFrom, typename>
-constexpr auto Unit<T, UnitSystemT>::operator-=(UnitFrom const& unitFrom) noexcept -> Unit&
+template <typename U, typename>
+constexpr auto Unit<T, UnitSystemT>::operator-=(U const u) noexcept -> Unit&
 {
-  val -= UnitCast<Unit>(unitFrom).value();
+  val -= UnitCast<Unit>(u).value();
   return *this;
 }
 
@@ -222,7 +225,7 @@ constexpr auto Unit<T, UnitSystemT>::operator-=(UnitFrom const& unitFrom) noexce
  * @brief muliplicates the given unit with a given value.
  */
 template <typename T, typename UnitSystemT>
-auto Unit<T, UnitSystemT>::operator*=(value_type v) noexcept -> Unit&
+constexpr auto Unit<T, UnitSystemT>::operator*=(value_type v) noexcept -> Unit&
 {
   val *= v;
   return *this;
@@ -232,7 +235,7 @@ auto Unit<T, UnitSystemT>::operator*=(value_type v) noexcept -> Unit&
  * @brief divides the given unit by a given value.
  */
 template <typename T, typename UnitSystemT>
-auto Unit<T, UnitSystemT>::operator/=(value_type v) -> Unit&
+constexpr auto Unit<T, UnitSystemT>::operator/=(value_type v) -> Unit&
 {
   val /= v;
   return *this;
@@ -243,7 +246,7 @@ auto Unit<T, UnitSystemT>::operator/=(value_type v) -> Unit&
  * @remarks Only enabled if source and dest unit have the same dimensions, e.g. the same exponent list.
  */
 template <typename U1, typename U2, typename = EnableForSameDimensions<U1, U2>>
-constexpr auto operator+(U1 const& ul, U2 const& ur) noexcept -> U1
+constexpr auto operator+(U1 const ul, U2 const ur) noexcept -> U1
 {
   U1 copy{ul};
   return copy += ur;
@@ -254,7 +257,7 @@ constexpr auto operator+(U1 const& ul, U2 const& ur) noexcept -> U1
  * @remarks Only enabled if source and dest unit have the same dimensions, e.g. the same exponent list.
  */
 template <typename U1, typename U2, typename = EnableForSameDimensions<U1, U2>>
-constexpr auto operator-(U1 const& ul, U2 const& ur) noexcept -> U1
+constexpr auto operator-(U1 const ul, U2 const ur) noexcept -> U1
 {
   U1 copy{ul};
   return copy -= ur;
@@ -264,20 +267,43 @@ constexpr auto operator-(U1 const& ul, U2 const& ur) noexcept -> U1
 template <typename U>
 using BaseUnit = Unit<typename U::value_type, unit::BaseUnitGenerator<typename U::unitSystem>>;
 
+/** 
+ * @brief N-th power of units.
+ */
+template <typename U, std::size_t N>
+using UnitPowerType = Unit<typename U::value_type, unit::arithmetic::NthPower<typename U::unitSystem, N>>;
+
+template <std::size_t N, typename U>
+[[nodiscard]] auto constexpr pow(U const u) noexcept
+{
+  return UnitPowerType<U, N>{meta::Power<N>(u.value())};
+}
+
+/** 
+ * @brief Multiplication of two equal units.
+ */
+template <typename U>
+[[nodiscard]] auto constexpr operator*(U const u1, U const u2) noexcept
+{
+  return UnitPowerType<U, 2ULL>{u1.value() * u2.value()};
+}
+
+/** 
+ * @brief Templated multiplication of different units.
+ */
 template <typename U1, typename U2>
 using MultiplicationType =
   Unit<CommonType<U1, U2>, arithmetic::MultiplicationType<typename U1::unitSystem, typename U2::unitSystem>>;
 
-/** 
- * @brief Templated multiplication of units.
- */
 template <typename U1, typename U2>
-auto constexpr operator*(U1 const& ul, U2 const& ur) noexcept -> MultiplicationType<U1, U2>
+[[nodiscard]] auto constexpr operator*(U1 const ul, U2 const ur) noexcept -> MultiplicationType<U1, U2>
 {
-  using returnType = MultiplicationType<U1, U2>;
-  return returnType{UnitCast<BaseUnit<U1>>(ul).value() * UnitCast<BaseUnit<U2>>(ur).value()};
+  return MultiplicationType<U1, U2>{UnitCast<BaseUnit<U1>>(ul).value() * UnitCast<BaseUnit<U2>>(ur).value()};
 }
 
+/**
+ * @brief Templated division of units.
+ */
 template <typename U1, typename U2>
 using DivisionType = std::conditional_t<
   dimension::HasOnlyZeroExponents<dimension::DivisionType<DimensionOf<U1>, DimensionOf<U2>>>,
@@ -285,37 +311,32 @@ using DivisionType = std::conditional_t<
   Unit<CommonType<U1, U2>, arithmetic::DivisionType<typename U1::unitSystem, typename U2::unitSystem>>
 >;
 
-/**
- * @brief Templated division of units.
- */
 template <typename U1, typename U2, typename = std::void_t<typename U1::value_type, typename U2::value_type, typename U1::unitSystem>>
-auto constexpr operator/(U1 const& ul, U2 const& ur) -> DivisionType<U1, U2>
+[[nodiscard]] auto constexpr operator/(U1 const ul, U2 const ur) -> DivisionType<U1, U2>
 {
-  using returnType = DivisionType<U1, U2>;
-  return returnType{UnitCast<BaseUnit<U1>>(ul).value() / UnitCast<BaseUnit<U2>>(ur).value()};
+  return DivisionType<U1, U2>{UnitCast<BaseUnit<U1>>(ul).value() / UnitCast<BaseUnit<U2>>(ur).value()};
 }
 
 /**
  * @brief Multiplication with scalars.
  */
 template <typename U>
-[[nodiscard]] auto constexpr operator*(U const& unit, typename U::value_type const v) noexcept -> U
+[[nodiscard]] auto constexpr operator*(U const unit, typename U::value_type const v) noexcept -> U
 {
   return U{unit.value() * v};
 }
 
 template <typename U>
-[[nodiscard]] auto constexpr operator*(typename U::value_type const v, U const& unit) noexcept -> U
+[[nodiscard]] auto constexpr operator*(typename U::value_type const v, U const unit) noexcept -> U
 {
   return unit * v;
 }
-
 
 /**
  * @brief Division by a scalar.
  */
 template <typename U>
-[[nodiscard]] auto constexpr operator/(U const& unit, typename U::value_type const v) -> U
+[[nodiscard]] auto constexpr operator/(U const unit, typename U::value_type const v) -> U
 {
   return U{unit.value() / v};
 }
@@ -324,77 +345,98 @@ template <typename U>
 using UnitInversionType = Unit<typename U::value_type, unit::arithmetic::InversionOf<typename U::unitSystem>>;
 
 template <typename U>
-auto constexpr invertUnit(U const& unit) -> UnitInversionType<U>
+auto constexpr invertUnit(U const unit) -> UnitInversionType<U>
 {
   return UnitInversionType<U>{1.0 / unit.value()};
 }
 
 template <typename U, typename = std::void_t<typename U::value_type>>
-auto constexpr operator/(typename U::value_type v, U const& unit) -> UnitInversionType<U>
+auto constexpr operator/(typename U::value_type v, U const unit) -> UnitInversionType<U>
 {
   return UnitInversionType<U>{v / unit.value()};
 }
 
+/**
+ * @brief calculates the N-th root of a given unit.
+ */
+template <typename U, std::size_t N>
+using UnitNthRootType = Unit<typename U::value_type, unit::arithmetic::NthRoot<typename U::unitSystem, N>>;
+
+template <std::size_t N, typename U>
+[[nodiscard]] inline auto root(U const unit) -> UnitNthRootType<U, N>
+{
+  return UnitNthRootType<U, N>{std::pow(unit.value(), 1.0 / N)};
+}
+
+/**
+ * @brief calculates the square root of a given unit.
+ */
+template <typename U>
+[[nodiscard]] inline auto sqrt(U const unit) -> UnitNthRootType<U, 2ULL>
+{
+  return root<2ULL>(unit);
+}
 
 /**
  * @brief Comparison for almost equality of two units. Returns true if the distance in ULP (units in the last place)
  *        of the unit values is less than a maximum which is given by a template parameter.
  */
-template <typename U, std::size_t MaxULPDist = 4ULL, typename = std::enable_if_t<IsUnit<U>>>
-inline [[nodiscard]] auto equals(U const& ul, U const& ur) -> bool
+template <typename U, std::size_t MaxULPDist = 4ULL, typename = EnableForUnit<U>>
+inline [[nodiscard]] auto equals(U const ul, U const ur) -> bool
 {
   return cpptools::FloatingPoint<typename U::value_type>::almostEqual<MaxULPDist>(ul.value(), ur.value());
 }
 
-template <typename U, typename = std::enable_if_t<IsUnit<U>>>
-inline [[nodiscard]] auto operator==(U const& ul, U const& ur) -> bool
+template <typename U, typename = EnableForUnit<U>>
+inline [[nodiscard]] auto operator==(U const ul, U const ur) -> bool
 {
   return equals<U, 1ULL>(ul, ur);
+}
+
+/**
+ * @brief Comparison for almost equality of two units of same dimension but different units.
+ *        Returns true if the distance in ULP (units in the last place)
+ *        of the unit values is less than a maximum which is given by a template parameter.
+ */
+template <typename U1, typename U2, std::size_t MaxULPDist = 4ULL, typename = EnableForSameDimensions<U1, U2>>
+inline [[nodiscard]] auto equals(U1 const ul, U2 const ur) -> bool
+{
+  return equals<U1, MaxULPDist>(ul, UnitCast<U1>(ur));
+}
+
+template <typename U1, typename U2, typename = EnableForSameDimensions<U1, U2>>
+inline [[nodiscard]] auto operator==(U1 const ul, U2 const ur) -> bool
+{
+  return equals<U1, U2, 1ULL>(ul, ur);
 }
 
 /**
  * @brief Comparison for almost equality of a unit and a scalar. Returns true if the distance in ULP (units in the last place)
  *        of the unit values is less than a maximum which is given by a template parameter.
  */
-template <typename U, std::size_t MaxULPDist = 4ULL, typename = std::enable_if_t<IsUnit<U>>>
-inline [[nodiscard]] auto equals(U const& u, typename U::value_type const v) -> bool
+template <typename U, std::size_t MaxULPDist = 4ULL, typename = EnableForUnit<U>>
+inline [[nodiscard]] auto equals(U const u, typename U::value_type const v) -> bool
 {
   return cpptools::FloatingPoint<typename U::value_type>::almostEqual<MaxULPDist>(u.value(), v);
 }
 
-template <typename U, typename = std::enable_if_t<IsUnit<U>>>
-inline [[nodiscard]] auto operator==(U const& u, typename U::value_type const v) -> bool
+template <typename U, typename = EnableForUnit<U>>
+inline [[nodiscard]] auto operator==(U const u, typename U::value_type const v) -> bool
 {
   return equals<U, 1ULL>(u, v);
 }
 
-template <typename U, typename = std::enable_if_t<IsUnit<U>>>
-inline [[nodiscard]] auto operator==(typename U::value_type const v, U const& u) -> bool
+template <typename U, typename = EnableForUnit<U>>
+inline [[nodiscard]] auto operator==(typename U::value_type const v, U const u) -> bool
 {
   return equals<U, 1ULL>(u, v);
 }
-
-
-//template <typename U1, typename U2, std::size_t MaxULPDist = 4ULL,
-//          typename = std::void_t<typename U1::value_type, typename U2::value_type, typename U1::unitSystem>>
-//[[nodiscard]] auto equals(U1 const& ul, U2 const& ur) -> bool
-//{
-//  using FloatingPoint = cpptools::FloatingPoint<typename U1::value_type>;
-//  return FloatingPoint::almostEqual<MaxULPDist>(ul.value(), ur.value());
-//}
-//
-//template <typename U1, typename U2,
-//          typename = std::void_t<typename U1::value_type, typename U2::value_type, typename U1::unitSystem>>
-//[[nodiscard]] auto operator==(U1 const& ul, U2 const& ur) -> bool
-//{
-//  return equals<U1, U2, 1ULL>(ul, ur);
-//}
 
 /**
  * @brief less operator for two units
  */
-template <typename U, typename = std::enable_if_t<IsUnit<U>>>
-[[nodiscard]] constexpr auto operator<(U const& ul, U const& ur) noexcept -> bool
+template <typename U, typename = EnableForUnit<U>>
+[[nodiscard]] constexpr auto operator<(U const ul, U const ur) noexcept -> bool
 {
   return ul.value() < ur.value();
 }
@@ -402,8 +444,8 @@ template <typename U, typename = std::enable_if_t<IsUnit<U>>>
 /**
  * @brief less or equal operator for two units
  */
-template <typename U, typename = std::enable_if_t<IsUnit<U>>>
-[[nodiscard]] constexpr auto operator<=(U const& ul, U const& ur) noexcept -> bool
+template <typename U, typename = EnableForUnit<U>>
+[[nodiscard]] constexpr auto operator<=(U const ul, U const ur) noexcept -> bool
 {
   return ul.value() <= ur.value();
 }
@@ -411,8 +453,8 @@ template <typename U, typename = std::enable_if_t<IsUnit<U>>>
 /**
  * @brief greater operator for two units
  */
-template <typename U, typename = std::enable_if_t<IsUnit<U>>>
-[[nodiscard]] constexpr auto operator>(U const& ul, U const& ur) noexcept -> bool
+template <typename U, typename = EnableForUnit<U>>
+[[nodiscard]] constexpr auto operator>(U const ul, U const ur) noexcept -> bool
 {
   return ur < ul;
 }
@@ -420,8 +462,8 @@ template <typename U, typename = std::enable_if_t<IsUnit<U>>>
 /**
  * @brief greater or equal operator for two units
  */
-template <typename U, typename = std::enable_if_t<IsUnit<U>>>
-[[nodiscard]] constexpr auto operator>=(U const& ul, U const& ur) noexcept -> bool
+template <typename U, typename = EnableForUnit<U>>
+[[nodiscard]] constexpr auto operator>=(U const ul, U const ur) noexcept -> bool
 {
   return ur <= ul;
 }
@@ -429,73 +471,73 @@ template <typename U, typename = std::enable_if_t<IsUnit<U>>>
 /**
  * @brief less operator for a unit and a scalar
  */
-template <typename U, typename = std::enable_if_t<IsUnit<U>>>
-[[nodiscard]] constexpr auto operator<(U const& unit, typename U::value_type const v) noexcept -> bool
+template <typename U, typename = EnableForUnit<U>>
+[[nodiscard]] constexpr auto operator<(U const u, typename U::value_type const v) noexcept -> bool
 {
-  return unit.value() < v;
+  return u.value() < v;
 }
 
 /**
  * @brief less or equal operator for a unit and a scalar
  */
-template <typename U, typename = std::enable_if_t<IsUnit<U>>>
-[[nodiscard]] constexpr auto operator<=(U const& unit, typename U::value_type const v) noexcept -> bool
+template <typename U, typename = EnableForUnit<U>>
+[[nodiscard]] constexpr auto operator<=(U const u, typename U::value_type const v) noexcept -> bool
 {
-  return unit.value() <= v;
+  return u.value() <= v;
 }
 
 /**
  * @brief greater operator for a unit and a scalar
  */
-template <typename U, typename = std::enable_if_t<IsUnit<U>>>
-[[nodiscard]] constexpr auto operator>(U const& unit, typename U::value_type const v) noexcept -> bool
+template <typename U, typename = EnableForUnit<U>>
+[[nodiscard]] constexpr auto operator>(U const u, typename U::value_type const v) noexcept -> bool
 {
-  return unit.value() > v;
+  return u.value() > v;
 }
 
 /**
  * @brief greater or equal operator for a unit and a scalar
  */
-template <typename U, typename = std::enable_if_t<IsUnit<U>>>
-[[nodiscard]] constexpr auto operator>=(U const& unit, typename U::value_type const v) noexcept -> bool
+template <typename U, typename = EnableForUnit<U>>
+[[nodiscard]] constexpr auto operator>=(U const u, typename U::value_type const v) noexcept -> bool
 {
-  return unit.value() >= v;
+  return u.value() >= v;
 }
 
 /**
  * @brief less operator for a scalar and a unit
  */
-template <typename U, typename = std::enable_if_t<IsUnit<U>>>
-[[nodiscard]] constexpr auto operator<(typename U::value_type const v, U const& unit) noexcept -> bool
+template <typename U, typename = EnableForUnit<U>>
+[[nodiscard]] constexpr auto operator<(typename U::value_type const v, U const u) noexcept -> bool
 {
-  return unit > v;
+  return u > v;
 }
 
 /**
  * @brief less or equal operator for a scalar and a unit
  */
-template <typename U, typename = std::enable_if_t<IsUnit<U>>>
-[[nodiscard]] constexpr auto operator<=(typename U::value_type const v, U const& unit) noexcept -> bool
+template <typename U, typename = EnableForUnit<U>>
+[[nodiscard]] constexpr auto operator<=(typename U::value_type const v, U const u) noexcept -> bool
 {
-  return unit >= v;
+  return u >= v;
 }
 
 /**
  * @brief greator operator for a scalar and a unit
  */
-template <typename U, typename = std::enable_if_t<IsUnit<U>>>
-[[nodiscard]] constexpr auto operator>(typename U::value_type const v, U const& unit) noexcept -> bool
+template <typename U, typename = EnableForUnit<U>>
+[[nodiscard]] constexpr auto operator>(typename U::value_type const v, U const u) noexcept -> bool
 {
-  return unit < v;
+  return u < v;
 }
 
 /**
  * @brief greter or equal operator for a scalar and a unit
  */
-template <typename U, typename = std::enable_if_t<IsUnit<U>>>
-[[nodiscard]] constexpr auto operator>=(typename U::value_type const v, U const& unit) noexcept -> bool
+template <typename U, typename = EnableForUnit<U>>
+[[nodiscard]] constexpr auto operator>=(typename U::value_type const v, U const u) noexcept -> bool
 {
-  return unit <= v;
+  return u <= v;
 }
 
 
@@ -503,10 +545,10 @@ template <typename U, typename = std::enable_if_t<IsUnit<U>>>
  * @brief Computes a unit with the largest integer value not bigger than the value of unit.
  */
 template <typename U, typename = std::void_t<typename U::value_type>>
-auto constexpr floor(U const& unit) -> U
+auto constexpr floor(U const u) -> U
 {
 //  constexpr auto i = static_cast<std::int64_t>(unit.value());
-  return U(static_cast<typename U::value_type>(static_cast<std::int64_t>(unit.value())));
+  return U(static_cast<typename U::value_type>(static_cast<std::int64_t>(u.value())));
 //  return U(i < unit.value() ? i : i - 1LL);
 }
 
@@ -514,242 +556,20 @@ auto constexpr floor(U const& unit) -> U
  * @brief Computes a unit with the smallest integer value not less than the value of unit.
  */
 template <typename U, typename = std::void_t<typename U::value_type>>
-auto constexpr ceil(U const& unit) -> U
+auto constexpr ceil(U const u) -> U
 {
-  return U(static_cast<typename U::value_type>(static_cast<std::int64_t>(unit.value() + 1.0)));
+  return U(static_cast<typename U::value_type>(static_cast<std::int64_t>(u.value() + 1.0)));
 }
 
 /**
  * @brief Rounds to the nearest integer value, rounding halfway cases away from zero.
  */
 template <typename U, typename = std::void_t<typename U::value_type>>
-inline auto round(U const& unit) -> U
+inline auto round(U const u) -> U
 {
 //  return U(static_cast<typename U::value_type>(static_cast<std::int64_t>(unit.value() + 0.5)));
-  return U(static_cast<typename U::value_type>(std::round(unit.value())));
+  return U(static_cast<typename U::value_type>(std::round(u.value())));
 }
-
-
-template <typename U, typename CharT>
-constexpr std::string_view prefix = "";
-
-/**
- * @brief Stream operator. Prints the actual value and a unit prefix if the prefix variable
- *        template has been specialized for the given unit.
- */
-template <typename CharT, typename U, typename CharTraits = std::char_traits<CharT>,
-          typename = std::void_t<typename U::value_type, typename U::unitSystem>>
-auto operator<<(std::basic_ostream<CharT, CharTraits>& ostr, U const& unit) -> std::basic_ostream<CharT, CharTraits>&
-{
-  return ostr << unit.value() << ostr.widen(' ') << prefix<U, CharT>;
-}
-
-
-// ---------------------------------------------------
-// convenient alias templates for length units
-template <typename Rep, typename Period = std::ratio<1>, typename Scaling = std::ratio<1>>
-using Length = Unit<double, unit::LengthUnitGenerator<Period, Scaling>>;
-
-using picometers  = Length<double, std::pico>;
-using nanometers  = Length<double, std::nano>;
-using micrometers = Length<double, std::micro>;
-using millimeters = Length<double, std::milli>;
-using centimeters = Length<double, std::centi>;
-using decimeters  = Length<double, std::deci>;
-using meters      = Length<double>;
-using kilometers  = Length<double, std::kilo>;
-using lightyears  = Length<double, std::ratio<9'460'730'472'580'800LL>>;
-using inch        = Length<double, std::ratio<254LL, 10'000LL>>;
-using points      = Length<double, std::ratio<127LL, 360'000LL>>;
-using pica        = Length<double, std::ratio<127LL, 30'000LL>>;
-using mile        = Length<double, std::ratio<1'609'344LL, 1'000LL>>;
-using yards       = Length<double, std::ratio<9'144LL, 10'000LL>>;
-using feets       = Length<double, std::ratio<3'048LL, 10'000LL>>;
-
-// unit prefixes
-template <>
-constexpr std::string_view prefix<picometers, char> = "pm";
-template <>
-constexpr std::wstring_view prefix<picometers, wchar_t> = L"pm";
-template <>
-constexpr std::string_view prefix<nanometers, char> = "nm";
-template <>
-constexpr std::wstring_view prefix<nanometers, wchar_t> = L"nm";
-template <>
-constexpr std::string_view prefix<micrometers, char> = "mum";
-template <>
-constexpr std::wstring_view prefix<micrometers, wchar_t> = L"mum";
-template <>
-constexpr std::string_view prefix<millimeters, char> = "mm";
-template <>
-constexpr std::wstring_view prefix<millimeters, wchar_t> = L"mm";
-template <>
-constexpr std::string_view prefix<centimeters, char> = "cm";
-template <>
-constexpr std::wstring_view prefix<centimeters, wchar_t> = L"cm";
-template <>
-constexpr std::string_view prefix<decimeters, char> = "dm";
-template <>
-constexpr std::wstring_view prefix<decimeters, wchar_t> = L"dm";
-template <>
-constexpr std::string_view prefix<meters, char> = "m";
-template <>
-constexpr std::wstring_view prefix<meters, wchar_t> = L"m";
-template <>
-constexpr std::string_view prefix<kilometers, char> = "km";
-template <>
-constexpr std::wstring_view prefix<kilometers, wchar_t> = L"km";
-template <>
-constexpr std::string_view prefix<lightyears, char> = "ly";
-template <>
-constexpr std::wstring_view prefix<lightyears, wchar_t> = L"ly";
-template <>
-constexpr std::string_view prefix<inch, char> = "in";
-template <>
-constexpr std::wstring_view prefix<inch, wchar_t> = L"in";
-template <>
-constexpr std::string_view prefix<points, char> = "pt";
-template <>
-constexpr std::wstring_view prefix<points, wchar_t> = L"pt";
-template <>
-constexpr std::string_view prefix<pica, char> = "pica";
-template <>
-constexpr std::wstring_view prefix<pica, wchar_t> = L"pica";
-template <>
-constexpr std::string_view prefix<mile, char> = "mi";
-template <>
-constexpr std::wstring_view prefix<mile, wchar_t> = L"mi";
-template <>
-constexpr std::string_view prefix<yards, char> = "yd";
-template <>
-constexpr std::wstring_view prefix<yards, wchar_t> = L"yd";
-template <>
-constexpr std::string_view prefix<feets, char> = "ft";
-template <>
-constexpr std::wstring_view prefix<feets, wchar_t> = L"ft";
-
-// literal operators
-namespace literals {
-/** @brief Literal operator for nanometers. */
-constexpr auto operator"" _nm(long double nm) noexcept { return nanometers(nm);}
-/** @brief Literal operator for millimeters. */
-constexpr auto operator"" _mm(long double mm) noexcept { return millimeters(mm);}
-/** @brief Literal operator for centimeters. */
-constexpr auto operator"" _cm(long double cm) noexcept { return centimeters(cm);}
-/** @brief Literal operator for meters. */
-constexpr auto operator"" _m (long double m)  noexcept { return meters(m);}
-/** @brief Literal operator for kilometers. */
-constexpr auto operator"" _km(long double km) noexcept { return kilometers(km);}
-/** @brief Literal operator for lightyears. */
-constexpr auto operator"" _ly(long double ly) noexcept { return lightyears(ly);}
-/** @brief Literal operator for inch. */
-constexpr auto operator"" _in(long double in) noexcept { return inch(in);}
-/** @brief Literal operator for points. */
-constexpr auto operator"" _pt(long double pt) noexcept { return points(pt);}
-/** @brief Literal operator for pica. */
-constexpr auto operator"" _pc(long double pc) noexcept { return pica(pc);  }
-/** @brief Literal operator for mile. */
-constexpr auto operator"" _mi(long double mi) noexcept { return mile(mi);  }
-/** @brief Literal operator for yards. */
-constexpr auto operator"" _yd(long double yd) noexcept { return yards(yd);  }
-/** @brief Literal operator for feets. */
-constexpr auto operator"" _ft(long double ft) noexcept { return feets(ft);  }
-}
-
-
-// ---------------------------------------------------
-// convenient alias templates for storage amount units
-template <typename Rep, typename Period = std::ratio<1>, typename Scaling = std::ratio<1>>
-using StorageAmount = Unit<double, unit::StorageAmountUnitGenerator<Period, Scaling>>;
-
-using bits      = StorageAmount<double>;
-using bytes     = StorageAmount<double, std::ratio<8ULL>>;
-using kilobytes = StorageAmount<double, std::ratio<8'000ULL>>;
-using megabytes = StorageAmount<double, std::ratio<8'000'000ULL>>;
-using gigabytes = StorageAmount<double, std::ratio<8'000'000'000ULL>>;
-using terabytes = StorageAmount<double, std::ratio<8'000'000'000'000ULL>>;
-using kibibytes = StorageAmount<double, std::ratio<8ULL * 1'024ULL>>;
-using mebibytes = StorageAmount<double, std::ratio<8ULL * 1'048'576ULL>>;
-using gibibytes = StorageAmount<double, std::ratio<8ULL * 1'073'741'824ULL>>;
-using tebibytes = StorageAmount<double, std::ratio<8ULL * 1'099'511'627'776ULL>>;
-
-template <>
-constexpr std::string_view prefix<bits, char> = "bit";
-template <>
-constexpr std::wstring_view prefix<bits, wchar_t> = L"bit";
-template <>
-constexpr std::string_view prefix<bytes, char> = "B";
-template <>
-constexpr std::wstring_view prefix<bytes, wchar_t> = L"B";
-template <>
-constexpr std::string_view prefix<kilobytes, char> = "kB";
-template <>
-constexpr std::wstring_view prefix<kilobytes, wchar_t> = L"kB";
-template <>
-constexpr std::string_view prefix<megabytes, char> = "MB";
-template <>
-constexpr std::wstring_view prefix<megabytes, wchar_t> = L"MB";
-template <>
-constexpr std::string_view prefix<gigabytes, char> = "GB";
-template <>
-constexpr std::wstring_view prefix<gigabytes, wchar_t> = L"GB";
-template <>
-constexpr std::string_view prefix<terabytes, char> = "TB";
-template <>
-constexpr std::wstring_view prefix<terabytes, wchar_t> = L"TB";
-
-namespace literals {
-  /** @brief Literal operator for bits. */
-constexpr auto operator"" _b(long double b) noexcept { return bits(b);}
-/** @brief Literal operator for bytes. */
-constexpr auto operator"" _B(long double b) noexcept { return bytes(b);}
-/** @brief Literal operator for kilobytes. */
-constexpr auto operator"" _kB  (long double kb) noexcept { return kilobytes(kb); }
-/** @brief Literal operator for megabytes. */
-constexpr auto operator"" _MB  (long double mb) noexcept { return megabytes(mb); }
-/** @brief Literal operator for gigabytes. */
-constexpr auto operator"" _GB  (long double gb) noexcept { return gigabytes(gb); }
-/** @brief Literal operator for terabytes. */
-constexpr auto operator"" _TB  (long double tb) noexcept { return terabytes(tb); }
-/** @brief Literal operator for kibibytes. */
-constexpr auto operator"" _KiB (long double kib) noexcept { return kibibytes(kib); }
-/** @brief Literal operator for mebibytes. */
-constexpr auto operator"" _MiB (long double mib) noexcept { return mebibytes(mib); }
-/** @brief Literal operator for gibibytes. */
-constexpr auto operator"" _GiB (long double gib) noexcept { return gibibytes(gib); }
-/** @brief Literal operator for tebibytes. */
-constexpr auto operator"" _TiB (long double tib) noexcept { return tebibytes(tib); }
-}
-
-
-// ---------------------------------------------------
-// convenient alias templates for pixels units
-template <typename Rep, typename Period = std::ratio<1>, typename Scaling = std::ratio<1>>
-using Pixels = Unit<double, unit::PixelsUnitGenerator<Period, Scaling>>;
-
-using pixels = Pixels<double>;
-
-namespace literals {
-/** @brief Literal operator for pixels. */
-constexpr auto operator"" _pix(long double pix) noexcept { return pixels(pix);}
-}   // namespace literals
-
-
-// ---------------------------------------------------
-// convenient alias templates for PixelDensity units
-template <typename Rep, typename PixelPeriod = std::ratio<1>, typename LengthPeriod = std::ratio<1>, typename Scaling = std::ratio<1>>
-using PixelDensity = Unit<double, unit::ResolutionUnitGenerator<PixelPeriod, LengthPeriod, Scaling>>;
-
-using pixelsPerInch = PixelDensity<double, std::ratio<1>, std::ratio<254LL, 10'000LL>>; 
-
-namespace literals {
-/** @brief Literal operator for pixelsPerInch. */
-constexpr auto operator"" _dpi(long double dpi) noexcept { return pixelsPerInch(dpi);}
-}   // namespace literals
-
-
-
-
 
 
 }   // namespace unit

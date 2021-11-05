@@ -69,13 +69,24 @@ template <typename UnitSystemT>
 using InversionType = UnitSystemForDimension<dimension::InversionType<DimensionOf<UnitSystemT>>, meta::Invert<ScalingOf<UnitSystemT>>>;
 
 template <typename UnitSystemT>
-struct InversionOfT
-  : meta::IdentityT<
-      UnitSystem<meta::typelist::Transform<UnitSystemBaseTagListOf<UnitSystemT>, InversionOfUnitSystemBaseTagT>,
-                 meta::Invert<ScalingOf<UnitSystemT>>>> {};
+using InversionOf = UnitSystem<meta::typelist::Transform<UnitSystemBaseTagListOf<UnitSystemT>, InversionOfUnitSystemBaseTagT>,
+                               meta::Invert<ScalingOf<UnitSystemT>>>;
 
-template <typename UnitSystemT>
-using InversionOf = typename InversionOfT<UnitSystemT>::type;
+/**
+ * @brief NthPower is an alias for the UnitSystem that results from taking the N-th power
+ *        of a unit system.
+ */
+template <typename UnitSystemT, std::size_t N>
+using NthPower = UnitSystem<meta::typelist::Transform<UnitSystemBaseTagListOf<UnitSystemT>, NthPowerOfUnitSystemBaseTagGenerator<N>>,
+                            ScalingOf<UnitSystemT>>;
+
+/**
+ * @brief NthRoot is an alias for the UnitSystem that results from taking the N-th root
+ *        of a unit system.
+ */
+template <typename UnitSystemT, std::size_t N>
+using NthRoot = UnitSystem<meta::typelist::Transform<UnitSystemBaseTagListOf<UnitSystemT>, NthRootOfUnitSystemBaseTagGenerator<N>>,
+                           ScalingOf<UnitSystemT>>;
 
 
 }   // namespace arithmetic

@@ -79,6 +79,19 @@ TEST(UnitSystem, InversionType)
   EXPECT_TRUE((std::is_same_v<generatedSystem, expectedUnitSystem>));
 }
 
+TEST(UnitSystem, RootType)
+{
+  using D1 = DimensionGenerator<TimeTag<std::ratio<-2>>, LengthTag<std::ratio<2>>>;
+  using scaling = std::ratio<1>;
+
+  using D3 = DimensionGenerator<TimeTag<std::ratio<-1>>, LengthTag<std::ratio<1>>>;
+
+  using UnitSystem1        = arithmetic::UnitSystemForDimension<D1, scaling>;
+  using expectedUnitSystem = arithmetic::UnitSystemForDimension<D3, scaling>;
+  using generatedSystem    = arithmetic::NthRoot<UnitSystem1, 2ULL>;
+  EXPECT_TRUE((std::is_same_v<generatedSystem, expectedUnitSystem>));
+}
+
  
  
 // *************************************************************************** // 

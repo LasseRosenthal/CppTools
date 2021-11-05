@@ -30,8 +30,7 @@ namespace dimension {
 
 /** 
  * @struct Dimension
- * @brief  Dimension defines a dimension as a composition
- *         of several base dimensions.
+ * @brief  Dimension defines a dimension as a composition of several base dimensions.
  * @tparam BaseDimTagList a \link #typelist \endlink of different
  *         \link #BaseDimensionTag \endlink structures.
  */
@@ -76,7 +75,7 @@ template <std::size_t Index, typename BaseDimTagList>
 using DimensionAt = std::conditional_t<
     meta::valuelist::HasValue<meta::valuelist::TypeToValuelist<BaseDimTagList, IndexOfT>, Index>,
     meta::typelist::NthElement<BaseDimTagList, meta::typelist::FindIf<BaseDimTagList, dimension::HasIndex<Index>>>,
-    DimensionTagGenerator<Index, std::ratio<0>>
+    BaseDimensionTag<Index, std::ratio<0>>
   >;
 
 /** 
@@ -92,8 +91,7 @@ struct BaseDimensionTagListGeneratorT<BaseDimTagList, std::index_sequence<Is...>
   : meta::IdentityT<meta::Typelist<DimensionAt<Is, BaseDimTagList>...>> {};
 
 template <typename BaseDimTagList>
-using BaseDimensionTagListGenerator =
-  typename BaseDimensionTagListGeneratorT<BaseDimTagList, BaseDimensionIndices>::type;
+using BaseDimensionTagListGenerator = typename BaseDimensionTagListGeneratorT<BaseDimTagList, BaseDimensionIndices>::type;
 
 /** 
  * @struct DimensionGeneratorT
@@ -123,30 +121,30 @@ struct DimensionTagListGeneratorT;
 
 template <typename Exponents, std::size_t... Is>
 struct DimensionTagListGeneratorT<Exponents, std::index_sequence<Is...>>
-  : meta::IdentityT<
-      meta::Typelist<DimensionTagGenerator<Is, meta::typelist::NthElement<Exponents, Is>>...>> {};
+  : meta::IdentityT<meta::Typelist<BaseDimensionTag<Is, meta::typelist::NthElement<Exponents, Is>>...>> {};
 
 template <typename Exponents>
-using DimensionTagListGenerator =
-  typename DimensionTagListGeneratorT<Exponents, BaseDimensionIndices>::type;
+using DimensionTagListGenerator = typename DimensionTagListGeneratorT<Exponents, BaseDimensionIndices>::type;
+
+
+
+template <typename Dimension1, typename Dimension2, template<typename Exponent1, typename Exponent2> class BinaryOp>
+using BinaryDimensionArithmetic =
+  Dimension<DimensionTagListGenerator<meta::typelist::TransformBinary<
+    ExponentsOf<Dimension1>, ExponentsOf<Dimension2>, BinaryOp>>
+  >;
 
 /** 
  * @brief MultiplicationType is an alias for the dimension of the product of two dimensions.
  */
 template <typename Dimension1, typename Dimension2>
-using MultiplicationType =
-  Dimension<DimensionTagListGenerator<meta::typelist::TransformBinary<
-    ExponentsOf<Dimension1>, ExponentsOf<Dimension2>, std::ratio_add>>
-  >;
+using MultiplicationType = BinaryDimensionArithmetic<Dimension1, Dimension2, std::ratio_add>;
 
 /** 
  * @brief DivisionType is an alias for the dimension of the quotient of two dimensions.
  */
 template <typename Dimension1, typename Dimension2>
-using DivisionType =
-  Dimension<DimensionTagListGenerator<meta::typelist::TransformBinary<
-    ExponentsOf<Dimension1>, ExponentsOf<Dimension2>, std::ratio_subtract>>
-  >;
+using DivisionType = BinaryDimensionArithmetic<Dimension1, Dimension2, std::ratio_subtract>;
 
 /** 
  * @brief DivisionType is an alias for the dimension of the quotient of two dimensions.
@@ -156,6 +154,27 @@ struct InversionTypeT : meta::IdentityT<Dimension<meta::typelist::Transform<type
 
 template <typename DimensionT>
 using InversionType = typename InversionTypeT<DimensionT>::type;
+
+
+/**
+ * @struct NthPowerT
+ * @brief  NthPowerT computes the N-th power of a given dimension
+ */
+template <typename DimensionT, std::size_t N>
+struct NthPowerT : meta::IdentityT<Dimension<meta::typelist::Transform<typename DimensionT::baseDimTags, NthPowerGenerator<N>>>> {};
+
+template <typename DimensionT, std::size_t N>
+using NthPower = typename NthPowerT<DimensionT, N>::type;
+
+/** 
+ * @struct NthRootT
+ * @brief  NthRootT computes the N-th root of a given dimension
+ */
+template <typename DimensionT, std::size_t N>
+struct NthRootT : meta::IdentityT<Dimension<meta::typelist::Transform<typename DimensionT::baseDimTags, NthRootGenerator<N>>>> {};
+
+template <typename DimensionT, std::size_t N>
+using NthRoot = typename NthRootT<DimensionT, N>::type;
 
 
 // ---------------------------------------------------

@@ -25,6 +25,14 @@ using namespace unit;
 using namespace unit::literals;
 
 
+TEST(Unit, Size)
+{
+  using type = seconds;
+  using value_type = type::value_type;
+
+  EXPECT_EQ(sizeof(type), sizeof(value_type));
+}
+
 TEST(Unit, DefaultConstructor)
 {
   seconds sec;
@@ -83,6 +91,21 @@ TEST(Unit, equalityOperatorExpectFalse)
   EXPECT_FALSE(equal);
 }
 
+TEST(Unit, equalityOperatorSameDimensionDifferentUnitExpectTrue)
+{
+  constexpr auto m1 = 1.0_mi;
+  constexpr auto m2 = 1609.344_m;
+  constexpr auto m3 = 1760.0_yd;
+
+  const bool equal1 = m1 == m3;
+  const bool equal2 = m2 == m3;
+  const bool equal3 = m2 == m1;
+
+  EXPECT_TRUE(equal1);
+  EXPECT_TRUE(equal2);
+  EXPECT_TRUE(equal3);
+}
+
 TEST(Unit, equalityOperatorWithScalarLastExpectTrue)
 {
   constexpr auto m1 = 1.35_m;
@@ -118,7 +141,6 @@ TEST(Unit, equalityOperatorWithScalarFirstExpectFalse)
   const bool equal = m1 == m2;
   EXPECT_FALSE(equal);
 }
-
 
 TEST(Unit, lessOperatorExpectTrue)
 {
@@ -312,10 +334,6 @@ TEST(Unit, greaterOrEqualOperatorWithScalarFirstExpectFalse)
   EXPECT_FALSE(less);
 }
 
-
-
-
-
 TEST(Unit, round)
 {
   const auto pix1Round = unit::round(45.12_pix);
@@ -483,7 +501,6 @@ TEST(Unit, SubtractionMileWithMeters)
   EXPECT_EQ(met.value(), expectedValue);
 }
 
-
 TEST(Unit, MultiplicationWithScalar)
 {
   auto s1 = 3.2_s;
@@ -508,6 +525,14 @@ TEST(Unit, MultiplicationWithScalarFreeOperatorScalarFirst)
   constexpr auto   s2            = factor * s1;
   constexpr double expectedValue = factor * 3.2;
   EXPECT_EQ(s2.value(), expectedValue);
+}
+
+TEST(Unit, MultiplicationOfSameUnit)
+{
+  using expectedType = squarecentimeters;
+  auto squareCentimeters = 2.0_cm * 2.0_cm;
+  EXPECT_TRUE((std::is_same_v<decltype(squareCentimeters), expectedType>));
+  EXPECT_EQ(squareCentimeters.value(), 4.0);
 }
 
 TEST(Unit, DivisionByScalarFreeOperator)
@@ -539,6 +564,7 @@ TEST(Unit, DivisionOfUnitsNoConversion)
   constexpr double expectedValue = 20.0;
   EXPECT_EQ(mPerS.value(), expectedValue);
 }
+
 TEST(Unit, DivisionOfUnitsOneConversion)
 {
   constexpr kilometersPerHour kmh           = 253.0_m / 10.0_s;
@@ -571,6 +597,158 @@ TEST(Unit, InvertMilliSecondTestType)
 {
   auto freq = 1.0 / 2.0_ms;
   EXPECT_TRUE((std::is_same_v<decltype(freq), kilohertz>));
+}
+
+TEST(Unit, InvertVelocityTwiceTestType)
+{
+  auto kmhInverted = 1.0 / 2.0_kmh;
+  auto kmh = 1.0 / kmhInverted;
+  EXPECT_TRUE((std::is_same_v<decltype(kmh), kilometersPerHour>));
+}
+
+TEST(Unit, InvertVelocityTwiceTestValue)
+{
+  auto kmhInverted = 1.0 / 2.0_kmh;
+  auto kmh = 1.0 / kmhInverted;
+  EXPECT_EQ(kmh.value(), 2.0);
+}
+
+TEST(Unit, InvertVelocityTwiceConvertTestValue)
+{
+  auto kmhInverted = 1.0 / 2.0_kmh;
+  metersPerSecond mPerSec = 1.0 / kmhInverted;
+  EXPECT_EQ(mPerSec.value(), 2.0 / 3.6);
+}
+
+TEST(Unit, RootOfSquareMetersTestType)
+{
+  auto area = 4.0_qm;
+  auto sideLength = unit::sqrt(area);
+  EXPECT_TRUE((std::is_same_v<decltype(sideLength), meters>));
+}
+
+TEST(Unit, RootOfSquareMetersTestValue)
+{
+  auto area = 4.0_qm;
+  auto sideLength = unit::sqrt(area);
+  constexpr double expectedValue = 2.0;
+  EXPECT_EQ(sideLength.value(), expectedValue);
+}
+
+TEST(Unit, RootOfSquareMetersAndConversionTestValue)
+{
+  auto area = 4.0_qm;
+  unit::centimeters sideLength = unit::sqrt(area);
+  constexpr double expectedValue = 200.0;
+  EXPECT_EQ(sideLength.value(), expectedValue);
+}
+
+TEST(Unit, RootOfVelocityAfterPowerTestType)
+{
+  using expectedType = kilometersPerHour;
+  auto squaredKmh = 4.0_kmh * 4.0_kmh;
+  auto kmh = unit::sqrt(squaredKmh);
+  EXPECT_TRUE((std::is_same_v<decltype(kmh), expectedType>));
+  EXPECT_EQ(kmh.value(), 4.0);
+}
+
+TEST(Unit, RootAfterPowTestType)
+{
+  constexpr std::size_t N = 5ULL;
+  using type = joule;
+  type e{2.3};
+  auto ePow = unit::pow<N>(e);
+  auto ePowRoot = unit::root<N>(ePow);
+  EXPECT_TRUE((std::is_same_v<decltype(ePowRoot), type>));
+}
+
+TEST(Unit, PowerTimesTime)
+{
+  constexpr auto p = 250.0_W;
+  constexpr auto t = 60.0_min;
+  constexpr kilocalorie e = p * t;
+  constexpr double expectedValue = 214.961'306'964'746'34;
+  EXPECT_EQ(e.value(), expectedValue);
+}
+
+TEST(Unit, ConversionKelvinToCelsius)
+{
+  constexpr auto k = 13.24_K;
+  constexpr celsius c = k;
+  EXPECT_EQ(c.value(), 13.24 - 273.15);
+}
+
+TEST(Unit, ConversionCelsiusToKelvin)
+{
+  constexpr auto c = 13.24_C;
+  constexpr kelvin k = c;
+  EXPECT_EQ(k.value(), 13.24 + 273.15);
+}
+
+TEST(Unit, ConversionRankineToKelvin)
+{
+  constexpr auto ra = 671.67_Ra;
+  constexpr kelvin k = ra;
+  EXPECT_EQ(k.value(), 373.15);
+}
+
+TEST(Unit, ConversionFahrenheitToKelvin)
+{
+  constexpr double tf = 135.135;
+  constexpr double expectedValue = (tf + 459.67)*(5.0 / 9.0);
+
+  constexpr fahrenheit f{tf};
+  constexpr kelvin k = f;
+  EXPECT_EQ(k.value(), expectedValue);
+}
+
+TEST(Unit, ConversionKelvinToFahrenheit)
+{
+  constexpr double tk = 1345.134;
+  constexpr double expectedValue = tk*(9.0/5.0) - 459.67;
+  constexpr kelvin k{tk};
+  constexpr fahrenheit f = k;
+  EXPECT_EQ(f.value(), expectedValue);
+}
+
+TEST(Unit, ConversionCelsiusToFahrenheit)
+{
+  constexpr double tc = 1213.4;
+  constexpr double expectedValue = tc*1.8 + 32.0;
+
+  constexpr celsius c{tc};
+  constexpr fahrenheit f = c;
+  EXPECT_EQ(f.value(), expectedValue);
+}
+
+TEST(Unit, ConversionCelsiusToRankine)
+{
+  constexpr double tc = 1213.4;
+  constexpr double expectedValue = tc*1.8 + 491.67;
+
+  constexpr celsius c{tc};
+  constexpr rankine ra = c;
+  EXPECT_EQ(ra.value(), expectedValue);
+}
+
+TEST(Unit, ConversionRankineToFahrenheit)
+{
+  constexpr double tr = 1213.4;
+  constexpr double expectedValue = tr - 459.67;
+
+  constexpr rankine ra{tr};
+  constexpr fahrenheit f = ra;
+  EXPECT_EQ(f.value(), expectedValue);
+}
+
+TEST(Unit, ConversionKelvinToRankine)
+{
+  constexpr double tk = 1213.4;
+  constexpr double expectedValue = tk * 1.8;
+
+  constexpr kelvin k{tk};
+  constexpr rankine ra = k;
+  EXPECT_EQ(ra.value(), expectedValue);
 }
 
 

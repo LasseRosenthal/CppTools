@@ -40,7 +40,7 @@ struct UnitSystemBaseTagLess : dimension::DimensionTagLess<BaseDimTagOf<UnitSyst
 template <std::size_t Index>
 struct HasIndexT {
   template <typename UnitSystemBaseTagT>
-  struct nestedTemplate : std::conditional_t<BaseDimIndexOf<UnitSystemBaseTagT> == Index, std::true_type, std::false_type> {};
+  using nestedTemplate = std::conditional_t<BaseDimIndexOf<UnitSystemBaseTagT> == Index, std::true_type, std::false_type>;
 };
 
 template <std::size_t Index>
@@ -57,7 +57,7 @@ template <std::size_t Index, typename BaseDimTagIndicesList, typename UnitSystem
 using UnitSystemBaseTagAt = std::conditional_t<
     meta::valuelist::HasValue<BaseDimTagIndicesList, Index>,
     meta::typelist::NthElement<UnitSystemBaseTagList, meta::typelist::FindIf<UnitSystemBaseTagList, HasIndex<Index>>>,
-    UnitSystemBaseTag<dimension::DimensionTagGenerator<Index, std::ratio<0>>, std::ratio<1>>
+    UnitSystemBaseTag<dimension::BaseDimensionTag<Index, std::ratio<0>>, std::ratio<1>>
   >;
 
 /** 
@@ -73,14 +73,15 @@ struct BaseDimensionTagListGeneratorT<BaseDimTagIndicesList, UnitSystemBaseTagLi
   : meta::IdentityT<meta::Typelist<UnitSystemBaseTagAt<Is, BaseDimTagIndicesList, UnitSystemBaseTagList>...>> {};
 
 template <typename BaseDimTagIndicesList, typename UnitSystemBaseTagList>
-using BaseDimensionTagListGenerator = typename BaseDimensionTagListGeneratorT<BaseDimTagIndicesList, UnitSystemBaseTagList, dimension::BaseDimensionIndices>::type;
+using BaseDimensionTagListGenerator = typename BaseDimensionTagListGeneratorT<BaseDimTagIndicesList, UnitSystemBaseTagList,
+                                                                              dimension::BaseDimensionIndices>::type;
 
 
 /**
  * @class UnitSystemGeneratorT
  * @brief 
  */
-template <typename UnitSystemBaseTagList, typename ScalingFactor = std::ratio<1>>
+template <typename UnitSystemBaseTagList, typename ScalingFactor = std::ratio<1>, typename Shift = std::ratio<0>>
 struct UnitSystemGeneratorT {
 
 private:
@@ -90,11 +91,11 @@ private:
   using unitSystemBaseTags         = BaseDimensionTagListGenerator<baseDimTagIndices, unitSystemBaseTagsProvided>;
 
 public:
-  using type                       = UnitSystem<unitSystemBaseTags, ScalingFactor>;
+  using type                       = UnitSystem<unitSystemBaseTags, ScalingFactor, Shift>;
 };
 
-template <typename UnitSystemBaseTagList, typename ScalingFactor = std::ratio<1>>
-using UnitSystemGenerator = typename UnitSystemGeneratorT<UnitSystemBaseTagList, ScalingFactor>::type;
+template <typename UnitSystemBaseTagList, typename ScalingFactor = std::ratio<1>, typename Shift = std::ratio<0>>
+using UnitSystemGenerator = typename UnitSystemGeneratorT<UnitSystemBaseTagList, ScalingFactor, Shift>::type;
 
 
 /** 
@@ -114,6 +115,11 @@ using MassUnitGenerator =
   UnitSystemGenerator<meta::Typelist<UnitSystemBaseTag<dimension::MassTag<std::ratio<1>>, Period>>,
                       ScalingFactor>;
 
+template <typename Period, typename Shift = std::ratio<0>>
+using TemperatureUnitGenerator =
+  UnitSystemGenerator<meta::Typelist<UnitSystemBaseTag<dimension::TemperatureTag<std::ratio<1>>, Period>>,
+                      std::ratio<1>, Shift>;
+
 template <typename Period, typename ScalingFactor = std::ratio<1>>
 using FrequencyUnitGenerator =
   UnitSystemGenerator<meta::Typelist<UnitSystemBaseTag<dimension::TimeTag<std::ratio<-1>>, Period>>,
@@ -123,7 +129,21 @@ template <typename TimePeriod, typename LengthPeriod, typename ScalingFactor = s
 using VelocityUnitGenerator = UnitSystemGenerator<
   meta::Typelist<UnitSystemBaseTag<dimension::TimeTag<std::ratio<-1>>, TimePeriod>,
                  UnitSystemBaseTag<dimension::LengthTag<std::ratio<1>>, LengthPeriod>>,
-  ScalingFactor>;
+                 ScalingFactor>;
+
+template <typename TimePeriod, typename LengthPeriod, typename MassPeriod, typename ScalingFactor = std::ratio<1>>
+using EnergyUnitGenerator = UnitSystemGenerator<
+  meta::Typelist<UnitSystemBaseTag<dimension::TimeTag<std::ratio<-2>>, TimePeriod>,
+                 UnitSystemBaseTag<dimension::LengthTag<std::ratio<2>>, LengthPeriod>,
+                 UnitSystemBaseTag<dimension::MassTag<std::ratio<1>>, MassPeriod>>,
+                 ScalingFactor>;
+
+template <typename TimePeriod, typename LengthPeriod, typename MassPeriod, typename ScalingFactor = std::ratio<1>>
+using PowerUnitGenerator = UnitSystemGenerator<
+  meta::Typelist<UnitSystemBaseTag<dimension::TimeTag<std::ratio<-3>>, TimePeriod>,
+                 UnitSystemBaseTag<dimension::LengthTag<std::ratio<2>>, LengthPeriod>,
+                 UnitSystemBaseTag<dimension::MassTag<std::ratio<1>>, MassPeriod>>,
+                 ScalingFactor>;
 
 template <typename Period, typename ScalingFactor = std::ratio<1>>
 using StorageAmountUnitGenerator = UnitSystemGenerator<
@@ -148,7 +168,7 @@ template <typename PixelPeriod, typename LengthPeriod, typename ScalingFactor = 
 using ResolutionUnitGenerator = UnitSystemGenerator<
   meta::Typelist<UnitSystemBaseTag<dimension::PixelTag<std::ratio<1>>, PixelPeriod>,
                  UnitSystemBaseTag<dimension::LengthTag<std::ratio<-1>>, LengthPeriod>>,
-  ScalingFactor>;
+                 ScalingFactor>;
 
 
 }   // namespace unit

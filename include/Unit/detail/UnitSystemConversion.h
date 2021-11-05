@@ -36,15 +36,16 @@ using RequiresSameDimension = std::enable_if_t<std::is_same_v<DimensionOf<UnitSy
  * @struct ConversionFactorT
  * @brief  ConversionFactorT computes the conversion factor between two units with same dimension but different units of measure.
  */
-template <typename UnitSystemTo, typename UnitSystemFrom, typename EnforceSameDimension = void, typename RationalExponentsTag = void>
+template <typename UnitSystemTo, typename UnitSystemFrom, typename T,
+          typename EnforceSameDimension = void, typename RationalExponentsTag = void>
 struct ConversionFactorT;
 
 /** 
  * @struct ConversionFactorT
  * @brief  Version for dimension with integer exponents only.
  */
-template <typename UnitSystemTo, typename UnitSystemFrom>
-class ConversionFactorT<UnitSystemTo, UnitSystemFrom, RequiresSameDimension<UnitSystemTo, UnitSystemFrom>,
+template <typename UnitSystemTo, typename UnitSystemFrom, typename T>
+class ConversionFactorT<UnitSystemTo, UnitSystemFrom, T, RequiresSameDimension<UnitSystemTo, UnitSystemFrom>,
                         std::enable_if_t<UnitSystemTo::dimension::isRational>> {
 
   template <typename Period, typename Exponent>
@@ -56,14 +57,16 @@ class ConversionFactorT<UnitSystemTo, UnitSystemFrom, RequiresSameDimension<Unit
 
 public:
   using factor = std::ratio_multiply<scaling, meta::typelist::Accumulate<fractionToExponentList, std::ratio_multiply, std::ratio<1>>>;
+
+  static constexpr T value = meta::AsDecimal<factor, T>;
 };
 
 /** 
  * @struct ConversionFactorT
  * @brief  Version for dimension with at least one rational exponent.
  */
-template <typename UnitSystemTo, typename UnitSystemFrom>
-class ConversionFactorT<UnitSystemTo, UnitSystemFrom, RequiresSameDimension<UnitSystemTo, UnitSystemFrom>,
+template <typename UnitSystemTo, typename UnitSystemFrom, typename T>
+class ConversionFactorT<UnitSystemTo, UnitSystemFrom, T, RequiresSameDimension<UnitSystemTo, UnitSystemFrom>,
                         std::enable_if_t<!UnitSystemTo::dimension::isRational>> {
 
   template <typename Period, typename RationalExponent>
@@ -81,9 +84,51 @@ class ConversionFactorT<UnitSystemTo, UnitSystemFrom, RequiresSameDimension<Unit
 
 public:
 
-  static constexpr double value = (static_cast<double>(scaling::num) * meta::accumulate(fractionToExponentList, [](auto& a, auto b) { a *= b; }, 1.0)) /
-                                   scaling::denum;
+  static constexpr T value = (static_cast<T>(scaling::num) * meta::accumulate(fractionToExponentList, [](auto& a, auto b) { a *= b; }, 1.0)) / scaling::denum;
 };
+
+template <typename UnitSystemTo, typename UnitSystemFrom, typename T>
+constexpr auto ConversionFactor = ConversionFactorT<UnitSystemTo, UnitSystemFrom, T>::value;
+
+
+/** 
+ * @struct ShiftT
+ * @brief  ShiftT computes the shift between two units with same dimension but different units of measure.
+ */
+template <typename UnitSystemTo, typename UnitSystemFrom, typename T,
+          typename EnforceSameDimension = void, typename = void>
+struct ShiftT;
+
+template <typename UnitSystemTo, typename UnitSystemFrom, typename T>
+struct ShiftT<UnitSystemTo, UnitSystemFrom, T, RequiresSameDimension<UnitSystemTo, UnitSystemFrom>,
+              std::enable_if_t<!IsShifted<UnitSystemTo> && IsShifted<UnitSystemFrom>>
+             > {
+  static constexpr auto value = -ShiftValue<UnitSystemFrom, T> * ConversionFactor<UnitSystemTo, UnitSystemFrom, T>;
+};
+
+template <typename UnitSystemTo, typename UnitSystemFrom, typename T>
+struct ShiftT<UnitSystemTo, UnitSystemFrom, T, RequiresSameDimension<UnitSystemTo, UnitSystemFrom>,
+              std::enable_if_t<IsShifted<UnitSystemTo> && !IsShifted<UnitSystemFrom>>
+             > {
+  static constexpr auto value = ShiftValue<UnitSystemTo, T>;
+};
+
+template <typename UnitSystemTo, typename UnitSystemFrom, typename T>
+struct ShiftT<UnitSystemTo, UnitSystemFrom, T, RequiresSameDimension<UnitSystemTo, UnitSystemFrom>,
+              std::enable_if_t<IsShifted<UnitSystemTo> && IsShifted<UnitSystemFrom>>
+             > {
+  static constexpr double value = ShiftValue<UnitSystemTo, T> - ShiftValue<UnitSystemFrom, T> * ConversionFactor<UnitSystemTo, UnitSystemFrom, T>;
+};
+
+template <typename UnitSystemTo, typename UnitSystemFrom, typename T>
+struct ShiftT<UnitSystemTo, UnitSystemFrom, T, RequiresSameDimension<UnitSystemTo, UnitSystemFrom>,
+              std::enable_if_t<!IsShifted<UnitSystemTo> && !IsShifted<UnitSystemFrom>>
+             > {
+  static constexpr T value = 0.0;
+};
+
+template <typename UnitSystemTo, typename UnitSystemFrom, typename T = double>
+constexpr auto Shift = ShiftT<UnitSystemTo, UnitSystemFrom, T>::value;
 
 
 }   // namespace unit
